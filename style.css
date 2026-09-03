@@ -1,0 +1,1915 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+body {
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+}
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    height: 100vh;
+    padding: 10px;
+    gap: 10px;
+}
+.frame {
+    position: relative;
+    border: 4px solid #4a4a6a;
+    background: #0d0d1a;
+    padding: 4px;
+    flex-shrink: 0;
+   /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.3);*/
+    overflow: hidden;
+}
+.world {
+    position: relative;
+    display: grid;
+    gap: 1px;
+    background: #0d0d1a;
+    cursor: pointer;
+}
+.cell {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    position: relative;
+    /* Ground block look now comes entirely from Registry data (see
+       applyBlockVisual() in game.js), set per-cell as CSS custom
+       properties instead of hardcoded per-block-id rules here. */
+    background-color: var(--bg-color, #0d0d1a);
+    background-image: var(--bg-image, none);
+    background-size: cover;
+    background-position: center;
+    /* --bg-rotation is only set for blocks registered with
+       `randomDirection: true` (registry.js), rolled once per tile at
+       placement time - see getGlobalDirection()/applyBlockVisual() in
+       game.js. Every other tile keeps the default 0deg (no visual
+       change). */
+    transform: rotate(var(--bg-rotation, 0deg));
+}
+/* Rotating .cell itself (above) also rotates every absolutely-positioned
+   child layer stacked on top of it - the overlay block (::after), the
+   dropped-ground-item chip (::before), and the player/selected outlines -
+   since they're all positioned relative to this same rotated element.
+   That's invisible on a bare randomDirection block with nothing else on
+   the tile (why this went unnoticed), but as soon as ANY of those other
+   layers is present on a rotated tile they'd visibly tilt with it too.
+   Counter-rotating every such child back by the same amount keeps only
+   the ground-layer background itself rotated, which is the only thing
+   `randomDirection` is meant to affect. */
+.cell.overlay::after,
+.cell.has-ground-item::before,
+.cell.has-ground-item::after {
+    transform: rotate(calc(-1 * var(--bg-rotation, 0deg)));
+}
+.cell.has-ground-item::before {
+    /* This layer also centers itself via translate(-50%,-50%) (see the
+       has-ground-item::before rule below) - both transforms must apply
+       together, so this re-declares translate alongside the counter-
+       rotation rather than letting the later rule's transform silently
+       replace it (a second `transform` declaration on the same selector
+       block, not a second selector, would just overwrite this one). */
+    transform: translate(-50%, -50%) rotate(calc(-1 * var(--bg-rotation, 0deg)));
+}
+.cell.void { background-color: #0d0d1a; background-image: none; }
+.cell.overlay::after {
+    content: '';
+    position: absolute;
+    inset: 8%;
+    z-index: 1;
+    pointer-events: none;
+    /* Overlay block (e.g. workbench) look also comes from Registry data
+       via --overlay-bg-color / --overlay-bg-image. */
+    background-color: var(--overlay-bg-color, #8a5a34);
+    background-image: var(--overlay-bg-image, none), var(--overlay-pattern);
+    background-size: cover, 8px 8px;
+    background-position: center, 0 0;
+    border: 1px solid #5c3d20;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.cell.overlay {
+    /* Subtle diagonal pattern kept as a generic "overlay block" texture
+       fallback so overlay blocks still read distinctly even with no
+       custom texture registered. */
+    --overlay-pattern: linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 75%),
+        linear-gradient(45deg, rgba(0,0,0,0.15) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 75%);
+}
+.cell.player {
+    background: #000 !important;
+    box-shadow: inset 0 0 3px rgba(255, 255, 255, 0.3);
+    z-index: 3;
+    position: relative;
+}
+.cell.selected {
+    outline: 3px solid #ffffffb9;
+    outline-offset: -1px;
+    z-index: 2;
+    position: relative;
+}
+/* Dropped item lying on a tile: shows that item's own texture/icon (via
+   --ground-item-bg-image / --ground-item-bg-color, set per-cell in
+   applyBlockVisual in game.js) instead of a generic marker, so you can
+   tell what's actually lying there at a glance. Falls back to a plain
+   amber chip if the item has no texture registered yet. */
+/* Dropped item lying on a tile: shows that item's own texture/icon (via
+   --ground-item-bg-image / --ground-item-bg-color, set per-cell in
+   applyBlockVisual in game.js) instead of a generic marker, so you can
+   tell what's actually lying there at a glance. Falls back to a plain
+   amber chip if the item has no texture registered yet.
+   The border/background-color "chip" only appears for items that actually
+   HAVE a real (non-transparent) color - see the .has-solid-bg toggle set
+   in game.js. Items with a fully transparent registry color (e.g. the
+   pebbles, color: '#ffffff00') skip it entirely: without this, the plain
+   square border was drawn around the tile regardless of what's inside it,
+   so a transparent-background icon showed nothing but a bare dark outline
+   floating on the tile with no visible fill inside it. */
+.cell.has-ground-item::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46%;
+    height: 46%;
+    min-width: 10px;
+    min-height: 10px;
+    transform: translate(-50%, -50%);
+    background-image: var(--ground-item-bg-image, none);
+    background-size: cover;
+    background-position: center;
+    border-radius: 3px;
+    z-index: 4;
+    pointer-events: none;
+}
+.cell.has-ground-item.has-solid-bg::before {
+    background-color: var(--ground-item-bg-color, #9a9a9a);
+    border: 1px solid rgba(0, 0, 0, 0.35);
+}
+.cell.has-ground-item.ground-item-many::after {
+    content: attr(data-ground-count);
+    position: absolute;
+    right: 6%;
+    bottom: 2%;
+    font-size: 10px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000, 0 0 2px #000;
+    z-index: 5;
+    pointer-events: none;
+}
+.debug-overlay {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.65);
+    border: 1px solid #4fc3f7;
+    color: #4fc3f7;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.35;
+    z-index: 10;
+    pointer-events: none;
+    display: none;
+    white-space: pre;
+}
+.debug-overlay.visible {
+    display: block;
+}
+.break-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: none;
+    height: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 6;
+    pointer-events: none;
+}
+.break-bar.visible {
+    display: block;
+}
+.break-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #ffb300;
+}
+.toggle-btn {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 36px;
+    height: 36px;
+    border: 2px solid #4a4a6a;
+    background: #2a2a4a;
+    color: #4fc3f7;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    z-index: 10;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.controls {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    flex: 1;
+    max-height: 180px;
+    align-items: center;
+}
+.control-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.section-label {
+    color: #aaa;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.d-pad {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.d-pad-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+.spacer {
+    width: 60px;
+    height: 60px;
+}
+.arrow-btn {
+    width: 60px;
+    height: 60px;
+    border: 3px solid #4a4a6a;
+    background: #2a2a4a;
+    color: #fff;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    touch-action: manipulation;
+}
+.arrow-btn:active {
+    background: #4a4a7a;
+    transform: scale(0.99);
+    border-color: #6a6a9a;
+}
+.mode-indicator {
+    margin-top: 4px;
+    padding: 6px 14px;
+    border: 2px solid #4a4a6a;
+    background: #1a1a2e;
+    color: #ccc;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.frame-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    margin-bottom: 52px;
+}
+.frame-wrapper .toggle-btn {
+    position: absolute;
+    left: 0;
+    right: auto;
+    top: calc(100% + 8px);
+    bottom: auto;
+}
+.interact-btn {
+    background: #2a2a4a;
+    border-color: #7a4a9a;
+    color: #fff;
+}
+.interact-btn:active {
+    background: #2a2a4a;
+    border-color: #9a6aba;
+    transform: scale(0.99);
+}
+.click-btn {
+    background: #2a2a4a;
+    border-color: #7a4a9a;
+    color: #fff;
+}
+.click-btn:active {
+    background: #2a2a4a;
+    border-color: #9a6aba;
+    transform: scale(0.99);
+}
+
+
+@media (max-height: 700px) {
+    .arrow-btn { width: 50px; height: 50px; font-size: 18px; }
+    .spacer { width: 50px; height: 50px; }
+}
+@media (max-height: 550px) {
+    .arrow-btn { width: 44px; height: 44px; font-size: 16px; }
+    .spacer { width: 44px; height: 44px; }
+    .section-label { font-size: 11px; }
+    .toggle-btn { width: 30px; height: 30px; font-size: 13px; }
+    .debug-overlay { font-size: 12px; }
+    .frame-wrapper { margin-bottom: 40px; }
+}
+
+/* ============================================
+   Inventory / Hotbar
+   ============================================ */
+
+.hotbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.hotbar {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: 3px;
+    background: #1a1a2e;
+    border: 3px solid #4a4a6a;
+    padding: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.inv-toggle-btn {
+    width: 44px;
+    height: 44px;
+    border: 3px solid #4a4a6a;
+    background: #2a2a4a;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    flex-shrink: 0;
+}
+.inv-toggle-btn:active {
+    background: #4a4a7a;
+    border-color: #6a6a9a;
+    transform: scale(0.96);
+}
+
+.inv-slot {
+    width: 100%;
+    min-width: 0;
+    max-width: 42px;
+    aspect-ratio: 1;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: none;
+    box-sizing: border-box;
+}
+.inv-slot.hotbar.selected-slot {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 1px #ffffff, inset 0 0 6px rgba(255,255,255,0.35);
+}
+.inv-slot:active {
+    background: #3a3a5a;
+}
+
+.item-icon {
+    width: 70%;
+    height: 70%;
+    border-radius: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    pointer-events: none;
+    position: relative;
+    overflow: hidden;
+}
+/* Same idea as .cell.has-ground-item.has-solid-bg above: the subtle inset
+   dark edge is only meaningful when the icon actually has a solid color/
+   texture behind it. Items registered with a fully transparent color
+   (color: '#ffffff00', e.g. the pebbles) get this class skipped in
+   itemIconHTML() (inventory.js), so their icon renders as bare art with no
+   thin dark outline around empty transparent pixels. */
+.item-icon.has-solid-bg {
+    box-shadow: inset 0 0 2px rgba(0,0,0,0.4);
+}
+/* Fluid-container fill bar (capsules/cells - see fluids.js and
+   itemIconHTML in inventory.js): a bottom-anchored colored bar sized to
+   the container's current fill percentage, so a capsule reads as
+   full/empty/partial at a glance without opening any tooltip. Sits behind
+   the glyph/label (z-index below the flex content's natural stacking). */
+.item-fluid-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    opacity: 0.85;
+    pointer-events: none;
+    transition: height 0.15s ease-out;
+}
+/* Capsule liquid fill (see itemIconHTML in inventory.js) - clipped to the
+   capsule shell's actual drawn interior instead of filling the whole
+   square icon box, so it reads as "liquid inside the capsule" rather than
+   a plain color square behind it. The inset percentages are measured
+   directly from capsule_shell.png/capsule_fill.png's 16x16 canvas (the
+   fill art's non-transparent interior sits at x:7-9, y:3-13 out of 16) -
+   top/right/bottom/left, matching CSS inset() order. See the itemIconHTML
+   comment for why this is a plain clip-path rather than a mask-image: a
+   file://-loaded PNG can't be used as a CSS mask (the game normally runs
+   with no server), so the old mask-based version silently never rendered
+   any liquid at all. clip-path has no such restriction. */
+.item-fluid-fill-capsule {
+    /* bottom inset was 0, so the fill bar's own bottom edge (anchored to
+       the ICON's bottom, not the capsule art's bottom) stuck out below the
+       capsule's actual drawn interior instead of stopping level with it.
+       capsule_fill.png's non-transparent interior sits at y:3-12 of 16 ->
+       top 3/16 = 18.75%, bottom (16-13)/16 = 18.75% too (was measured but
+       never applied). */
+    clip-path: inset(18.75% 43.75% 18.75% 43.75%);
+}
+/* Capsule shell art (capsule_shell.png) is a narrow vertical vial drawn on
+   a mostly-transparent 16x16 canvas (the vial itself is only ~half the
+   canvas width). itemIconStyle() (inventory.js) sets `background-size:
+   cover` for every icon, which is right for full-bleed block textures but
+   leaves this one looking like a faint sliver floating in the middle of
+   its slot - the "капсулы странные, их не видно" complaint. `contain`
+   instead scales the whole 16x16 canvas (vial + its transparent padding)
+   to fill the icon box evenly, and the icon itself is sized up a bit
+   relative to plain items so the vial reads clearly at normal slot sizes. */
+.item-icon.is-fluid-container {
+    width: 82%;
+    height: 82%;
+    background-size: contain !important;
+}
+
+.item-count {
+    position: absolute;
+    right: 2px;
+    bottom: 0px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000, -1px -1px 1px #000;
+    pointer-events: none;
+}
+
+.inventory-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+.inventory-overlay.visible {
+    display: flex;
+}
+
+.inventory-panel {
+    background: #1a1a2e;
+    border: 4px solid #4a4a6a;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 92vw;
+    max-width: 400px;
+    max-height: 92vh;
+    overflow-y: auto;
+}
+
+.inventory-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #eee;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.inv-close-btn {
+    width: 26px;
+    height: 26px;
+    border: 2px solid #4a4a6a;
+    background: #2a2a4a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.inv-close-btn:active {
+    background: #4a4a7a;
+}
+
+.inv-grid {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: 4px;
+    min-width: 0;
+}
+
+.main-grid {
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.inv-hotbar-section {
+    border-top: 2px solid #4a4a6a;
+    padding-top: 12px;
+}
+
+/* Name label for the item currently selected/held in the inventory
+   overlay (picked up from a slot or a crafting-grid cell). */
+.inv-selected-name {
+    min-height: 14px;
+    text-align: center;
+    font-size: 12px;
+    color: #c8d4e4;
+    letter-spacing: 0.3px;
+}
+
+/* Name label for the hotbar's currently-selected slot, shown above it. */
+.hotbar-selected-name {
+    min-height: 16px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #eee;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.hotbar-selected-name.visible { opacity: 1; }
+
+/* Name of the item a craft grid is about to produce. */
+.craft-result-name {
+    text-align: center;
+    font-size: 11px;
+    color: #9fe0bb;
+    min-height: 14px;
+    margin-top: -4px;
+}
+
+/* ============================================
+   Crafting
+   ============================================ */
+.craft-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px;
+    border: 2px solid #4a4a6a;
+    background: #15152a;
+}
+
+.craft-grid {
+    display: grid;
+    gap: 4px;
+}
+.craft-grid-2x2 {
+    grid-template-columns: repeat(2, minmax(0, 40px));
+    grid-template-rows: repeat(2, 40px);
+}
+.craft-grid-3x3 {
+    grid-template-columns: repeat(3, minmax(0, 40px));
+    grid-template-rows: repeat(3, 40px);
+}
+.craft-slot {
+    max-width: none;
+    width: 40px;
+    height: 40px;
+}
+
+/* ============================================
+   Generic GUI Blocks (any block with a `gui` entry in Registry - see
+   guiBlocks.js). Custom slots (input/output/etc.) sit above the panel's
+   own inventory+hotbar grid, and THIS frame (not the whole panel) can
+   take an optional background texture via gui.guiTexture, set inline
+   per-block in JS.
+   ============================================ */
+.gui-block-slots {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 8px;
+    border: 2px solid #4a4a6a;
+    background: rgba(21, 21, 42, 0.85);
+}
+/* Applied instead of the flex-wrap layout above once any slot in a
+   block's gui.slots defines x/y - each slot (and the progress bar, if
+   any) is placed with position:absolute via inline style, so this just
+   needs to be the positioning context and hold enough room for them. */
+.gui-block-slots.gui-block-slots-positioned {
+    display: block;
+    position: relative;
+    min-height: 110px;
+}
+.gui-slot {
+    max-width: none;
+    width: 42px;
+    height: 42px;
+}
+.gui-slot-output {
+    border-color: #7a9a4a;
+    box-shadow: inset 0 0 4px rgba(154, 255, 100, 0.25);
+}
+
+/* ============================================
+   Super Tank display (gui.tankDisplay: true - see tankDisplayHTML in
+   guiBlocks.js). Replaces the plain icon-grid slots layout with a large
+   fluid gauge + "Locked Fluid" readout, matching the reference UI: just
+   the gauge/label area, no extra button row underneath.
+   ============================================ */
+.gui-block-slots.tank-display-mode {
+    display: block;
+    padding: 0;
+    border: none;
+    background: none;
+}
+.tank-display {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 2px solid #4a4a6a;
+    background: rgba(21, 21, 42, 0.85);
+}
+.tank-gauge {
+    position: relative;
+    height: 90px;
+    border: 2px solid #4a4a6a;
+    background: #0d0d1a;
+    overflow: hidden;
+}
+.tank-gauge-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.85;
+    transition: height 0.2s ease-out;
+}
+.tank-gauge-label {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 8px 10px;
+    text-align: right;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.7);
+}
+.tank-gauge-title {
+    color: #e8ecf5;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+.tank-gauge-amount {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 2px;
+}
+.tank-locked-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid #4a4a6a;
+    background: #0d0d1a;
+    padding: 8px 10px;
+}
+.tank-locked-fluid-title {
+    color: #9fa8c4;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.tank-locked-fluid-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.tank-locked-fluid-swatch {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #4a4a6a;
+    flex-shrink: 0;
+}
+.tank-locked-fluid-name {
+    color: #eee;
+    font-size: 13px;
+    font-weight: bold;
+}
+/* Locked Fluid toggle button (tankDisplayHTML in guiBlocks.js /
+   TankState.toggleLock in fluids.js). Off (default) = tank accepts any
+   fluid while empty; On = tank only ever accepts the fluid it's already
+   holding, even once fully drained back to 0mB. */
+.tank-lock-btn {
+    flex-shrink: 0;
+    margin-left: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #cdd3e6;
+    background: #2a2a44;
+    border: 2px solid #4a4a6a;
+    cursor: pointer;
+}
+.tank-lock-btn:hover {
+    background: #35355a;
+}
+.tank-lock-btn.active {
+    color: #10131f;
+    background: #6ad17a;
+    border-color: #4fae60;
+}
+.tank-capsule-slots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.tank-capsule-slot-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.tank-capsule-slot-label {
+    color: #9fa8c4;
+    font-size: 10px;
+    text-align: center;
+    max-width: 60px;
+}
+/* Short instructional line under the capsuleIn/capsuleOut slots - those
+   two slots had no label of their own (the gauge above only shows the
+   tank's own contents), so it wasn't clear what dropping a capsule there
+   actually does. guiSlotHTML already shows each slot's own `label` field
+   ("Insert Capsule"/"Result") as a tooltip on hover/long-press, but that's
+   easy to miss - this spells the fill/drain behavior out directly under
+   the slots instead of requiring a hover to discover it. */
+.tank-capsule-hint {
+    color: #9fa8c4;
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: center;
+    padding: 0 4px;
+}
+
+/* Optional processing progress bar for a GUI block (gui.progressBar in
+   its Registry entry) - same filled-bar idea as .break-bar, just placed
+   at an arbitrary x/y inside the positioned slots panel instead of
+   pinned to the top of the screen. */
+.gui-progress-bar {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #4a4a6a;
+    overflow: hidden;
+}
+.gui-progress-bar-fill {
+    background: #ffb300;
+}
+
+.craft-arrow {
+    color: #7a7aa0;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.craft-result-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* "Craft all" button: sits just under/beside the result slot, appears
+   only once a recipe is actually matched (has-result). Consumes every
+   ingredient the grid can spare for the currently matched recipe in one
+   tap instead of one craft at a time. */
+.craft-all-btn {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    margin-top: 4px;
+    width: auto;
+    height: 18px;
+    padding: 0 6px;
+    white-space: nowrap;
+    background: #1a4a6e;
+    border: 1px solid #3a7abf;
+    color: #c0e0ff;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.craft-all-btn.visible { display: block; }
+.craft-all-btn:active { background: #1e5a8a; }
+
+.craft-rebalance-btn-square {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    padding: 0;
+    background: #2a2a4a;
+    border: 1px solid #45456a;
+    color: #c8d4e4;
+    font-size: 16px;
+    cursor: pointer;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.craft-rebalance-btn-square:active { background: #3a3a5a; }
+
+.craft-result-slot {
+    width: 44px;
+    height: 44px;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.craft-result-slot.has-result {
+    border-color: #4fc3f7;
+    box-shadow: 0 0 6px rgba(79, 195, 247, 0.5);
+    cursor: pointer;
+}
+.craft-result-slot .item-icon {
+    width: 70%;
+    height: 70%;
+    pointer-events: none;
+}
+
+.drag-item {
+    display: none;
+    position: fixed;
+    pointer-events: none;
+    z-index: 200;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+}
+.drag-item.visible {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.drag-item .item-icon {
+    width: 30px;
+    height: 30px;
+}
+
+@media (max-height: 550px) {
+    .inv-toggle-btn { width: 36px; height: 36px; font-size: 16px; }
+    .inventory-panel { padding: 8px; gap: 8px; }
+}
+
+/* ============================================
+   Split-stack popup
+   ============================================ */
+
+.split-popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+}
+.split-popup.visible {
+    display: flex;
+}
+.split-popup-box {
+    background: #1a1a2e;
+    border: 4px solid #4a4a6a;
+    padding: 16px;
+    width: 80vw;
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.split-popup-title {
+    color: #eee;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+.split-popup-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+}
+.split-popup-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.split-popup-icon {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #45456a;
+    background: #2a2a4a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+.split-popup-icon .item-icon {
+    width: 70%;
+    height: 70%;
+}
+.split-popup-label {
+    color: #aaa;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.split-popup-count {
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+}
+.split-popup-arrow {
+    color: #4fc3f7;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+.split-slider {
+    width: 100%;
+    accent-color: #4fc3f7;
+    touch-action: manipulation;
+}
+.split-popup-buttons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+.split-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: 2px solid #4a4a6a;
+    background: #2a2a4a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.split-btn:active {
+    background: #3a3a5a;
+}
+.split-confirm-btn {
+    border-color: #4fc3f7;
+    color: #4fc3f7;
+}
+
+/* ============================================
+   JEI-style Item List overlay
+   ============================================ */
+
+.jei-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 150;
+    align-items: center;
+    justify-content: center;
+}
+.jei-overlay.visible {
+    display: flex;
+}
+
+.jei-panel {
+    background: #1a1a2e;
+    border: 4px solid #4a4a6a;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 92vw;
+    max-width: 400px;
+    max-height: 92vh;
+}
+
+.jei-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #eee;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.jei-search {
+    width: 100%;
+    padding: 8px 10px;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+}
+.jei-search:focus {
+    border-color: #4fc3f7;
+}
+
+.jei-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+    overflow-y: auto;
+    padding: 2px;
+}
+
+.jei-slot {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-sizing: border-box;
+}
+.jei-slot:active {
+    background: #3a3a5a;
+    border-color: #4fc3f7;
+}
+.jei-slot .item-icon {
+    width: 70%;
+    height: 70%;
+    pointer-events: none;
+}
+.jei-slot-name {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    font-size: 8px;
+    color: #ccc;
+    text-align: center;
+    line-height: 1;
+    padding-bottom: 2px;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jei-empty {
+    grid-column: 1 / -1;
+    color: #888;
+    text-align: center;
+    font-size: 12px;
+    padding: 16px 0;
+}
+
+.jei-hint {
+    color: #888;
+    font-size: 10px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+@media (max-height: 550px) {
+    .jei-panel { padding: 8px; gap: 6px; }
+    .jei-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
+
+/* ---- JEI: long-press context menu (Give Item / View Recipes) ---- */
+
+.jei-context-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 170;
+    align-items: center;
+    justify-content: center;
+}
+.jei-context-menu.visible {
+    display: flex;
+}
+
+.jei-context-box {
+    background: #1a1a2e;
+    border: 3px solid #4fc3f7;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 200px;
+}
+
+.jei-context-title {
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    text-align: center;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #45456a;
+}
+
+.jei-context-btn {
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    color: #eee;
+    padding: 10px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.jei-context-btn:active {
+    background: #3a3a5a;
+    border-color: #4fc3f7;
+}
+.jei-context-cancel {
+    color: #aaa;
+}
+
+/* ---- JEI: recipe browser ---- */
+
+.jei-recipe-view {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: #1a1a2e;
+    padding: 14px;
+    flex-direction: column;
+    gap: 10px;
+}
+.jei-recipe-view.visible {
+    display: flex;
+}
+
+.jei-recipe-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #eee;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.jei-recipe-header-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.jei-recipe-header-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.jei-recipe-back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+/* ---- JEI: Recipe / Usage sub-tabs inside the detail view ---- */
+
+.jei-recipe-subtabs {
+    display: flex;
+    gap: 6px;
+}
+
+.jei-recipe-subtab {
+    flex: 1;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    color: #aaa;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.jei-recipe-subtab:active {
+    background: #3a3a5a;
+}
+.jei-recipe-subtab.active {
+    color: #fff;
+    border-color: #4fc3f7;
+    background: #24344a;
+}
+
+.jei-recipe-list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 2px;
+}
+
+/* ---- JEI: "Produce" sub-tab (station items only) - what this station
+   makes + every recipe that consumes the station block itself ---- */
+
+.jei-produce-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.jei-produce-heading {
+    color: #aaa;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #33334f;
+    padding-bottom: 4px;
+}
+
+.jei-produce-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.jei-recipe-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #15152a;
+    border: 2px solid #4a4a6a;
+    padding: 10px;
+}
+
+/* Ingredient/output icons inside a recipe card are clickable - tapping one
+   jumps to that item's own detail view, so players can click through a
+   crafting chain (e.g. Plank -> Oak Log -> its own recipe/usage). */
+.jei-recipe-cell[data-id]:not([data-id=""]),
+.craft-result-slot[data-id] {
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.jei-recipe-cell[data-id]:not([data-id=""]):active {
+    border-color: #4fc3f7;
+}
+/* Shapeless recipes only ever show as few cells as there are ingredients
+   (no padded-out empty grid), so the card's gap can stay tight instead of
+   stretching out to match the widest shaped grid. */
+.jei-recipe-card:has(.jei-recipe-shapeless) {
+    gap: 6px;
+}
+
+.jei-recipe-grid {
+    display: grid;
+    gap: 3px;
+}
+.jei-recipe-grid-2x2 {
+    grid-template-columns: repeat(2, 34px);
+    grid-template-rows: repeat(2, 34px);
+}
+.jei-recipe-grid-3x3 {
+    grid-template-columns: repeat(3, 34px);
+    grid-template-rows: repeat(3, 34px);
+}
+.jei-recipe-shapeless {
+    grid-template-columns: repeat(auto-fill, 34px);
+    grid-auto-rows: 34px;
+    /* Was 108px, which padded the shapeless ingredient grid out to a fixed
+       3-wide width regardless of how many ingredients it actually has,
+       leaving a big empty gap before the arrow whenever there's just one
+       or two ingredients. Cap it at 2 columns instead so short shapeless
+       recipes sit right up against the arrow, same spacing as the shaped
+       grids. */
+    max-width: 72px;
+}
+
+.jei-recipe-cell {
+    width: 34px;
+    height: 34px;
+    background: #2a2a4a;
+    border: 1px solid #45456a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    /* .item-count (added for ingredient-count badges, e.g. "x4") is
+       position:absolute - without a positioned ancestor here it would
+       jump up to whatever positioned element is further up the DOM
+       instead of anchoring to this cell. */
+    position: relative;
+}
+.jei-recipe-cell .item-icon {
+    width: 70%;
+    height: 70%;
+    pointer-events: none;
+}
+
+.jei-recipe-arrow {
+    color: #7a7aa0;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.jei-recipe-output .craft-result-slot {
+    width: 40px;
+    height: 40px;
+}
+
+.jei-recipe-type {
+    text-align: center;
+    color: #888;
+    font-size: 10px;
+    margin-top: -8px;
+    letter-spacing: 0.5px;
+}
+/* ============================================
+   Quest Book
+   ============================================ */
+
+.quest-toggle-btn {
+    font-size: 18px;
+}
+.frame-wrapper .quest-toggle-btn {
+    position: absolute;
+    left: 44px;
+    right: auto;
+    top: calc(100% + 8px);
+    bottom: auto;
+}
+@media (max-height: 550px) {
+    .frame-wrapper .quest-toggle-btn { left: 36px; }
+}
+
+.alt-toggle-btn {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+.frame-wrapper .alt-toggle-btn {
+    position: absolute;
+    left: 88px;
+    right: auto;
+    top: calc(100% + 8px);
+    bottom: auto;
+}
+.alt-toggle-btn.alt-active {
+    background: #ffb300;
+    border-color: #ffd54f;
+    color: #1a1a2e;
+    box-shadow: 0 0 8px rgba(255, 179, 0, 0.7);
+}
+@media (max-height: 550px) {
+    .frame-wrapper .alt-toggle-btn { left: 72px; }
+}
+
+.save-toggle-btn {
+    font-size: 15px;
+}
+.frame-wrapper .save-toggle-btn {
+    position: absolute;
+    left: 132px;
+    right: auto;
+    top: calc(100% + 8px);
+    bottom: auto;
+}
+@media (max-height: 550px) {
+    .frame-wrapper .save-toggle-btn { left: 108px; }
+}
+
+.reset-toggle-btn {
+    font-size: 15px;
+    color: #ff8a80;
+    border-color: #6a3a3a;
+}
+.frame-wrapper .reset-toggle-btn {
+    position: absolute;
+    left: 176px;
+    right: auto;
+    top: calc(100% + 8px);
+    bottom: auto;
+}
+@media (max-height: 550px) {
+    .frame-wrapper .reset-toggle-btn { left: 144px; }
+}
+
+.save-toast {
+    position: absolute;
+    left: 132px;
+    top: calc(100% + 48px);
+    background: #1a1a2e;
+    border: 1px solid #4a4a6a;
+    color: #e8e8f0;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 20;
+}
+.save-toast.visible {
+    opacity: 1;
+}
+@media (max-height: 550px) {
+    .save-toast { left: 108px; top: calc(100% + 40px); }
+}
+
+.quest-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 160;
+    align-items: center;
+    justify-content: center;
+}
+.quest-overlay.visible {
+    display: flex;
+}
+
+.quest-panel {
+    background: #1a1a2e;
+    border: 4px solid #4a4a6a;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 92vw;
+    max-width: 420px;
+    height: min(78vh, 640px);
+    max-height: 92vh;
+    overflow: hidden;
+}
+
+.quest-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #eee;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+.quest-panel-header span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quest-back-btn {
+    display: none;
+    width: 26px;
+    height: 26px;
+    border: 2px solid #4a4a6a;
+    background: #2a2a4a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.quest-back-btn.flex-visible {
+    display: flex;
+}
+.quest-back-btn:active {
+    background: #4a4a7a;
+}
+
+.quest-panel-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Graph (list-replacement) view: search box + pannable canvas of the same
+   node graph the Quest Editor builds. */
+.quest-graph-view {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quest-toolbar {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.quest-search {
+    width: 100%;
+    padding: 8px 10px;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    flex: 1;
+    min-width: 0;
+}
+.quest-search:focus {
+    border-color: #4fc3f7;
+}
+
+.quest-mode-btn {
+    width: 36px;
+    flex-shrink: 0;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    color: #aab4cc;
+    font-size: 15px;
+    cursor: pointer;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.quest-mode-btn.active {
+    color: #4fc3f7;
+    border-color: #4fc3f7;
+    background: #1a3a4a;
+}
+.quest-mode-btn:active {
+    background: #3a3a5a;
+}
+
+.quest-reset-btn.armed {
+    color: #ffb0a0;
+    border-color: #d0523a;
+    background: #4a1e18;
+    animation: quest-reset-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes quest-reset-pulse {
+    from { box-shadow: 0 0 0 rgba(208, 82, 58, 0); }
+    to { box-shadow: 0 0 8px rgba(208, 82, 58, 0.7); }
+}
+
+.quest-graph-canvas-wrap {
+    flex: 1;
+    min-height: 0;
+    background: #12121f;
+    border: 2px solid #45456a;
+    position: relative;
+    overflow: hidden;
+}
+.quest-graph-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: grab;
+}
+
+/* List view: flat, searchable list of quests as an alternative to the graph. */
+.quest-list-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    background: #12121f;
+    border: 2px solid #45456a;
+    padding: 6px;
+}
+.quest-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    margin-bottom: 4px;
+    background: #1e2035;
+    border: 1px solid #33355a;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.quest-list-item:active {
+    background: #2a2c4a;
+}
+.quest-list-item.locked {
+    opacity: 0.45;
+    cursor: default;
+}
+.quest-list-item.hidden-quest {
+    opacity: 0.3;
+}
+.quest-list-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    font-size: 13px;
+}
+.quest-list-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.quest-list-info {
+    flex: 1;
+    min-width: 0;
+}
+.quest-list-title {
+    font-size: 13px;
+    color: #d0d8e8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.quest-list-subtitle {
+    font-size: 11px;
+    color: #8899b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.quest-list-status {
+    flex-shrink: 0;
+    font-size: 14px;
+}
+.quest-list-empty {
+    color: #778;
+    font-size: 12px;
+    text-align: center;
+    padding: 20px 8px;
+}
+
+.quest-icon-letter {
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.quest-empty {
+    color: #aab;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+    padding: 24px 8px;
+}
+
+/* Detail view: description + tasks for a single quest, shown after tapping
+   a node in the graph. Scrolls independently of the graph view. */
+.quest-detail-view {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: none;
+}
+.quest-empty code {
+    background: #2a2a4a;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #cde;
+}
+.quest-empty-hint {
+    display: block;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #778;
+}
+
+.quest-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.quest-detail-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: #2a2a4a;
+    border: 2px solid #45456a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.quest-detail-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.quest-detail-subtitle {
+    color: #99a8c0;
+    font-size: 12px;
+}
+.quest-detail-status {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+.quest-status-available { color: #4fc3f7; }
+.quest-status-completed { color: #4caf7d; }
+.quest-status-locked { color: #d08a4a; }
+
+.quest-section {
+    margin-bottom: 14px;
+}
+.quest-section h4 {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #99a8c0;
+    margin-bottom: 6px;
+}
+
+.quest-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #c8d4e4;
+}
+.quest-desc img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 6px 0;
+}
+
+.quest-task-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: #232640;
+    margin: 3px 0;
+    font-size: 13px;
+    color: #d0d8e8;
+    cursor: pointer;
+}
+.quest-task-row.optional {
+    opacity: 0.8;
+    border-left: 3px solid #ffaa44;
+}
+.quest-task-row input[type=checkbox] {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: #4fc3f7;
+}
+.quest-task-row em {
+    color: #8899b8;
+    font-style: normal;
+    font-size: 11px;
+}
+
+/* Code-verified tasks (e.g. "have item in inventory") - no checkbox, the
+   player can't tick these by hand, only the game logic can. */
+.quest-task-row.auto {
+    cursor: default;
+}
+.quest-task-check {
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+    color: #4fc3f7;
+    font-weight: bold;
+}
+.quest-task-progress {
+    display: inline-block;
+    margin-left: 6px;
+    color: #7fd7a0;
+    font-size: 11px;
+}
+
+.quest-complete-btn {
+    width: 100%;
+    padding: 10px;
+    background: #1a4a6e;
+    border: 1px solid #3a7abf;
+    color: #c0e0ff;
+    font-size: 13px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.quest-complete-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+.quest-complete-btn:not(:disabled):active {
+    background: #1e5a8a;
+}
+
+.quest-check-btn {
+    width: 100%;
+    padding: 9px;
+    margin-top: 4px;
+    background: #1a4a2e;
+    border: 1px solid #3a9b5e;
+    color: #b9f5cf;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.15s;
+}
+.quest-check-btn:active { background: #1e6a3e; }
+.quest-check-btn-fail {
+    background: #4a2a1a !important;
+    border-color: #9b5e3a;
+    color: #f5cfb9;
+}
+
+.quest-dep-tag {
+    display: inline-block;
+    background: #1f2b3d;
+    padding: 5px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    cursor: pointer;
+    margin: 2px 4px 2px 0;
+    color: #bcc8dd;
+    border: 1px solid transparent;
+}
+.quest-dep-tag.quest-dep-done {
+    color: #9fe0bb;
+    border-color: #4caf7d55;
+}
+
+@media (max-height: 550px) {
+    .quest-panel { padding: 8px; gap: 6px; }
+}

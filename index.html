@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Industrial Revolution: Reborn</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="frame-wrapper">
+            <div class="frame">
+                <div id="world" class="world"></div>
+                <div id="debug-overlay" class="debug-overlay"></div>
+                <div id="break-bar" class="break-bar"><div id="break-bar-fill" class="break-bar-fill"></div></div>
+            </div>
+            <button id="toggle-mode" class="toggle-btn">⇄</button>
+            <button id="quest-toggle" class="toggle-btn quest-toggle-btn" title="Quest Book (B)">📜</button>
+            <button id="dpad-alt" class="toggle-btn alt-toggle-btn" title="Alt mode">ALT</button>
+            <button id="save-game-btn" class="toggle-btn save-toggle-btn" title="Save game">💾</button>
+            <button id="reset-game-btn" class="toggle-btn reset-toggle-btn" title="Reset all progress">🗑</button>
+            <div id="save-toast" class="save-toast"></div>
+        </div>
+
+        <div class="controls">
+            <div class="control-section">
+                <div class="d-pad">
+                    <div class="d-pad-row">
+                        <button id="dpad-click" class="arrow-btn click-btn">Click</button>
+                        <button id="dpad-up" class="arrow-btn">▲</button>
+                        <button id="dpad-interact" class="arrow-btn interact-btn">Use</button>
+                    </div>
+                    <div class="d-pad-row">
+                        <button id="dpad-left" class="arrow-btn">◄</button>
+                        <button id="dpad-down" class="arrow-btn">▼</button>
+                        <button id="dpad-right" class="arrow-btn">►</button>
+                    </div>
+                </div>
+                <div id="dpad-mode" class="mode-indicator">Movement</div>
+            </div>
+        </div>
+
+        <div id="hotbar-selected-name" class="hotbar-selected-name"></div>
+        <div class="hotbar-row">
+            <div id="hotbar" class="hotbar"></div>
+            <button id="inventory-toggle" class="inv-toggle-btn" title="Inventory">I</button>
+            <button id="jei-toggle" class="inv-toggle-btn" title="Item List">J</button>
+        </div>
+    </div>
+
+    <div id="hotbar-context-menu" class="jei-context-menu"></div>
+
+    <div id="inventory-overlay" class="inventory-overlay">
+        <div class="inventory-panel">
+            <div class="inventory-panel-header">
+                <span>Inventory</span>
+                <button id="inventory-close" class="inv-close-btn">✕</button>
+            </div>
+            <div class="craft-section">
+                <button id="craft-rebalance-2x2" class="craft-rebalance-btn-square" title="Rebalance">⚖</button>
+                <div id="craft-grid-2x2" class="craft-grid craft-grid-2x2"></div>
+                <div class="craft-arrow">→</div>
+                <div class="craft-result-wrap">
+                    <div id="craft-result-2x2" class="craft-result-slot"></div>
+                    <button id="craft-all-2x2" class="craft-all-btn" title="Craft all">Craft All</button>
+                </div>
+            </div>
+            <div id="craft-result-name-2x2" class="craft-result-name"></div>
+            <div id="inv-selected-name" class="inv-selected-name"></div>
+            <div id="inv-main-grid" class="inv-grid main-grid"></div>
+            <div class="inv-hotbar-section">
+                <div id="inv-hotbar-grid" class="inv-grid hotbar-grid"></div>
+            </div>
+        </div>
+    </div>
+    <div id="drag-item" class="drag-item"></div>
+
+    <div id="workbench-overlay" class="inventory-overlay">
+        <div class="inventory-panel">
+            <div class="inventory-panel-header">
+                <span>Workbench</span>
+                <button id="workbench-close" class="inv-close-btn">✕</button>
+            </div>
+            <div class="craft-section">
+                <button id="craft-rebalance-3x3" class="craft-rebalance-btn-square" title="Rebalance">⚖</button>
+                <div id="craft-grid-3x3" class="craft-grid craft-grid-3x3"></div>
+                <div class="craft-arrow">→</div>
+                <div class="craft-result-wrap">
+                    <div id="craft-result-3x3" class="craft-result-slot"></div>
+                    <button id="craft-all-3x3" class="craft-all-btn" title="Craft all">Craft All</button>
+                </div>
+            </div>
+            <div id="craft-result-name-3x3" class="craft-result-name"></div>
+            <div id="wb-selected-name" class="inv-selected-name"></div>
+            <div id="wb-main-grid" class="inv-grid main-grid"></div>
+            <div class="inv-hotbar-section">
+                <div id="wb-hotbar-grid" class="inv-grid hotbar-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="jei-overlay" class="jei-overlay">
+        <div class="jei-panel">
+            <div class="jei-panel-header">
+                <span>Item List</span>
+                <button id="jei-close" class="inv-close-btn">✕</button>
+            </div>
+            <input id="jei-search" class="jei-search" type="text" placeholder="Search...">
+            <div id="jei-grid" class="jei-grid"></div>
+            <div id="jei-hint" class="jei-hint">Hold a slot for options</div>
+        </div>
+        <div id="jei-recipe-view" class="jei-recipe-view"></div>
+    </div>
+    <div id="jei-context-menu" class="jei-context-menu"></div>
+
+    <div id="quest-overlay" class="quest-overlay">
+        <div class="quest-panel">
+            <div class="quest-panel-header">
+                <button id="quest-back-btn" class="quest-back-btn">←</button>
+                <span id="quest-panel-title">Quest Book</span>
+                <button id="quest-close" class="inv-close-btn">✕</button>
+            </div>
+            <div id="quest-panel-body" class="quest-panel-body">
+                <div id="quest-graph-view" class="quest-graph-view">
+                    <div class="quest-toolbar">
+                        <input id="quest-list-search" class="quest-search" type="text" placeholder="Search quests..." style="display:none;">
+                        <button id="quest-list-toggle" class="quest-mode-btn" title="List view">☰</button>
+                        <button id="quest-eye-toggle" class="quest-mode-btn" title="Show all quests (greyed out)">👁</button>
+                        <button id="quest-reset-toggle" class="quest-mode-btn quest-reset-btn" title="Reset all quest progress">🗑</button>
+                    </div>
+                    <div id="quest-graph-canvas-wrap" class="quest-graph-canvas-wrap">
+                        <canvas id="quest-graph-canvas"></canvas>
+                    </div>
+                    <div id="quest-list-wrap" class="quest-list-wrap" style="display:none;"></div>
+                    <div id="quest-graph-empty" class="quest-empty" style="display:none;"></div>
+                </div>
+                <div id="quest-detail-view" class="quest-detail-view"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="split-popup" class="split-popup">
+        <div class="split-popup-box">
+            <div class="split-popup-title">Split Stack</div>
+            <div class="split-popup-row">
+                <div class="split-popup-side">
+                    <div id="split-take-icon" class="split-popup-icon"></div>
+                    <div class="split-popup-label">Take</div>
+                    <div id="split-take-count" class="split-popup-count">0</div>
+                </div>
+                <div class="split-popup-arrow">→</div>
+                <div class="split-popup-side">
+                    <div id="split-leave-icon" class="split-popup-icon"></div>
+                    <div class="split-popup-label">Leave</div>
+                    <div id="split-leave-count" class="split-popup-count">0</div>
+                </div>
+            </div>
+            <input type="range" id="split-slider" class="split-slider" min="1" max="1" value="1">
+            <div class="split-popup-buttons">
+                <button id="split-cancel" class="split-btn split-cancel-btn">Cancel</button>
+                <button id="split-confirm" class="split-btn split-confirm-btn">Take</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/registry.js"></script>
+    <script src="scripts/tick.js"></script>
+    <script src="scripts/save.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/altDrop.js"></script>
+    <script src="scripts/tInter.js"></script>
+    <script src="scripts/inventory.js"></script>
+    <script src="scripts/crafting.js"></script>
+    <script src="scripts/guiBlocks.js"></script>
+    <script src="scripts/fluids.js"></script>
+    <script src="scripts/jei.js"></script>
+    <script src="scripts/quests.js"></script>
+</body>
+</html>
