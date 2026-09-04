@@ -518,15 +518,16 @@ Registry.register({
         texture: 'assets/kiln.png',
         gui: {
             title: 'Kiln',
+            guiTexture: 'assets/kiln_gui.png',
             slots: [
-                { id: 'input1', label: 'Input 1' },
-                { id: 'input2', label: 'Input 2' },
+                { id: 'input1', label: 'Fuel/Input', x: 20, y: 15 },
+                { id: 'input2', label: 'Material 1', x: 20, y: 55 },
                 // 3rd slot: real soda-lime-silica glass needs three oxides
                 // (SiO2 + CaO + Na2O), not two - see kiln-glass-capsule below.
-                { id: 'input3', label: 'Input 3' },
-                { id: 'output', label: 'Output', output: true }
+                { id: 'input3', label: 'Material 2', x: 55, y: 55 },
+                { id: 'output', label: 'Fired Result', output: true, x: 120, y: 35 }
             ],
-            progressBar: { x: 55, y: 35, width: 32, height: 8, direction: 'right' }
+            progressBar: { x: 85, y: 20, width: 28, height: 20, direction: 'up' }
         }
     },
     'IR-autoclave': {
