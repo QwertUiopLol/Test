@@ -1747,6 +1747,105 @@ const GuiBlockRecipeRegistry = {
             ],
             result: { id: 'IR-quicklime', count: 2 },
             ticks: 100
+        },
+        
+        // ---- Finery Forge recipes: pig iron refining ----
+        {
+            // Finery forge: decarburizes pig iron at 1250-1350°C
+            // Chemistry: Fe3C + O2 → 3Fe + CO2 (carbon oxidation)
+            // Converts brittle pig iron (~4% C) to malleable wrought iron (<0.08% C)
+            id: 'finery-refine-pigiron',
+            block: 'IR-fineryforge',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-pigiron', count: 3 },
+                { id: 'IR-coke', count: 4 }
+            ],
+            result: { id: 'IR-wroughtironingot', count: 2 },
+            byproduct: { id: 'IR-slag', count: 1 },
+            ticks: 400,
+            minTemp: 1250,
+            maxTemp: 1350
+        },
+        
+        // ---- Crucible Furnace recipes: steel production ----
+        {
+            // Crucible steelmaking: melts wrought iron with carbon source
+            // Sealed crucible prevents oxidation, allows precise carbon control
+            // Produces homogeneous steel with 0.2-2.1% carbon content
+            id: 'crucible-mildsteel',
+            block: 'IR-cruciblefurnace',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-wroughtironingot', count: 2 },
+                { id: 'IR-charcoal', count: 1 }
+            ],
+            result: { id: 'IR-mildsteelingot', count: 2 },
+            byproduct: { id: 'IR-slag', count: 1 },
+            ticks: 500,
+            minTemp: 1450,
+            maxTemp: 1550
+        },
+        {
+            // Medium carbon steel: higher carbon content for tools
+            id: 'crucible-mediumsteel',
+            block: 'IR-cruciblefurnace',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-wroughtironingot', count: 2 },
+                { id: 'IR-coke', count: 2 }
+            ],
+            result: { id: 'IR-mediumsteelingot', count: 2 },
+            byproduct: { id: 'IR-slag', count: 1 },
+            ticks: 500,
+            minTemp: 1450,
+            maxTemp: 1550
+        },
+        {
+            // High carbon steel: maximum carbon for cutting tools/springs
+            id: 'crucible-highcarbonsteel',
+            block: 'IR-cruciblefurnace',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-wroughtironingot', count: 2 },
+                { id: 'IR-graphite', count: 1 }
+            ],
+            result: { id: 'IR-highcarbonsteelingot', count: 2 },
+            byproduct: { id: 'IR-slag', count: 1 },
+            ticks: 500,
+            minTemp: 1500,
+            maxTemp: 1600
+        },
+        
+        // ---- Charcoal Pit recipes: fuel production ----
+        {
+            // Convert wood planks to charcoal in low-oxygen environment
+            // Drives off volatiles, leaves nearly pure carbon
+            // Essential fuel for bloomery smelting
+            id: 'charcoalpit-plank-to-charcoal',
+            block: 'IR-charcoalpit',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-plank', count: 4 }
+            ],
+            result: { id: 'IR-charcoal', count: 2 },
+            ticks: 200
+        },
+        
+        // ---- Coke Oven recipes: coal processing ----
+        {
+            // Convert bituminous coal to coke through destructive distillation
+            // Removes volatile compounds, creates high-temperature fuel
+            // Required for finery forge and crucible furnace
+            id: 'cokeoven-coal-to-coke',
+            block: 'IR-cokeoven',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-bituminouscoal', count: 3 }
+            ],
+            result: { id: 'IR-coke', count: 2 },
+            byproduct: { id: 'IR-coaltar', count: 1 },
+            ticks: 300
         }
     ]
 }
@@ -1921,6 +2020,167 @@ const CraftingRegistry = {
                 null, null, null
             ],
             result: { id: 'IR-sapling', count: 1 }
+        },
+        
+        // ========================================================
+        // METALLURGY CRAFTING RECIPES
+        // ========================================================
+        // These recipes allow crafting metallurgy machines and items
+        // in the player's inventory grid or at the workbench.
+        // ========================================================
+        
+        // ---- Charcoal Pit crafting ----
+        {
+            // Hand-assembled charcoal pit: stone housing with clay lining
+            // and air vents. Can be crafted in 2x2 inventory grid.
+            id: 'charcoalpit-from-stone-clay',
+            type: 'shapeless',
+            ingredients: [
+                { id: 'IR-cobblestone', count: 4 },
+                { id: 'IR-claybrick', count: 2 }
+            ],
+            result: { id: 'IR-charcoalpit', count: 1 }
+        },
+        
+        // ---- Coke Oven crafting ----
+        {
+            // Coke oven: brick construction with sealed door and flue
+            // Requires fired bricks and iron fittings for gas sealing
+            id: 'cokeoven-from-bricks',
+            type: 'shaped2x2',
+            width: 2,
+            pattern: [
+                'IR-brick', 'IR-brick',
+                'IR-brick', 'IR-ironplate'
+            ],
+            result: { id: 'IR-cokeoven', count: 1 }
+        },
+        
+        // ---- Bloomery Furnace crafting ----
+        {
+            // Clay bloomery furnace: assembled from clay bricks, stone
+            // base, and iron bands. Shapeless recipe for flexibility.
+            id: 'bloomeryfurnace-from-clay-stone',
+            type: 'shapeless',
+            ingredients: [
+                { id: 'IR-claybrick', count: 8 },
+                { id: 'IR-cobblestone', count: 4 },
+                { id: 'IR-ironband', count: 2 }
+            ],
+            result: { id: 'IR-bloomeryfurnace', count: 1 }
+        },
+        
+        // ---- Finery Forge crafting ----
+        {
+            // Finery forge: requires steel frame, refractory bricks,
+            // and heavy anvil surface. Advanced metallurgy station.
+            id: 'fineryforge-from-steel-refractory',
+            type: 'shaped3x3',
+            width: 3,
+            pattern: [
+                'IR-steelframe', 'IR-steelframe', 'IR-steelframe',
+                'IR-refractorybrick', 'IR-anvilheavy', 'IR-refractorybrick',
+                'IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone'
+            ],
+            result: { id: 'IR-fineryforge', count: 1 }
+        },
+        
+        // ---- Crucible Furnace crafting ----
+        {
+            // Crucible furnace: graphite crucibles in refractory housing
+            // with mechanical bellows attachment. Highest temperature station.
+            id: 'cruciblefurnace-from-graphite-refractory',
+            type: 'shaped3x3',
+            width: 3,
+            pattern: [
+                'IR-cruciblegraphite', 'IR-bellowsmechanical', 'IR-cruciblegraphite',
+                'IR-refractorybrick', null, 'IR-refractorybrick',
+                'IR-refractorybrick', 'IR-steelframe', 'IR-refractorybrick'
+            ],
+            result: { id: 'IR-cruciblefurnace', count: 1 }
+        },
+        
+        // ---- Hand Bellows crafting ----
+        {
+            // Hand-cranked bellows: wood frame with leather bag
+            // Simple auxiliary tool for airflow control
+            id: 'bellows-hand-from-wood-leather',
+            type: 'shapeless',
+            ingredients: [
+                { id: 'IR-plank', count: 3 },
+                { id: 'IR-leather', count: 2 },
+                { id: 'IR-ironrod', count: 1 }
+            ],
+            result: { id: 'IR-bellowshand', count: 1 }
+        },
+        
+        // ---- Mechanical Bellows crafting ----
+        {
+            // Mechanical bellows: geared mechanism with metal housing
+            // Provides consistent high-pressure airflow
+            id: 'bellows-mechanical-from-gears-iron',
+            type: 'shaped2x2',
+            width: 2,
+            pattern: [
+                'IR-ironplate', 'IR-gear',
+                'IR-gear', 'IR-ironrod'
+            ],
+            result: { id: 'IR-bellowsmechanical', count: 1 }
+        },
+        
+        // ---- Heavy Anvil crafting ----
+        {
+            // Heavy forging anvil: massive wrought iron block on stone base
+            // Essential for consolidating sponge iron and shaping hot metal
+            id: 'anvil-heavy-from-wroughtiron-stone',
+            type: 'shaped2x2',
+            width: 2,
+            pattern: [
+                'IR-wroughtironingot', 'IR-wroughtironingot',
+                'IR-wroughtironingot', 'IR-stoneblock'
+            ],
+            result: { id: 'IR-anvilheavy', count: 1 }
+        },
+        
+        // ---- Quern Stone crafting ----
+        {
+            // Quern-stone: hand mill for crushing ores and materials
+            // Two grinding stones in wooden housing
+            id: 'quernstone-from-grindingstones',
+            type: 'shapeless',
+            ingredients: [
+                { id: 'IR-grindingstone', count: 2 },
+                { id: 'IR-plank', count: 2 }
+            ],
+            result: { id: 'IR-quernstone', count: 1 }
+        },
+        
+        // ---- Sluice Box crafting ----
+        {
+            // Sluice box: wooden channel with riffles for ore concentration
+            // Uses water flow to separate heavy minerals from lighter gangue
+            id: 'sluicebox-from-planks-riffles',
+            type: 'shaped2x2',
+            width: 2,
+            pattern: [
+                'IR-plank', 'IR-plank',
+                'IR-woodenriffle', 'IR-plank'
+            ],
+            result: { id: 'IR-sluicebox', count: 1 }
+        },
+        
+        // ---- Pyrometer/Temperature Gauge crafting ----
+        {
+            // Early pyrometer prototype: ceramic tube with metal wire
+            // Measures furnace temperatures via thermal expansion
+            id: 'pyrometer-from-ceramic-wire',
+            type: 'shapeless',
+            ingredients: [
+                { id: 'IR-ceramictube', count: 1 },
+                { id: 'IR-metalwire', count: 3 },
+                { id: 'IR-glass', count: 2 }
+            ],
+            result: { id: 'IR-pyrometer', count: 1 }
         }
     ]
 }
