@@ -202,9 +202,22 @@ const Inventory = {
                     this.dragging = { fromIndex: index, item: clicked };
                 }
             } else {
-                // swap
-                this.slots[index] = dragItem;
-                this.dragging = { fromIndex: index, item: clicked };
+                // Different item types - check if we can merge dragged item elsewhere first
+                // to prevent losing items when swapping with a full inventory
+                const swapTarget = this.dragging.fromIndex;
+                
+                // If original slot is now empty or was the same slot, allow swap
+                // Otherwise, try to find space for the swapped-out item
+                if (swapTarget !== null && this.slots[swapTarget] === null) {
+                    // Original slot is empty, put clicked item there
+                    this.slots[swapTarget] = clicked;
+                    this.slots[index] = dragItem;
+                    this.dragging = null;
+                } else {
+                    // Swap normally - the clicked item goes back to drag state
+                    this.slots[index] = dragItem;
+                    this.dragging = { fromIndex: index, item: clicked };
+                }
             }
         }
         this.onChange();
@@ -286,15 +299,18 @@ const Inventory = {
     // slot or from a crafting grid cell.
     cancelDrag() {
         if (!this.dragging) return;
-        const { item } = this.dragging;
+        const { item, fromIndex } = this.dragging;
 
         const leftover = this.addItem(item.id, item.count);
-        // If truly no space left anywhere, the item has nowhere to go -
-        // this is an edge case (full inventory) and, to avoid destroying
-        // it outright, is silently dropped only if literally nothing else
-        // can be done. In practice this only triggers on a completely full
-        // 36-slot inventory.
-        void leftover;
+        // If truly no space left anywhere, drop the leftover on the ground
+        // at player position instead of silently destroying it. This prevents
+        // item loss when closing inventory with full slots.
+        if (leftover > 0 && typeof addItemOrDrop === 'function') {
+            // Find player position from game.js scope
+            const px = (typeof playerX !== 'undefined') ? playerX : 0;
+            const py = (typeof playerY !== 'undefined') ? playerY : 0;
+            addItemOrDrop(px, py, item.id, leftover);
+        }
 
         this.dragging = null;
         this.onChange();
@@ -1080,6 +1096,9 @@ function initInventory() {
     if (TEST_MODE) {
         Inventory.addItem('IR-dirt', 128);
         Inventory.addItem('IR-cobblestone', 16);
+    } else {
+        // Normal mode: give minimal starter items (just a few dirt blocks)
+        Inventory.addItem('IR-dirt', 5);
     }
 
     renderInventory();

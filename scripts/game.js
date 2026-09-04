@@ -31,7 +31,7 @@
 // see isWalkable() below (walking is unrestricted) and initInventory() in
 // inventory.js (gives starter items). Flip to false for "real" behavior.
 
-const TEST_MODE = true;
+const TEST_MODE = false;
 const CHUNK_SIZE = 16;      // world is split into CHUNK_SIZE x CHUNK_SIZE chunks
 const SELECTION_RADIUS = 5; // how far from the player the selection cursor can reach
 
@@ -175,12 +175,13 @@ function getChunk(cx, cy) {
     if (cx === 0 && cy === 0) {
         const centerX = Math.floor(CHUNK_SIZE / 2);
         const centerY = Math.floor(CHUNK_SIZE / 2);
-        for (let dy = -3; dy <= 3; dy++) {
-            for (let dx = -3; dx <= 3; dx++) {
+        // Reduced starting platform from 7x7 to 5x5 for harder early game
+        for (let dy = -2; dy <= 2; dy++) {
+            for (let dx = -2; dx <= 2; dx++) {
                 const x = centerX + dx;
                 const y = centerY + dy;
                 if (x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_SIZE) {
-                    const isEdge = Math.abs(dx) === 3 || Math.abs(dy) === 3;
+                    const isEdge = Math.abs(dx) === 2 || Math.abs(dy) === 2;
                     chunk.data[y][x] = isEdge ? 'IR-cobblestone' : 'IR-dirt';
                 }
             }
@@ -344,16 +345,13 @@ function rebuildCellPool() {
 // it just recalculates what belongs in each pooled cell and updates its
 // classes/data/CSS vars.
 function renderWorld() {
-    const prevW = viewportW;
-    const prevH = viewportH;
-    calculateViewport();
-
     const worldEl = document.getElementById('world');
-    const sizeChanged = (viewportW !== prevW || viewportH !== prevH || cellPool.length === 0);
-
-    if (sizeChanged) {
+    
+    // Skip viewport recalculation - already cached from init/resize
+    // Only check if we need to rebuild cell pool due to size mismatch
+    const totalCells = viewportW * viewportH;
+    if (cellPool.length !== totalCells) {
         rebuildCellPool();
-    } else {
         worldEl.style.gridTemplateColumns = `repeat(${viewportW}, ${cellSize}px)`;
         worldEl.style.gridTemplateRows = `repeat(${viewportH}, ${cellSize}px)`;
     }
@@ -693,6 +691,11 @@ function init() {
     if (typeof SaveGame !== 'undefined') SaveGame.load();
 
     getChunk(0, 0);
+    
+    // Cache viewport dimensions on init; only recalc on actual resize
+    calculateViewport();
+    rebuildCellPool();
+    
     renderWorld();
     setupControls();
 
@@ -705,6 +708,15 @@ function init() {
         TickSystem.start();
     }
     
-    window.addEventListener('resize', renderWorld);
+    // Only recalc viewport on resize, not every render
+    window.addEventListener('resize', () => {
+        const prevW = viewportW;
+        const prevH = viewportH;
+        calculateViewport();
+        if (viewportW !== prevW || viewportH !== prevH) {
+            rebuildCellPool();
+            renderWorld();
+        }
+    });
 }
 init();

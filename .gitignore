@@ -1,33 +1,49 @@
-# Examples with artifacts:
-dist/
-build/
-node_modules/
-.git/
-.vscode/
-*.log
-*.tmp
+```
+# Compiled and build artifacts
 *.pyc
 __pycache__/
-.env
-.env.local
-.DS_Store
-Thumbs.db
 *.o
 *.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
+dist/
+build/
+target/
+
+# Dependencies
+.venv/
+venv/
+node_modules/
+.julia/
+zig*/
+.mypy_cache/
+.pytest_cache/
+
+# Logs and temp files
+*.log
+*.tmp
 *.swp
 *.swo
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
 coverage/
 htmlcov/
 .coverage
-.mypy_cache/
-.pytest_cache/
-target/
-.gradle/
+
+# Compressed files
 *.zip
 *.gz
 *.tar
@@ -50,9 +66,4 @@ target/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-*.png
-*.jpg
-*.jpeg
-*.bmp
-*.gif
-*.webm
+```

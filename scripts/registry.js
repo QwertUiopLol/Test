@@ -184,7 +184,7 @@ Registry.register({
         type: 'block',
         stackable: true,
         maxStack: 64,
-        breakTimeTicks: 20,
+        breakTimeTicks: 30,  // Increased from 20 (1.5s) - basic but not instant
         hardness: 1,
         color: '#6b8e23',
         dropId: 'IR-dirt',
@@ -205,7 +205,7 @@ Registry.register({
         type: 'block',
         stackable: true,
         maxStack: 64,
-        breakTimeTicks: 40,
+        breakTimeTicks: 60,  // Increased from 40 (3s) - proper stone difficulty
         hardness: 3,
         color: '#808080',
         dropId: 'IR-cobblestone',
@@ -243,7 +243,7 @@ Registry.register({
         type: 'block',
         stackable: true,
         maxStack: 64,
-        breakTimeTicks: 25,
+        breakTimeTicks: 40,  // Increased from 25 (2s) - crafting station takes time to break
         hardness: 2,
         color: '#8a5a34',
         dropId: 'IR-workbench',
