@@ -1,48 +1,5 @@
-// ============================================
-// Quest Book
-// ============================================
-// This is the biggest file in the project, but it splits cleanly into
-// three layers - read them in this order if you're new to it:
-//   1. QuestBook (data + rules)      - loads assets/quests.json, tracks
-//      completedTasks/completed per node in localStorage, and answers
-//      "is this quest locked/available/completed/visible?"
-//   2. DOM rendering (renderQuestBook, renderGraphView, renderQuestListView,
-//      renderQuestDetail) - turns QuestBook's state into the list/detail
-//      panels you see when the book is open.
-//   3. QuestGraph - a separate, self-contained <canvas> renderer for the
-//      node-map view (pan/click, draws nodes+edges), read-only counterpart
-//      to whatever the (separate, not-included-here) Quest Editor produces.
-//
-// A "node" is one quest; an "edge" is a prerequisite link (`from` must be
-// completed before `to` becomes reachable). Both come straight out of
-// assets/quests.json, which this file only reads - it never writes back
-// to that file (only to localStorage, via saveProgress/saveUiState).
-//
-// Reads quest data exported from the Quest Editor and placed at
-// assets/quests.json. Tracks per-task completion in localStorage and
-// works out which quests are locked (waiting on other quests),
-// available, or completed.
-//
-// Tasks come in two flavors, set in the Quest Editor:
-//   - "manual"  : the player ticks the checkbox themselves (legacy behaviour).
-//   - "item"    : verified by CODE, not the player - but only ON DEMAND.
-//                 The player presses the "Check" button shown under a
-//                 quest's task list, which runs QuestBook.checkAutoTasks()
-//                 and checks Inventory.countItem(itemId) against
-//                 itemCount right then. It is NOT re-checked automatically
-//                 as the inventory changes. Once satisfied it locks in as
-//                 complete - the player can never fake it by hand, and it
-//                 stays complete even if the item is later spent/crafted
-//                 away.
-//
-// Note: loading assets/quests.json uses fetch(), which browsers block
-// when index.html is opened directly as a file:// URL. Serve the game
-// folder with a local web server (e.g. "npx serve", "python -m
-// http.server", or VSCode's Live Server) for the Quest Book to find the
-// file.
-
 const QUEST_PROGRESS_KEY = 'ir-quest-progress';
-const QUEST_DATA_PATH = 'assets/quests.json';
+const QUEST_UI_KEY = 'ir-quest-ui';
 
 function escapeHtml(str) {
     return String(str === undefined || str === null ? '' : str).replace(/[&<>"']/g, (c) => ({
@@ -50,7 +7,49 @@ function escapeHtml(str) {
     })[c]);
 }
 
-const QUEST_UI_KEY = 'ir-quest-ui';
+// Embedded quest data - no network required, works on file:// protocol
+const EMBEDDED_QUEST_DATA = {
+  "nodes": [
+    {"id":1,"x":240,"y":60,"radius":22,"shape":"circle","title":"Prologue","subtitle":"No trees nearby","description":"Only earth and stone surround you. A sapling must be CREATED from minerals, water, and ancient organic matter.","iconUrl":"","tasks":[]},
+    {"id":2,"x":240,"y":200,"radius":22,"shape":"circle","title":"Soil Science","subtitle":"Earth is not just dirt","description":"Hold ALT+Click on Dirt to sift soil by hand. You may get pebbles or rarely humus.","iconUrl":"","tasks":[{"text":"Find Andesite Pebble via ALT+Click","optional":false,"type":"item","itemId":"IR-apebble","itemCount":1}]},
+    {"id":3,"x":130,"y":340,"radius":20,"shape":"circle","title":"Stone Table","subtitle":"Craft Workbench","description":"Arrange 4 Cobblestone in 2x2 square to craft Workbench.","iconUrl":"","tasks":[{"text":"Craft Workbench","optional":false,"type":"item","itemId":"IR-workbench","itemCount":1}]},
+    {"id":4,"x":350,"y":340,"radius":20,"shape":"circle","title":"Hand Mill","subtitle":"Build Mixer","description":"Find Daisleyte pebble and craft Mixer with 2 Cobblestone.","iconUrl":"","tasks":[{"text":"Find Daisleyte Pebble","optional":false,"type":"item","itemId":"IR-dpebble","itemCount":1},{"text":"Craft Mixer","optional":false,"type":"item","itemId":"IR-mixer","itemCount":1}]},
+    {"id":5,"x":130,"y":480,"radius":20,"shape":"circle","title":"Kiln","subtitle":"Build Kiln","description":"Arrange 8 Cobblestone in ring on Workbench for Kiln.","iconUrl":"","tasks":[{"text":"Build Kiln","optional":false,"type":"item","itemId":"IR-kiln","itemCount":1}]},
+    {"id":6,"x":350,"y":480,"radius":20,"shape":"circle","title":"Volcanic Flour","subtitle":"Mineral Powder","description":"Grind Andesite and Basalt in Mixer into Mineral Powder.","iconUrl":"","tasks":[{"text":"Find Basalt Pebble","optional":false,"type":"item","itemId":"IR-bpebble","itemCount":1},{"text":"Craft Mineral Powder x2","optional":false,"type":"item","itemId":"IR-mineralpowder","itemCount":2}]},
+    {"id":7,"x":460,"y":480,"radius":20,"shape":"circle","title":"Glass Ingredients","subtitle":"Lime and Silica","description":"Grind Calcite into Lime Powder, Blackstone into Silica Powder.","iconUrl":"","tasks":[{"text":"Find Calcite Pebble","optional":false,"type":"item","itemId":"IR-cpebble","itemCount":1},{"text":"Craft Lime Powder","optional":false,"type":"item","itemId":"IR-limepowder","itemCount":1},{"text":"Craft Silica Powder","optional":false,"type":"item","itemId":"IR-silicapowder","itemCount":1}]},
+    {"id":8,"x":240,"y":620,"radius":24,"shape":"circle","title":"Glass Capsule","subtitle":"First Vessel","description":"Fire Silica and Lime in Kiln to get Glass Capsules.","iconUrl":"","tasks":[{"text":"Craft Glass Capsule x2","optional":false,"type":"item","itemId":"IR-capsule-1000","itemCount":2}]},
+    {"id":9,"x":240,"y":760,"radius":20,"shape":"circle","title":"Water Capsule","subtitle":"Extract Water","description":"Fill empty capsule with water from dirt.","iconUrl":"","tasks":[{"text":"Craft Water Capsule","optional":false,"type":"item","itemId":"IR-capsule-1000-water","itemCount":1}]},
+    {"id":10,"x":350,"y":900,"radius":22,"shape":"circle","title":"Nutrient Gel","subtitle":"Hydroponics","description":"Craft Fluid Extractor and make Nutrient Gel.","iconUrl":"","tasks":[{"text":"Craft Fluid Extractor","optional":false,"type":"item","itemId":"IR-fluid-extractor","itemCount":1},{"text":"Craft Nutrient Gel x2","optional":false,"type":"item","itemId":"IR-nutrientgel","itemCount":2}]},
+    {"id":11,"x":350,"y":1040,"radius":20,"shape":"circle","title":"Tissue Culture","subtitle":"Callus Growth","description":"Find Humus and grow Callus Culture in Mixer.","iconUrl":"","tasks":[{"text":"Find Humus","optional":false,"type":"item","itemId":"IR-humus","itemCount":1},{"text":"Craft Callus Culture","optional":false,"type":"item","itemId":"IR-callusculture","itemCount":1}]},
+    {"id":12,"x":350,"y":1360,"radius":30,"shape":"star","title":"First Sapling","subtitle":"Synthetic Seed FINALE","description":"Create first Oak Sapling through biotechnology.","iconUrl":"","tasks":[{"text":"Craft Oak Sapling","optional":false,"type":"item","itemId":"IR-sapling","itemCount":1}]},
+    {"id":13,"x":460,"y":620,"radius":20,"shape":"circle","title":"Plant Ash","subtitle":"Alkali Source","description":"Calcine Humus in Kiln to get Plant Ash.","iconUrl":"","tasks":[{"text":"Craft Plant Ash","optional":false,"type":"item","itemId":"IR-plantash","itemCount":1}]},
+    {"id":14,"x":460,"y":700,"radius":20,"shape":"circle","title":"Lye","subtitle":"Potash Solution","description":"Mix Plant Ash with 2 Dirt to get Lye.","iconUrl":"","tasks":[{"text":"Craft Lye","optional":false,"type":"item","itemId":"IR-ashlye","itemCount":1}]},
+    {"id":15,"x":460,"y":780,"radius":20,"shape":"circle","title":"Soda Ash","subtitle":"Glass Flux","description":"Calcine Lye in Kiln to get Soda Ash.","iconUrl":"","tasks":[{"text":"Craft Soda Ash","optional":false,"type":"item","itemId":"IR-sodaash","itemCount":1}]},
+    {"id":16,"x":240,"y":620,"radius":22,"shape":"circle","title":"Better Glass","subtitle":"Soda-Lime Formula","description":"Craft glass with soda flux for better quality.","iconUrl":"","tasks":[{"text":"Craft Glass Capsule (with soda)","optional":false,"type":"item","itemId":"IR-capsule-1000","itemCount":1}]},
+    {"id":17,"x":240,"y":1120,"radius":20,"shape":"circle","title":"Autoclave","subtitle":"Sterilization","description":"Craft Autoclave for sterile processing.","iconUrl":"","tasks":[{"text":"Craft Autoclave","optional":false,"type":"item","itemId":"IR-autoclave","itemCount":1}]},
+    {"id":18,"x":240,"y":1200,"radius":20,"shape":"circle","title":"Asepsis","subtitle":"Sterile Materials","description":"Sterilize capsule and nutrient gel separately.","iconUrl":"","tasks":[{"text":"Sterilize Capsule","optional":false,"type":"item","itemId":"IR-capsule-sterile","itemCount":1},{"text":"Sterilize Nutrient Gel","optional":false,"type":"item","itemId":"IR-nutrientgel-sterile","itemCount":1}]},
+    {"id":19,"x":460,"y":1120,"radius":20,"shape":"circle","title":"Growth Regulators","subtitle":"Plant Hormones","description":"Create Growth Regulator Solution.","iconUrl":"","tasks":[{"text":"Craft Growth Regulator","optional":false,"type":"item","itemId":"IR-growthregulator","itemCount":1}]},
+    {"id":20,"x":460,"y":1200,"radius":20,"shape":"circle","title":"Embryogenic Callus","subtitle":"Differentiated Cells","description":"Create Embryogenic Callus.","iconUrl":"","tasks":[{"text":"Craft Embryogenic Callus","optional":false,"type":"item","itemId":"IR-embryocallus","itemCount":1}]},
+    {"id":21,"x":350,"y":1280,"radius":22,"shape":"circle","title":"Encapsulation","subtitle":"Synthetic Seed","description":"Assemble Synthetic Seed.","iconUrl":"","tasks":[{"text":"Craft Synthetic Seed","optional":false,"type":"item","itemId":"IR-synthetic-seed","itemCount":1}]},
+    {"id":22,"x":350,"y":1440,"radius":28,"shape":"star","title":"Living Tree","subtitle":"Life from Stone","description":"Grow Oak Tree from Synthetic Seed.","iconUrl":"","tasks":[{"text":"Grow Oak Tree","optional":false,"type":"item","itemId":"IR-oaklog","itemCount":1}]},
+    {"id":23,"x":550,"y":340,"radius":20,"shape":"circle","title":"Charcoal","subtitle":"Carbon for Metallurgy","description":"Produce Charcoal in Kiln.","iconUrl":"","tasks":[{"text":"Craft Charcoal x4","optional":false,"type":"item","itemId":"IR-charcoal","itemCount":4}]},
+    {"id":24,"x":550,"y":480,"radius":20,"shape":"circle","title":"Refractory Brick","subtitle":"Furnace Materials","description":"Find Clay and fire into Bricks.","iconUrl":"","tasks":[{"text":"Find Clay x4","optional":false,"type":"item","itemId":"IR-clay","itemCount":4},{"text":"Craft Brick x4","optional":false,"type":"item","itemId":"IR-brick","itemCount":4}]},
+    {"id":25,"x":550,"y":620,"radius":22,"shape":"circle","title":"Bloomery","subtitle":"Iron Age Begins","description":"Build Bloomery Furnace.","iconUrl":"","tasks":[{"text":"Build Bloomery","optional":false,"type":"item","itemId":"IR-bloomery","itemCount":1}]},
+    {"id":26,"x":660,"y":620,"radius":20,"shape":"circle","title":"Iron Ore","subtitle":"Red Stones","description":"Find Iron Ore by sifting.","iconUrl":"","tasks":[{"text":"Find Iron Ore x4","optional":false,"type":"item","itemId":"IR-ironore","itemCount":4}]},
+    {"id":27,"x":605,"y":760,"radius":24,"shape":"circle","title":"Iron Bloom","subtitle":"Sponge Iron","description":"Smelt Iron Bloom in Bloomery.","iconUrl":"","tasks":[{"text":"Smelt Iron Bloom","optional":false,"type":"item","itemId":"IR-ironbloom","itemCount":1}]},
+    {"id":28,"x":605,"y":900,"radius":20,"shape":"circle","title":"Wrought Iron","subtitle":"Pure Iron","description":"Forge Wrought Iron from bloom.","iconUrl":"","tasks":[{"text":"Forge Wrought Iron","optional":false,"type":"item","itemId":"IR-wroughtiron","itemCount":1}]},
+    {"id":29,"x":720,"y":900,"radius":20,"shape":"circle","title":"Steel Bloom","subtitle":"Carburization","description":"Create Steel Bloom via carburization.","iconUrl":"","tasks":[{"text":"Create Steel Bloom","optional":false,"type":"item","itemId":"IR-steelbloom","itemCount":1}]},
+    {"id":30,"x":605,"y":1040,"radius":22,"shape":"circle","title":"Medium Steel","subtitle":"Tool Steel","description":"Forge Medium Steel Ingot.","iconUrl":"","tasks":[{"text":"Forge Medium Steel Ingot","optional":false,"type":"item","itemId":"IR-mediumsteelingot","itemCount":1}]},
+    {"id":31,"x":720,"y":1040,"radius":20,"shape":"circle","title":"High Carbon Steel","subtitle":"Cutting Steel","description":"Create High Carbon Steel Ingot.","iconUrl":"","tasks":[{"text":"Create High Carbon Steel Ingot","optional":false,"type":"item","itemId":"IR-highcarbonsteelingot","itemCount":1}]},
+    {"id":32,"x":605,"y":1180,"radius":20,"shape":"circle","title":"Steel Tools","subtitle":"Industrial Revolution","description":"Craft Steel Pickaxe and Axe.","iconUrl":"","tasks":[{"text":"Craft Steel Pickaxe","optional":false,"type":"item","itemId":"IR-steel-pickaxe","itemCount":1},{"text":"Craft Steel Axe","optional":false,"type":"item","itemId":"IR-steel-axe","itemCount":1}]},
+    {"id":33,"x":720,"y":1180,"radius":20,"shape":"circle","title":"Cast Iron","subtitle":"Molten Iron","description":"Produce Cast Iron Ingot (optional).","iconUrl":"","tasks":[{"text":"Produce Cast Iron Ingot","optional":true,"type":"item","itemId":"IR-castironingot","itemCount":1}]},
+    {"id":34,"x":660,"y":1320,"radius":32,"shape":"star","title":"STEEL AGE","subtitle":"MASTER OF METAL - FINAL QUEST","description":"You have conquered metallurgy! From rock to steel - Industrial Revolution begins.<br><br>FINAL QUEST: Create high carbon steel products.","iconUrl":"","tasks":[{"text":"Create High Carbon Steel x5","optional":false,"type":"item","itemId":"IR-highcarbonsteelingot","itemCount":5},{"text":"Obtain Cast Iron (optional)","optional":true,"type":"item","itemId":"IR-castironingot","itemCount":1}]}
+  ],
+  "edges": [
+    {"from":1,"to":2},{"from":2,"to":3},{"from":2,"to":4},{"from":3,"to":5},{"from":4,"to":6},{"from":4,"to":7},{"from":5,"to":8},{"from":8,"to":9},{"from":9,"to":10},{"from":6,"to":10},{"from":10,"to":11},{"from":7,"to":13},{"from":13,"to":14},{"from":14,"to":15},{"from":15,"to":16},{"from":16,"to":8},{"from":8,"to":17},{"from":6,"to":19},{"from":19,"to":20},{"from":18,"to":20},{"from":20,"to":21},{"from":21,"to":12},{"from":18,"to":12},{"from":21,"to":22},{"from":22,"to":23},{"from":23,"to":24},{"from":24,"to":25},{"from":24,"to":26},{"from":25,"to":27},{"from":26,"to":27},{"from":27,"to":28},{"from":28,"to":29},{"from":28,"to":30},{"from":29,"to":30},{"from":30,"to":31},{"from":30,"to":32},{"from":31,"to":32},{"from":31,"to":33},{"from":32,"to":34},{"from":33,"to":34}
+  ],
+  "cameraX":0,"cameraY":0,"nextNodeId":35
+};
 
 const QuestBook = {
     isOpen: false,
@@ -58,21 +57,20 @@ const QuestBook = {
     nodes: [],
     edges: [],
     progress: {},
-    openNodeId: null, // node currently shown in detail view; null = graph view
-    viewMode: 'graph', // 'graph' | 'list'
-    showHidden: false, // "eye" toggle: reveal not-yet-reachable quests, greyed out
+    openNodeId: null,
+    viewMode: 'graph',
+    showHidden: false,
 
     async init() {
         this.progress = this.loadProgress();
         try {
-            const res = await fetch(QUEST_DATA_PATH, { cache: 'no-store' });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            this.nodes = Array.isArray(data.nodes) ? data.nodes : [];
-            this.edges = Array.isArray(data.edges) ? data.edges : [];
+            this.nodes = Array.isArray(EMBEDDED_QUEST_DATA.nodes) ? EMBEDDED_QUEST_DATA.nodes : [];
+            this.edges = Array.isArray(EMBEDDED_QUEST_DATA.edges) ? EMBEDDED_QUEST_DATA.edges : [];
         } catch (err) {
-            console.warn('Quest Book: could not load ' + QUEST_DATA_PATH, err);
+            console.warn('Quest Book: could not load embedded quest data', err);
             this.loadError = true;
+            this.nodes = [];
+            this.edges = [];
         }
         this.syncCompletion();
         this.checkAutoTasks({ silent: true });
