@@ -582,6 +582,715 @@ Registry.register({
             progressBar: { x: 55, y: 35, width: 32, height: 8, direction: 'right' }
         }
     },
+    // ========================================================
+    // METALLURGY EXPANSION - Iron Age to Steel Age
+    // ========================================================
+    // This entire section implements realistic metallurgical progression
+    // from primitive iron smelting (bloomery) through refined steel production.
+    // Every process is based on real historical methods and chemistry.
+    // 
+    // Key scientific concepts implemented:
+    // - Solid-state reduction (bloomery, 1150-1250°C)
+    // - Carburization and decarburization
+    // - Slag formation and flux chemistry
+    // - Carbon content control (wrought iron <0.08% C, steel 0.2-2.1% C)
+    // - Temperature-dependent phase transitions
+    // ========================================================
+    
+    // ---- IRON ORES ----
+    'IR-bogironore': {
+        // Bog iron ore: hydrated iron oxide (mostly goethite, FeO(OH)) formed
+        // in peat bogs by iron-oxidizing bacteria. Historically the FIRST iron
+        // source used by many cultures (Vikings, early Celts) because it's
+        // found at the surface, no mining needed. Low grade (~30-40% Fe) but
+        // easy to access and naturally pre-concentrated.
+        name: 'Bog Iron Ore',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#8b4513',
+        icon: '🟤',
+        texture: 'assets/bog_iron_ore.png'
+    },
+    'IR-hematite': {
+        // Hematite (Fe₂O₃): the most important iron ore, ~70% iron content.
+        // Reddish streak (literally - its name comes from Greek "haima" = blood).
+        // Requires underground mining but yields the best results in smelting.
+        name: 'Hematite',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#8b0000',
+        icon: '🔴',
+        texture: 'assets/hematite.png'
+    },
+    'IR-magnetite': {
+        // Magnetite (Fe₃O₄): magnetic iron ore, ~72% iron content (highest of
+        // common ores). Black, heavy, strongly magnetic. Historically prized
+        // because it could be separated from gangue using lodestone magnets.
+        name: 'Magnetite',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#2f2f2f',
+        icon: '⚫',
+        texture: 'assets/magnetite.png'
+    },
+    'IR-limonite': {
+        // Limonite: generic term for hydrated iron oxides (mostly goethite),
+        // yellowish-brown. Lower grade (~50-60% Fe) but widespread. The
+        // "yellow ochre" pigment comes from limonite.
+        name: 'Limonite',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#cd853f',
+        icon: '🟠',
+        texture: 'assets/limonite.png'
+    },
+    'IR-ironore': {
+        // Generic high-grade iron ore (mixed hematite/magnetite deposit).
+        // ~65% Fe, the standard "good ore" for serious smelting operations.
+        name: 'Iron Ore',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#696969',
+        icon: '🌑',
+        texture: 'assets/iron_ore.png'
+    },
+    
+    // ---- CRUSHED ORES (after quern-stone processing) ----
+    'IR-crushedbogiron': {
+        // Bog iron ore, crushed to sand/gravel size. Increases surface area
+        // for more efficient reduction in the bloomery. Real crushed ore is
+        // about 2-5mm particle size for optimal smelting.
+        name: 'Crushed Bog Iron',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#a0522d',
+        icon: '⬤',
+        texture: 'assets/crushed_bog_iron.png'
+    },
+    'IR-crushedhematite': {
+        name: 'Crushed Hematite',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#a52a2a',
+        icon: '⬤',
+        texture: 'assets/crushed_hematite.png'
+    },
+    'IR-crushedmagnetite': {
+        name: 'Crushed Magnetite',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#3c3c3c',
+        icon: '⬤',
+        texture: 'assets/crushed_magnetite.png'
+    },
+    'IR-crushedlimonite': {
+        name: 'Crushed Limonite',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#daa520',
+        icon: '⬤',
+        texture: 'assets/crushed_limonite.png'
+    },
+    'IR-crushedironore': {
+        name: 'Crushed Iron Ore',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#808080',
+        icon: '⬤',
+        texture: 'assets/crushed_iron_ore.png'
+    },
+    
+    // ---- WASHED/CONCENTRATED ORES (after sluice box processing) ----
+    'IR-concentratebogiron': {
+        // Bog iron concentrate: washed to remove clay/sand impurities.
+        // Gravity separation in a sluice box exploits iron ore's higher
+        // specific gravity (~5.0) vs quartz sand (~2.65). Yields ~50% Fe.
+        name: 'Bog Iron Concentrate',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#cd661d',
+        icon: '◼',
+        texture: 'assets/bog_iron_concentrate.png'
+    },
+    'IR-concentratehematite': {
+        // Hematite concentrate: high-grade feed for bloomery (~65% Fe).
+        // Washing removes silica and alumina gangue minerals.
+        name: 'Hematite Concentrate',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#dc143c',
+        icon: '◼',
+        texture: 'assets/hematite_concentrate.png'
+    },
+    'IR-concentratemagnetite': {
+        // Magnetite concentrate: highest grade (~70% Fe), often magnetic
+        // separation is used historically (lodestones) before washing.
+        name: 'Magnetite Concentrate',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#1c1c1c',
+        icon: '◼',
+        texture: 'assets/magnetite_concentrate.png'
+    },
+    'IR-concentratelimonite': {
+        name: 'Limonite Concentrate',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#b8860b',
+        icon: '◼',
+        texture: 'assets/limonite_concentrate.png'
+    },
+    'IR-concentrateironore': {
+        name: 'Iron Ore Concentrate',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#696969',
+        icon: '◼',
+        texture: 'assets/iron_ore_concentrate.png'
+    },
+    
+    // ---- FLUXES ----
+    'IR-limestone': {
+        // Limestone (CaCO₃): calcium carbonate, the primary flux for iron
+        // smelting. Reacts with silica gangue to form slag (CaSiO₃), which
+        // melts and floats on top of the iron, protecting it from re-oxidation
+        // and allowing easy separation. Essential for any serious metallurgy.
+        name: 'Limestone',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#d3d3d3',
+        icon: '⬜',
+        texture: 'assets/limestone.png'
+    },
+    'IR-crushedlimestone': {
+        // Crushed limestone: must be broken small (~1-2cm) for proper flux
+        // action. Large pieces won't fully react; too fine and they clog
+        // the furnace burden. Historical bloomeries used hand-broken fist-sized
+        // chunks, later crushed smaller.
+        name: 'Crushed Limestone',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#e8e8e8',
+        icon: '⬤',
+        texture: 'assets/crushed_limestone.png'
+    },
+    'IR-quicklime': {
+        // Quicklime (CaO): produced by calcining limestone at 900-1000°C.
+        // CaCO₃ → CaO + CO₂. More reactive than raw limestone, forms slag
+        // more readily. Historically used in advanced bloomeries and finery
+        // forges. Also used for mortar, soil treatment.
+        name: 'Quicklime',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#f5f5f5',
+        icon: '⚪',
+        texture: 'assets/quicklime.png'
+    },
+    'IR-slag': {
+        // Iron silicate slag (primarily CaSiO₃): the waste product of smelting.
+        // In reality, slag is a complex mix of calcium silicate, alumina,
+        // magnesia, and dissolved iron oxides. Proper slag has a glassy
+        // appearance and should be dark green/black. Too much iron in slag
+        // (= poor smelt) makes it brownish/red. Can be re-smelted to recover
+        // trapped iron prills.
+        name: 'Slag',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#2f4f4f',
+        icon: '🗿',
+        texture: 'assets/slag.png'
+    },
+    'IR-richslag': {
+        // Iron-rich slag: failed or inefficient smelt result. Contains
+        // excessive FeO (up to 20-30% iron lost to slag). Brownish/reddish
+        // color indicates poor flux ratio or insufficient temperature.
+        // Must be re-smelted with fresh ore and proper flux to recover iron.
+        name: 'Iron-Rich Slag',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#8b4513',
+        icon: '🗿',
+        texture: 'assets/rich_slag.png'
+    },
+    
+    // ---- FUELS ----
+    'IR-charcoal': {
+        // Charcoal: wood pyrolyzed at 400-500°C in low-oxygen conditions.
+        // Nearly pure carbon (~75-90% C), burns hotter and cleaner than wood.
+        // ESSENTIAL for bloomery smelting - wood smoke contaminates iron with
+        // sulfur/phosphorus. Historical charcoal production took weeks in
+        // charcoal pits/clamps. Yield: ~20-25% by weight from dry wood.
+        name: 'Charcoal',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#1c1c1c',
+        icon: '⚫',
+        texture: 'assets/charcoal.png'
+    },
+    'IR-coal': {
+        // Bituminous coal: fossilized plant matter, ~75-85% carbon. Burns
+        // hot but contains sulfur and volatile compounds that contaminate
+        // iron (making it brittle). CANNOT be used directly in bloomery -
+        // must be converted to coke first. Historically, coal was avoided
+        // for iron until coke was invented (1709, Abraham Darby).
+        name: 'Bituminous Coal',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#2f2f2f',
+        icon: '🌑',
+        texture: 'assets/coal.png'
+    },
+    'IR-coke': {
+        // Coke: coal heated to 1000-1100°C without air (destructive distillation).
+        // Drives off volatiles (tar, ammonia, sulfur compounds), leaving ~90-95%
+        // pure carbon porous structure. Burns very hot, essential for cupola
+        // furnaces and early blast furnaces. Invented specifically to solve
+        // coal's contamination problems for iron smelting.
+        name: 'Coke',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#1a1a1a',
+        icon: '⬛',
+        texture: 'assets/coke.png'
+    },
+    
+    // ---- INTERMEDIATE PRODUCTS ----
+    'IR-spongeiron': {
+        // Sponge iron (direct reduced iron, DRI): product of solid-state
+        // reduction in bloomery. Porous metallic iron mixed with unreduced
+        // oxides and slag inclusions. Result of Fe₂O₃ + 3CO → 2Fe + 3CO₂.
+        // Still contains significant oxygen; must be consolidated by forging.
+        // Name comes from its spongy, vesicular appearance when fractured.
+        name: 'Sponge Iron',
+        type: 'item',
+        stackable: true,
+        maxStack: 16,
+        color: '#a8a8a8',
+        icon: '🧽',
+        texture: 'assets/sponge_iron.png'
+    },
+    'IR-bloom': {
+        // Iron bloom: the consolidated mass from a bloomery smelt. A mixture
+        // of metallic iron particles, slag, and some unreduced ore. Typically
+        // 1-5 kg for small bloomeries, up to 20+ kg for large ones. Carbon
+        // content varies wildly (0.02-1.5% C) depending on smelt conditions.
+        // Must be reheated and hammered (shingled) to expel slag and consolidate.
+        name: 'Iron Bloom',
+        type: 'item',
+        stackable: false,
+        maxStack: 1,
+        color: '#c0c0c0',
+        icon: '🔩',
+        texture: 'assets/iron_bloom.png'
+    },
+    'IR-pigiron': {
+        // Pig iron: high-carbon iron (~3.5-4.5% C) from melting cast iron.
+        // Named for traditional sand casting molds arranged like piglets
+        // suckling from a sow. Very brittle, cannot be forged, but excellent
+        // for casting. Must be refined (decarburized) in finery forge to make
+        // wrought iron or steel. Melting point ~1150-1200°C (lower than pure
+        // iron due to high carbon).
+        name: 'Pig Iron',
+        type: 'item',
+        stackable: true,
+        maxStack: 16,
+        color: '#4a4a4a',
+        icon: '🐖',
+        texture: 'assets/pig_iron.png'
+    },
+    'IR-steelbloom': {
+        // Steel bloom: bloom with controlled carbon content (0.2-2.1% C).
+        // Achieved through careful carburization (adding carbon) or
+        // decarburization (removing carbon) during smelting/forging.
+        // Higher carbon = harder but more brittle. This is the "sweet spot"
+        // bloom for tool/weapon steel.
+        name: 'Steel Bloom',
+        type: 'item',
+        stackable: false,
+        maxStack: 1,
+        color: '#b8b8d0',
+        icon: '⭐',
+        texture: 'assets/steel_bloom.png'
+    },
+    
+    // ---- FINAL PRODUCTS (INGOTS) ----
+    'IR-wroughtironingot': {
+        // Wrought iron ingot: nearly pure iron (<0.08% C) with fibrous slag
+        // inclusions. Malleable, ductile, corrosion-resistant. Cannot be
+        // hardened by heat treatment (too little carbon). Used for nails,
+        // chains, decorative work, structural elements. Historically the
+        // most common form of worked iron until cheap steel (Bessemer, 1856).
+        name: 'Wrought Iron Ingot',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#d4d4d4',
+        icon: '▭',
+        texture: 'assets/wrought_iron_ingot.png'
+    },
+    'IR-mildsteelingot': {
+        // Mild steel ingot (0.08-0.3% C): general-purpose steel. Good balance
+        // of strength and ductility. Can be case-hardened (surface carburized)
+        // for wear resistance. Used for structural beams, wire, sheet metal,
+        // general forgings. Most common modern steel type.
+        name: 'Mild Steel Ingot',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#c8c8d8',
+        icon: '▭',
+        texture: 'assets/mild_steel_ingot.png'
+    },
+    'IR-mediumsteelingot': {
+        // Medium carbon steel ingot (0.3-0.6% C): stronger than mild steel,
+        // can be heat treated (quenched and tempered) for hardness. Used for
+        // axles, gears, crankshafts, hammers, chisels. The "tool steel" tier
+        // for most applications.
+        name: 'Medium Steel Ingot',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#b8b8c8',
+        icon: '▭',
+        texture: 'assets/medium_steel_ingot.png'
+    },
+    'IR-highcarbonsteelingot': {
+        // High carbon steel ingot (0.6-1.5% C): very hard when heat treated,
+        // but brittle if not properly tempered. Used for cutting tools,
+        // knives, saw blades, springs. File steel is typically ~1.0-1.2% C.
+        // Damascus steel patterns come from layering different carbon steels.
+        name: 'High Carbon Steel Ingot',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#a8a8b8',
+        icon: '▭',
+        texture: 'assets/high_carbon_steel_ingot.png'
+    },
+    'IR-castironingot': {
+        // Cast iron ingot (>2.1% C, typically 3-4%): brittle, cannot be
+        // forged, but excellent fluidity when molten for casting complex
+        // shapes. Hard, wear-resistant, good compression strength. Used for
+        // engine blocks, pans, radiators, ornamental work. Melts at ~1150°C.
+        name: 'Cast Iron Ingot',
+        type: 'item',
+        stackable: true,
+        maxStack: 64,
+        color: '#3c3c3c',
+        icon: '▭',
+        texture: 'assets/cast_iron_ingot.png'
+    },
+    
+    // ---- METALLURGY MACHINES/BLOCKS ----
+    'IR-quernstone': {
+        // Quern-stone: the oldest mechanical crushing device. Two stacked
+        // stones - stationary lower "bedstone", rotating upper "runner stone".
+        // Ore fed through center hole (the "eye"), crushed between stones as
+        // runner turns. Essential for crushing ore to increase surface area
+        // before smelting. Also grinds limestone into flux powder.
+        name: 'Quern-Stone',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 40,
+        hardness: 3,
+        color: '#696969',
+        dropId: 'IR-quernstone',
+        overlay: true,
+        icon: '⚙',
+        texture: 'assets/quern_stone.png',
+        gui: {
+            title: 'Quern-Stone',
+            slots: [
+                { id: 'input1', label: 'Ore to Crush', x: 20, y: 35 },
+                { id: 'output', label: 'Crushed Ore', output: true, x: 110, y: 35 }
+            ],
+            progressBar: { x: 68, y: 38, width: 32, height: 8, direction: 'right' }
+        }
+    },
+    'IR-sluicebox': {
+        // Sluice box: gravity separation device for ore concentration.
+        // Water flows through a long box with riffles (obstacles) on the
+        // bottom. Heavy ore particles settle behind riffles; lighter sand
+        // and clay wash away. Exploits specific gravity difference: iron ore
+        // ~5.0 g/cm³ vs quartz sand ~2.65 g/cm³. Historical gold miners used
+        // identical原理 ("black sand" concentrates are often magnetite).
+        name: 'Sluice Box',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 30,
+        hardness: 2,
+        color: '#8b4513',
+        dropId: 'IR-sluicebox',
+        overlay: true,
+        icon: '🌊',
+        texture: 'assets/sluice_box.png',
+        gui: {
+            title: 'Sluice Box',
+            slots: [
+                { id: 'input1', label: 'Crushed Ore', x: 20, y: 20 },
+                { id: 'water', label: 'Water Capsule', x: 20, y: 60 },
+                { id: 'concentrate', label: 'Ore Concentrate', output: true, x: 110, y: 20 },
+                { id: 'tailings', label: 'Waste Tailings', output: true, x: 110, y: 60 }
+            ],
+            progressBar: { x: 68, y: 38, width: 32, height: 8, direction: 'right' }
+        }
+    },
+    'IR-bellows': {
+        // Hand-cranked bellows: air pump for forcing air into furnaces.
+        // Leather bag squeezed by wooden boards, with one-way valves (flaps)
+        // that let air in on upstroke, force it out through nozzle on
+        // downstroke. Critical for reaching bloomery temperatures (1150-1250°C).
+        // Airflow rate directly controls combustion rate and peak temperature.
+        // Too little air = insufficient heat; too much = over-oxidation of iron.
+        name: 'Hand Bellows',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 25,
+        hardness: 1,
+        color: '#a0522d',
+        dropId: 'IR-bellows',
+        overlay: true,
+        icon: '💨',
+        texture: 'assets/bellows.png',
+        // Bellows doesn't have input/output slots - it's a manual operation
+        // block that provides airflow to adjacent furnaces. Player interacts
+        // directly to pump air (separate mechanic from GUI processing).
+        gui: {
+            title: 'Bellows Controls',
+            slots: [],
+            specialUI: 'bellows_pump' // Custom UI for pumping action
+        }
+    },
+    'IR-bloomeryfurnace': {
+        // Clay bloomery furnace: the first iron-smelting technology (~1200 BCE).
+        // Shaft furnace made of clay/stone, ~1-2m tall. Charged from top with
+        // alternating layers of charcoal and crushed iron ore. Bellows force
+        // air through tuyère (clay pipe) near bottom. Temperature 1150-1250°C
+        // - hot enough to reduce Fe₂O₃ to metallic Fe, NOT hot enough to melt
+        // iron (1538°C). Result is solid "bloom" of sponge iron + slag mixture.
+        // Chemistry: Fe₂O₃ + 3CO → 2Fe + 3CO₂ (CO from incomplete charcoal combustion).
+        name: 'Bloomery Furnace',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 50,
+        hardness: 2,
+        color: '#cd853f',
+        dropId: 'IR-bloomeryfurnace',
+        overlay: true,
+        icon: '🏺',
+        texture: 'assets/bloomery_furnace.png',
+        gui: {
+            title: 'Bloomery Furnace',
+            slots: [
+                { id: 'ore', label: 'Iron Ore Concentrate', x: 20, y: 15 },
+                { id: 'flux', label: 'Crushed Limestone', x: 20, y: 45 },
+                { id: 'fuel', label: 'Charcoal', x: 20, y: 75 },
+                { id: 'bloom', label: 'Iron Bloom', output: true, x: 140, y: 25 },
+                { id: 'slag', label: 'Slag', output: true, x: 140, y: 55 }
+            ],
+            progressBar: { x: 75, y: 40, width: 40, height: 10, direction: 'right' },
+            temperatureGauge: { x: 75, y: 55, width: 40, height: 8, minTemp: 800, maxTemp: 1400 }
+        }
+    },
+    'IR-fineryforge': {
+        // Finery forge: decarburization furnace for refining pig iron into
+        // wrought iron or steel. Pig iron is melted (1400-1500°C) while air
+        // is blown over/through it, oxidizing carbon: C + O₂ → CO₂. Process
+        // continues until desired carbon content reached. Skilled finers
+        // judged carbon by spark patterns when tapping samples. Wrought iron
+        // (<0.08% C) requires nearly complete decarburization; steel (0.2-2.1%)
+        // stops partway. Cannot produce cast iron (that requires ADDING carbon).
+        name: 'Finery Forge',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 60,
+        hardness: 3,
+        color: '#b22222',
+        dropId: 'IR-fineryforge',
+        overlay: true,
+        icon: '🔥',
+        texture: 'assets/finery_forge.png',
+        gui: {
+            title: 'Finery Forge',
+            slots: [
+                { id: 'pigiron', label: 'Pig Iron', x: 20, y: 15 },
+                { id: 'fuel', label: 'Coke', x: 20, y: 50 },
+                { id: 'product', label: 'Refined Iron/Steel', output: true, x: 140, y: 30 }
+            ],
+            progressBar: { x: 75, y: 35, width: 40, height: 10, direction: 'right' },
+            temperatureGauge: { x: 75, y: 50, width: 40, height: 8, minTemp: 1200, maxTemp: 1700 },
+            carbonMeter: { x: 75, y: 65, width: 40, height: 6, label: '%C' }
+        }
+    },
+    'IR-cruciblefurnace': {
+        // Crucible furnace: sealed ceramic vessel for melting steel.
+        // Invented independently in multiple cultures (wootz steel India,
+        // crucible steel Central Asia, Huntsman process England 1740s).
+        // Iron + carbon source sealed in clay crucible, heated to 1600-1700°C
+        // until fully molten. Carbon diffuses evenly throughout (unlike
+        // solid-state cementation). Produces homogeneous high-quality steel.
+        // Can also melt cast iron for casting. Crucible is single-use -
+        // must be broken to retrieve metal.
+        name: 'Crucible Furnace',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 50,
+        hardness: 3,
+        color: '#8b0000',
+        dropId: 'IR-cruciblefurnace',
+        overlay: true,
+        icon: '🍯',
+        texture: 'assets/crucible_furnace.png',
+        gui: {
+            title: 'Crucible Furnace',
+            slots: [
+                { id: 'iron', label: 'Iron/Steel Scrap', x: 15, y: 20 },
+                { id: 'carbon', label: 'Carbon Source (Charcoal/Coke)', x: 15, y: 50 },
+                { id: 'flux', label: 'Flux (Optional)', x: 15, y: 80 },
+                { id: 'ingot', label: 'Steel Ingot', output: true, x: 140, y: 50 }
+            ],
+            progressBar: { x: 70, y: 45, width: 45, height: 12, direction: 'right' },
+            temperatureGauge: { x: 70, y: 65, width: 45, height: 10, minTemp: 1400, maxTemp: 1800 }
+        }
+    },
+    'IR-charcoalpit': {
+        // Charcoal pit/clamp: wood pyrolysis setup. Wood stacked in pile,
+        // covered with turf/charcoal dust to limit air, ignited from bottom.
+        // Burns slowly (days to weeks) at 400-500°C with restricted oxygen.
+        // Drives off water and volatiles (methane, methanol, acetic acid),
+        // leaving nearly pure carbon. Yield: ~20-25% by weight from dry wood.
+        // Skill: proper air restriction - too much air burns to ash, too
+        // little extinguishes. Smoke color indicates stage (white=steam,
+        // blue=volatiles burning, clear=done).
+        name: 'Charcoal Pit',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 35,
+        hardness: 1,
+        color: '#3d2817',
+        dropId: 'IR-charcoalpit',
+        overlay: true,
+        icon: '🪵',
+        texture: 'assets/charcoal_pit.png',
+        gui: {
+            title: 'Charcoal Pit',
+            slots: [
+                { id: 'wood', label: 'Wood/Planks', x: 20, y: 30 },
+                { id: 'charcoal', label: 'Charcoal', output: true, x: 110, y: 30 }
+            ],
+            progressBar: { x: 68, y: 35, width: 32, height: 8, direction: 'right' }
+        }
+    },
+    'IR-cokeoven': {
+        // Coke oven: destructive distillation of coal. Coal heated to
+        // 1000-1100°C in absence of air (sealed chamber). Volatiles driven
+        // off (coal tar, ammonia, coal gas - all useful byproducts), leaving
+        // porous coke (~90-95% carbon). Essential for serious iron production
+        // because raw coal's sulfur/phosphorus contaminate iron, making it
+        // useless for tools/weapons. Coke was the key invention enabling
+        // Industrial Revolution iron production (Abraham Darby, 1709).
+        name: 'Coke Oven',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 45,
+        hardness: 3,
+        color: '#2f2f2f',
+        dropId: 'IR-cokeoven',
+        overlay: true,
+        icon: '🏭',
+        texture: 'assets/coke_oven.png',
+        gui: {
+            title: 'Coke Oven',
+            slots: [
+                { id: 'coal', label: 'Bituminous Coal', x: 20, y: 30 },
+                { id: 'coke', label: 'Coke', output: true, x: 110, y: 30 }
+            ],
+            progressBar: { x: 68, y: 35, width: 32, height: 8, direction: 'right' }
+        }
+    },
+    'IR-anvil': {
+        // Heavy anvil: metalworking surface for forging. Traditionally wrought
+        // iron body with hardened steel face. Used for hammering blooms to
+        // expel slag (shingling), shaping hot metal, welding (forge welding
+        // iron/steel at ~1200°C). Different areas serve different purposes:
+        // flat face (general work), horn (curving), hardy hole (tool mounting),
+        // pritchel hole (punching). Mass matters - light anvils bounce, heavy
+        // anvils (100+ kg) absorb hammer energy efficiently.
+        name: 'Heavy Anvil',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 60,
+        hardness: 5,
+        color: '#2f4f4f',
+        dropId: 'IR-anvil',
+        overlay: true,
+        icon: '🔨',
+        texture: 'assets/anvil.png',
+        gui: {
+            title: 'Anvil',
+            slots: [
+                { id: 'workpiece', label: 'Hot Metal', x: 30, y: 35 },
+                { id: 'hammer', label: 'Hammer (Tool)', x: 30, y: 70 },
+                { id: 'output', label: 'Forged Item', output: true, x: 130, y: 35 }
+            ],
+            specialUI: 'anvil_forging' // Mini-game for quality forging
+        }
+    },
+    'IR-pyrometer': {
+        // Pyrometer prototype: early temperature measurement device.
+        // Pre-modern metallurgists judged temperature by color (black→red→
+        // orange→yellow→white) and material behavior (lead melts 327°C,
+        // copper 1085°C, iron 1538°C). This simplified version uses thermal
+        // expansion of a metal rod or color-matching cards. Essential for
+        // consistent heat treatment and knowing when steel is at proper
+        // forging/quenching temperature. Accuracy ±25-50°C.
+        name: 'Pyrometer Prototype',
+        type: 'block',
+        stackable: true,
+        maxStack: 64,
+        breakTimeTicks: 30,
+        hardness: 2,
+        color: '#708090',
+        dropId: 'IR-pyrometer',
+        overlay: false, // Not placed on ground, held/used differently
+        icon: '🌡',
+        texture: 'assets/pyrometer.png',
+        // Pyrometer is a tool, not a processing station - no GUI
+        // Used by clicking on furnaces to read their temperature
+        gui: null
+    },
     'IR-mixer': {
         name: 'Mixer',
         type: 'block',
@@ -813,6 +1522,231 @@ const GuiBlockRecipeRegistry = {
             ],
             result: { id: 'IR-embryogeniccallus', count: 1 },
             ticks: 180
+        },
+        // ========================================================
+        // METALLURGY RECIPES - GuiBlockRecipeRegistry additions
+        // ========================================================
+        
+        // ---- Quern-Stone recipes: ore crushing ----
+        {
+            // Crushing bog iron ore increases surface area for efficient
+            // reduction. Real crushed ore is 2-5mm particle size.
+            id: 'quern-crush-bogiron',
+            block: 'IR-quernstone',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-bogironore', count: 1 }
+            ],
+            result: { id: 'IR-crushedbogiron', count: 2 },
+            ticks: 40
+        },
+        {
+            id: 'quern-crush-hematite',
+            block: 'IR-quernstone',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-hematite', count: 1 }
+            ],
+            result: { id: 'IR-crushedhematite', count: 2 },
+            ticks: 40
+        },
+        {
+            id: 'quern-crush-magnetite',
+            block: 'IR-quernstone',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-magnetite', count: 1 }
+            ],
+            result: { id: 'IR-crushedmagnetite', count: 2 },
+            ticks: 45 // Magnetite is harder
+        },
+        {
+            id: 'quern-crush-limonite',
+            block: 'IR-quernstone',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-limonite', count: 1 }
+            ],
+            result: { id: 'IR-crushedlimonite', count: 2 },
+            ticks: 35
+        },
+        {
+            id: 'quern-crush-ironore',
+            block: 'IR-quernstone',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-ironore', count: 1 }
+            ],
+            result: { id: 'IR-crushedironore', count: 2 },
+            ticks: 40
+        },
+        {
+            // Limestone must be crushed for proper flux action in bloomery
+            id: 'quern-crush-limestone',
+            block: 'IR-quernstone',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-limestone', count: 1 }
+            ],
+            result: { id: 'IR-crushedlimestone', count: 2 },
+            ticks: 30
+        },
+        
+        // ---- Sluice Box recipes: ore concentration ----
+        {
+            // Washing crushed bog iron removes clay/sand impurities
+            // Specific gravity: iron ore ~5.0, quartz sand ~2.65
+            id: 'sluice-wash-bogiron',
+            block: 'IR-sluicebox',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-crushedbogiron', count: 2 },
+                { id: 'IR-capsule-1000-water', count: 1 }
+            ],
+            result: { id: 'IR-concentratebogiron', count: 1 },
+            ticks: 50
+        },
+        {
+            id: 'sluice-wash-hematite',
+            block: 'IR-sluicebox',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-crushedhematite', count: 2 },
+                { id: 'IR-capsule-1000-water', count: 1 }
+            ],
+            result: { id: 'IR-concentratehematite', count: 1 },
+            ticks: 50
+        },
+        {
+            id: 'sluice-wash-magnetite',
+            block: 'IR-sluicebox',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-crushedmagnetite', count: 2 },
+                { id: 'IR-capsule-1000-water', count: 1 }
+            ],
+            result: { id: 'IR-concentratemagnetite', count: 1 },
+            ticks: 50
+        },
+        {
+            id: 'sluice-wash-limonite',
+            block: 'IR-sluicebox',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-crushedlimonite', count: 2 },
+                { id: 'IR-capsule-1000-water', count: 1 }
+            ],
+            result: { id: 'IR-concentratelimonite', count: 1 },
+            ticks: 50
+        },
+        {
+            id: 'sluice-wash-ironore',
+            block: 'IR-sluicebox',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-crushedironore', count: 2 },
+                { id: 'IR-capsule-1000-water', count: 1 }
+            ],
+            result: { id: 'IR-concentrateironore', count: 1 },
+            ticks: 50
+        },
+        
+        // ---- Charcoal Pit recipes: fuel production ----
+        {
+            // Wood pyrolysis at 400-500°C, low oxygen
+            // Yield: ~20-25% by weight from dry wood
+            // Takes multiple planks to produce one charcoal
+            id: 'charcoalpit-wood-to-charcoal',
+            block: 'IR-charcoalpit',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-plank', count: 4 }
+            ],
+            result: { id: 'IR-charcoal', count: 1 },
+            ticks: 120
+        },
+        
+        // ---- Coke Oven recipes: coal processing ----
+        {
+            // Coal heated to 1000-1100°C without air
+            // Drives off volatiles (tar, ammonia, sulfur)
+            // Yield: ~70-75% by weight
+            id: 'cokeoven-coal-to-coke',
+            block: 'IR-cokeoven',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-coal', count: 2 }
+            ],
+            result: { id: 'IR-coke', count: 1 },
+            ticks: 100
+        },
+        
+        // ---- Bloomery Furnace recipes: iron smelting ----
+        {
+            // Bloomery smelting: solid-state reduction at 1150-1250°C
+            // Chemistry: Fe₂O₃ + 3CO → 2Fe + 3CO₂
+            // Requires concentrated ore, flux (limestone), and charcoal fuel
+            // Produces iron bloom (sponge iron + slag mixture) and waste slag
+            // Temperature MUST stay below iron melting point (1538°C)
+            id: 'bloomery-smelt-hematite',
+            block: 'IR-bloomeryfurnace',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-concentratehematite', count: 4 },
+                { id: 'IR-crushedlimestone', count: 2 },
+                { id: 'IR-charcoal', count: 6 }
+            ],
+            result: { id: 'IR-bloom', count: 1 },
+            ticks: 300,
+            byproduct: { id: 'IR-slag', count: 2 },
+            minTemp: 1150,
+            maxTemp: 1250
+        },
+        {
+            id: 'bloomery-smelt-magnetite',
+            block: 'IR-bloomeryfurnace',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-concentratemagnetite', count: 4 },
+                { id: 'IR-crushedlimestone', count: 2 },
+                { id: 'IR-charcoal', count: 6 }
+            ],
+            result: { id: 'IR-bloom', count: 1 },
+            ticks: 300,
+            byproduct: { id: 'IR-slag', count: 2 },
+            minTemp: 1150,
+            maxTemp: 1250
+        },
+        {
+            // Bog iron is lower grade, produces more slag
+            id: 'bloomery-smelt-bogiron',
+            block: 'IR-bloomeryfurnace',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-concentratebogiron', count: 6 },
+                { id: 'IR-crushedlimestone', count: 3 },
+                { id: 'IR-charcoal', count: 8 }
+            ],
+            result: { id: 'IR-bloom', count: 1 },
+            ticks: 350,
+            byproduct: { id: 'IR-richslag', count: 3 },
+            minTemp: 1150,
+            maxTemp: 1250
+        },
+        
+        // ---- Kiln recipe: limestone calcination ----
+        {
+            // Calcining limestone at 900-1000°C drives off CO₂
+            // CaCO₃ → CaO + CO₂
+            // Quicklime is more reactive flux than raw limestone
+            id: 'kiln-calcine-limestone',
+            block: 'IR-kiln',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-limestone', count: 2 }
+            ],
+            result: { id: 'IR-quicklime', count: 2 },
+            ticks: 100
         }
     ]
 }
