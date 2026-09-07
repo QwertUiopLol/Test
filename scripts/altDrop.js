@@ -47,7 +47,18 @@ const ALT_DROP_POOL = [
     { id: 'IR-bpebble', weight: 4 },
     { id: 'IR-blpebble', weight: 4 },
     { id: 'IR-dpebble', weight: 4 },
-    { id: 'IR-humus', weight: 1 }
+    { id: 'IR-humus', weight: 1 },
+    // Rare heavy grains and deposits found while carefully sifting soil.
+    // These are intentionally uncommon: they open the metallurgy branch
+    // without replacing the early mineral/biology progression.
+    { id: 'IR-clay', weight: 2 },
+    { id: 'IR-limestone', weight: 2 },
+    { id: 'IR-coal', weight: 1 },
+    { id: 'IR-bogironore', weight: 2 },
+    { id: 'IR-ironore', weight: 1 },
+    { id: 'IR-hematite', weight: 1 },
+    { id: 'IR-magnetite', weight: 1 },
+    { id: 'IR-limonite', weight: 1 }
 ];
 
 function pickAltDropItem() {

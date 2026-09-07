@@ -171,7 +171,34 @@ const JEI = {
         const processed = (typeof GuiBlockRecipeRegistry !== 'undefined' ? GuiBlockRecipeRegistry.recipes : [])
             .filter(r => r.result && r.result.id === id)
             .map(r => ({ ...r, source: 'gui' }));
-        return [...crafted, ...processed];
+        return [...crafted, ...processed, ...this.gatheringSourcesFor(id)];
+    },
+
+    // Not every item enters the game through a crafting grid or a machine.
+    // Sifting is a real acquisition route, so expose it alongside recipes
+    // instead of leaving raw drops with the misleading "No known recipes"
+    // message.  Keeping this derived from ALT_DROP_POOL makes the tooltip
+    // automatically stay in sync when the drop table is balanced later.
+    gatheringSourcesFor(id) {
+        const sifted = typeof ALT_DROP_POOL === 'undefined' ? [] : ALT_DROP_POOL
+            .filter(entry => entry.id === id)
+            .map(entry => ({
+                id: `sifting-${entry.id}`,
+                source: 'gathering',
+                method: 'Sift dirt',
+                ingredients: [{ id: 'IR-dirt', count: 1 }],
+                result: { id: entry.id, count: 1 }
+            }));
+        const blockDrops = Object.values(Registry.blocks)
+            .filter(block => block.dropId === id && block.id !== id)
+            .map(block => ({
+                id: `breaking-${block.id}`,
+                source: 'gathering',
+                method: `Break ${block.name}`,
+                ingredients: [{ id: block.id, count: 1 }],
+                result: { id, count: 1 }
+            }));
+        return [...sifted, ...blockDrops];
     },
 
     // All recipes/processes that CONSUME this item as an ingredient - the
@@ -367,6 +394,9 @@ function jeiGuiRecipeGridHTML(recipe) {
 }
 
 function jeiRecipeTypeLabel(recipe) {
+    if (recipe.source === 'gathering') {
+        return `${recipe.method} — hold Alt and use Break on exposed dirt`;
+    }
     if (recipe.source === 'gui') {
         const stationData = Registry.get(recipe.block);
         const stationName = stationData ? stationData.name : recipe.block;

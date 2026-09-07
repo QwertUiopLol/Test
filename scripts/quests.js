@@ -10,45 +10,2068 @@ function escapeHtml(str) {
 // Embedded quest data - no network required, works on file:// protocol
 const EMBEDDED_QUEST_DATA = {
   "nodes": [
-    {"id":1,"x":240,"y":60,"radius":22,"shape":"circle","title":"Prologue","subtitle":"No trees nearby","description":"Only earth and stone surround you. A sapling must be CREATED from minerals, water, and ancient organic matter.","iconUrl":"","tasks":[]},
-    {"id":2,"x":240,"y":200,"radius":22,"shape":"circle","title":"Soil Science","subtitle":"Earth is not just dirt","description":"Hold ALT+Click on Dirt to sift soil by hand. You may get pebbles or rarely humus.","iconUrl":"","tasks":[{"text":"Find Andesite Pebble via ALT+Click","optional":false,"type":"item","itemId":"IR-apebble","itemCount":1}]},
-    {"id":3,"x":130,"y":340,"radius":20,"shape":"circle","title":"Stone Table","subtitle":"Craft Workbench","description":"Arrange 4 Cobblestone in 2x2 square to craft Workbench.","iconUrl":"","tasks":[{"text":"Craft Workbench","optional":false,"type":"item","itemId":"IR-workbench","itemCount":1}]},
-    {"id":4,"x":350,"y":340,"radius":20,"shape":"circle","title":"Hand Mill","subtitle":"Build Mixer","description":"Find Daisleyte pebble and craft Mixer with 2 Cobblestone.","iconUrl":"","tasks":[{"text":"Find Daisleyte Pebble","optional":false,"type":"item","itemId":"IR-dpebble","itemCount":1},{"text":"Craft Mixer","optional":false,"type":"item","itemId":"IR-mixer","itemCount":1}]},
-    {"id":5,"x":130,"y":480,"radius":20,"shape":"circle","title":"Kiln","subtitle":"Build Kiln","description":"Arrange 8 Cobblestone in ring on Workbench for Kiln.","iconUrl":"","tasks":[{"text":"Build Kiln","optional":false,"type":"item","itemId":"IR-kiln","itemCount":1}]},
-    {"id":6,"x":350,"y":480,"radius":20,"shape":"circle","title":"Volcanic Flour","subtitle":"Mineral Powder","description":"Grind Andesite and Basalt in Mixer into Mineral Powder.","iconUrl":"","tasks":[{"text":"Find Basalt Pebble","optional":false,"type":"item","itemId":"IR-bpebble","itemCount":1},{"text":"Craft Mineral Powder x2","optional":false,"type":"item","itemId":"IR-mineralpowder","itemCount":2}]},
-    {"id":7,"x":460,"y":480,"radius":20,"shape":"circle","title":"Glass Ingredients","subtitle":"Lime and Silica","description":"Grind Calcite into Lime Powder, Blackstone into Silica Powder.","iconUrl":"","tasks":[{"text":"Find Calcite Pebble","optional":false,"type":"item","itemId":"IR-cpebble","itemCount":1},{"text":"Craft Lime Powder","optional":false,"type":"item","itemId":"IR-limepowder","itemCount":1},{"text":"Craft Silica Powder","optional":false,"type":"item","itemId":"IR-silicapowder","itemCount":1}]},
-    {"id":8,"x":240,"y":620,"radius":24,"shape":"circle","title":"Glass Capsule","subtitle":"First Vessel","description":"Fire Silica and Lime in Kiln to get Glass Capsules.","iconUrl":"","tasks":[{"text":"Craft Glass Capsule x2","optional":false,"type":"item","itemId":"IR-capsule-1000","itemCount":2}]},
-    {"id":9,"x":240,"y":760,"radius":20,"shape":"circle","title":"Water Capsule","subtitle":"Extract Water","description":"Fill empty capsule with water from dirt.","iconUrl":"","tasks":[{"text":"Craft Water Capsule","optional":false,"type":"item","itemId":"IR-capsule-1000-water","itemCount":1}]},
-    {"id":10,"x":350,"y":900,"radius":22,"shape":"circle","title":"Nutrient Gel","subtitle":"Hydroponics","description":"Craft Fluid Extractor and make Nutrient Gel.","iconUrl":"","tasks":[{"text":"Craft Fluid Extractor","optional":false,"type":"item","itemId":"IR-fluid-extractor","itemCount":1},{"text":"Craft Nutrient Gel x2","optional":false,"type":"item","itemId":"IR-nutrientgel","itemCount":2}]},
-    {"id":11,"x":350,"y":1040,"radius":20,"shape":"circle","title":"Tissue Culture","subtitle":"Callus Growth","description":"Find Humus and grow Callus Culture in Mixer.","iconUrl":"","tasks":[{"text":"Find Humus","optional":false,"type":"item","itemId":"IR-humus","itemCount":1},{"text":"Craft Callus Culture","optional":false,"type":"item","itemId":"IR-callusculture","itemCount":1}]},
-    {"id":12,"x":350,"y":1360,"radius":30,"shape":"star","title":"First Sapling","subtitle":"Synthetic Seed FINALE","description":"Create first Oak Sapling through biotechnology.","iconUrl":"","tasks":[{"text":"Craft Oak Sapling","optional":false,"type":"item","itemId":"IR-sapling","itemCount":1}]},
-    {"id":13,"x":460,"y":620,"radius":20,"shape":"circle","title":"Plant Ash","subtitle":"Alkali Source","description":"Calcine Humus in Kiln to get Plant Ash.","iconUrl":"","tasks":[{"text":"Craft Plant Ash","optional":false,"type":"item","itemId":"IR-plantash","itemCount":1}]},
-    {"id":14,"x":460,"y":700,"radius":20,"shape":"circle","title":"Lye","subtitle":"Potash Solution","description":"Mix Plant Ash with 2 Dirt to get Lye.","iconUrl":"","tasks":[{"text":"Craft Lye","optional":false,"type":"item","itemId":"IR-ashlye","itemCount":1}]},
-    {"id":15,"x":460,"y":780,"radius":20,"shape":"circle","title":"Soda Ash","subtitle":"Glass Flux","description":"Calcine Lye in Kiln to get Soda Ash.","iconUrl":"","tasks":[{"text":"Craft Soda Ash","optional":false,"type":"item","itemId":"IR-sodaash","itemCount":1}]},
-    {"id":16,"x":240,"y":620,"radius":22,"shape":"circle","title":"Better Glass","subtitle":"Soda-Lime Formula","description":"Craft glass with soda flux for better quality.","iconUrl":"","tasks":[{"text":"Craft Glass Capsule (with soda)","optional":false,"type":"item","itemId":"IR-capsule-1000","itemCount":1}]},
-    {"id":17,"x":240,"y":1120,"radius":20,"shape":"circle","title":"Autoclave","subtitle":"Sterilization","description":"Craft Autoclave for sterile processing.","iconUrl":"","tasks":[{"text":"Craft Autoclave","optional":false,"type":"item","itemId":"IR-autoclave","itemCount":1}]},
-    {"id":18,"x":240,"y":1200,"radius":20,"shape":"circle","title":"Asepsis","subtitle":"Sterile Materials","description":"Sterilize capsule and nutrient gel separately.","iconUrl":"","tasks":[{"text":"Sterilize Capsule","optional":false,"type":"item","itemId":"IR-capsule-sterile","itemCount":1},{"text":"Sterilize Nutrient Gel","optional":false,"type":"item","itemId":"IR-nutrientgel-sterile","itemCount":1}]},
-    {"id":19,"x":460,"y":1120,"radius":20,"shape":"circle","title":"Growth Regulators","subtitle":"Plant Hormones","description":"Create Growth Regulator Solution.","iconUrl":"","tasks":[{"text":"Craft Growth Regulator","optional":false,"type":"item","itemId":"IR-growthregulator","itemCount":1}]},
-    {"id":20,"x":460,"y":1200,"radius":20,"shape":"circle","title":"Embryogenic Callus","subtitle":"Differentiated Cells","description":"Create Embryogenic Callus.","iconUrl":"","tasks":[{"text":"Craft Embryogenic Callus","optional":false,"type":"item","itemId":"IR-embryocallus","itemCount":1}]},
-    {"id":21,"x":350,"y":1280,"radius":22,"shape":"circle","title":"Encapsulation","subtitle":"Synthetic Seed","description":"Assemble Synthetic Seed.","iconUrl":"","tasks":[{"text":"Craft Synthetic Seed","optional":false,"type":"item","itemId":"IR-synthetic-seed","itemCount":1}]},
-    {"id":22,"x":350,"y":1440,"radius":28,"shape":"star","title":"Living Tree","subtitle":"Life from Stone","description":"Grow Oak Tree from Synthetic Seed.","iconUrl":"","tasks":[{"text":"Grow Oak Tree","optional":false,"type":"item","itemId":"IR-oaklog","itemCount":1}]},
-    {"id":23,"x":550,"y":340,"radius":20,"shape":"circle","title":"Charcoal","subtitle":"Carbon for Metallurgy","description":"Produce Charcoal in Kiln.","iconUrl":"","tasks":[{"text":"Craft Charcoal x4","optional":false,"type":"item","itemId":"IR-charcoal","itemCount":4}]},
-    {"id":24,"x":550,"y":480,"radius":20,"shape":"circle","title":"Refractory Brick","subtitle":"Furnace Materials","description":"Find Clay and fire into Bricks.","iconUrl":"","tasks":[{"text":"Find Clay x4","optional":false,"type":"item","itemId":"IR-clay","itemCount":4},{"text":"Craft Brick x4","optional":false,"type":"item","itemId":"IR-brick","itemCount":4}]},
-    {"id":25,"x":550,"y":620,"radius":22,"shape":"circle","title":"Bloomery","subtitle":"Iron Age Begins","description":"Build Bloomery Furnace.","iconUrl":"","tasks":[{"text":"Build Bloomery","optional":false,"type":"item","itemId":"IR-bloomery","itemCount":1}]},
-    {"id":26,"x":660,"y":620,"radius":20,"shape":"circle","title":"Iron Ore","subtitle":"Red Stones","description":"Find Iron Ore by sifting.","iconUrl":"","tasks":[{"text":"Find Iron Ore x4","optional":false,"type":"item","itemId":"IR-ironore","itemCount":4}]},
-    {"id":27,"x":605,"y":760,"radius":24,"shape":"circle","title":"Iron Bloom","subtitle":"Sponge Iron","description":"Smelt Iron Bloom in Bloomery.","iconUrl":"","tasks":[{"text":"Smelt Iron Bloom","optional":false,"type":"item","itemId":"IR-ironbloom","itemCount":1}]},
-    {"id":28,"x":605,"y":900,"radius":20,"shape":"circle","title":"Wrought Iron","subtitle":"Pure Iron","description":"Forge Wrought Iron from bloom.","iconUrl":"","tasks":[{"text":"Forge Wrought Iron","optional":false,"type":"item","itemId":"IR-wroughtiron","itemCount":1}]},
-    {"id":29,"x":720,"y":900,"radius":20,"shape":"circle","title":"Steel Bloom","subtitle":"Carburization","description":"Create Steel Bloom via carburization.","iconUrl":"","tasks":[{"text":"Create Steel Bloom","optional":false,"type":"item","itemId":"IR-steelbloom","itemCount":1}]},
-    {"id":30,"x":605,"y":1040,"radius":22,"shape":"circle","title":"Medium Steel","subtitle":"Tool Steel","description":"Forge Medium Steel Ingot.","iconUrl":"","tasks":[{"text":"Forge Medium Steel Ingot","optional":false,"type":"item","itemId":"IR-mediumsteelingot","itemCount":1}]},
-    {"id":31,"x":720,"y":1040,"radius":20,"shape":"circle","title":"High Carbon Steel","subtitle":"Cutting Steel","description":"Create High Carbon Steel Ingot.","iconUrl":"","tasks":[{"text":"Create High Carbon Steel Ingot","optional":false,"type":"item","itemId":"IR-highcarbonsteelingot","itemCount":1}]},
-    {"id":32,"x":605,"y":1180,"radius":20,"shape":"circle","title":"Steel Tools","subtitle":"Industrial Revolution","description":"Craft Steel Pickaxe and Axe.","iconUrl":"","tasks":[{"text":"Craft Steel Pickaxe","optional":false,"type":"item","itemId":"IR-steel-pickaxe","itemCount":1},{"text":"Craft Steel Axe","optional":false,"type":"item","itemId":"IR-steel-axe","itemCount":1}]},
-    {"id":33,"x":720,"y":1180,"radius":20,"shape":"circle","title":"Cast Iron","subtitle":"Molten Iron","description":"Produce Cast Iron Ingot (optional).","iconUrl":"","tasks":[{"text":"Produce Cast Iron Ingot","optional":true,"type":"item","itemId":"IR-castironingot","itemCount":1}]},
-    {"id":34,"x":660,"y":1320,"radius":32,"shape":"star","title":"STEEL AGE","subtitle":"MASTER OF METAL - FINAL QUEST","description":"You have conquered metallurgy! From rock to steel - Industrial Revolution begins.<br><br>FINAL QUEST: Create high carbon steel products.","iconUrl":"","tasks":[{"text":"Create High Carbon Steel x5","optional":false,"type":"item","itemId":"IR-highcarbonsteelingot","itemCount":5},{"text":"Obtain Cast Iron (optional)","optional":true,"type":"item","itemId":"IR-castironingot","itemCount":1}]}
+    {
+      "id": 1,
+      "x": 240,
+      "y": 60,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Пролог",
+      "subtitle": "Ни одного дерева поблизости",
+      "description": "Вокруг только земля и камень - ни единого дерева, ни единого семени. Значит, саженец придётся не найти, а СДЕЛАТЬ: из минералов, воды и той органики, что уже тысячи лет пролежала в почве.<br><br>Каждый шаг ниже - это реальный процесс (дроблёная порода, обожжённое стекло, культура тканей), а не магия. Открывай список предметов (J) в любой момент, если забудешь рецепт.",
+      "iconUrl": "",
+      "tasks": []
+    },
+    {
+      "id": 2,
+      "x": 240,
+      "y": 200,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Почвоведение",
+      "subtitle": "Земля - это не просто грязь",
+      "description": "Почва - это смесь обломков минералов и гумуса (перегнившей органики). Обе составляющие можно найти, не разрушая сам блок земли.<br><br>Зажми кнопку ALT, затем удерживай Click, наведясь на клетку с Землёй (Dirt) - ты просеешь горсть почвы руками вместо того, чтобы копать её лопатой. Блок земли останется на месте, а в руках может оказаться камешек (или, гораздо реже, комок гумуса).",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Просей землю через ALT+Click и найди андезитовый камешек",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-apebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "x": 130,
+      "y": 340,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Стол из камня",
+      "subtitle": "Дереву тут взяться неоткуда",
+      "description": "Верстаку необязательно быть деревянным - ровная плита из подогнанных камней работает ничуть не хуже. Сложи 4 булыжника квадратом (2х2), чтобы получить Верстак.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Верстак из 4 булыжников",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-workbench",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "x": 350,
+      "y": 340,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Ручная мельница",
+      "subtitle": "Жёрнов должен быть твёрже, чем то, что он мелет",
+      "description": "Дальше понадобится дробить твёрдую вулканическую породу, а голыми руками андезит и базальт не размолоть. Дейслейт плотнее обычного камня - как раз то, из чего в реальности делают жернова.<br><br>Найди камешек дейслейта (ALT+Click по земле) и собери из него и булыжника Миксер (Mixer) - механическую дробилку-мешалку.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Найди камешек дейслейта",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-dpebble",
+          "itemCount": 1
+        },
+        {
+          "text": "Собери Миксер (2 булыжника + камешек дейслейта)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mixer",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "x": 130,
+      "y": 480,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Печь обжига",
+      "subtitle": "Смешать - не значит расплавить",
+      "description": "Миксер отлично мелет и мешает холодные порошки, но стекло получается только из расплава - смесь силикатов и извести нужно ОБЖЕЧЬ. Для этого нужна отдельная, более горячая станция.<br><br>На Верстаке (нужна полная сетка 3х3) выложи кольцо из 8 булыжников с пустым центром - классическая форма печи.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Построй Печь (Kiln) на Верстаке кольцом из 8 булыжников",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-kiln",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "x": 350,
+      "y": 480,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Вулканическая мука",
+      "subtitle": "Настоящее удобрение из камня",
+      "description": "Андезит и базальт, размолотые вместе в Миксере, - это буквально настоящая 'каменная мука': реальное минеральное удобрение, богатое калием, магнием и микроэлементами. Именно поэтому она потом растворяется в воде и превращается в питательный раствор.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Найди базальтовый камешек",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bpebble",
+          "itemCount": 1
+        },
+        {
+          "text": "Размели андезит и базальт в Миксере в Минеральную пыль",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mineralpowder",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "x": 460,
+      "y": 480,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Известь и кремнезём",
+      "subtitle": "Химия обычного стекла",
+      "description": "Кальцит мягкий (твёрдость около 3 по Моосу) - его можно растереть просто руками, получив известковую пыль (по сути, мел/CaCO3). Чёрный камень (blackstone) - плотная стекловидная вулканическая порода, богатая кремнезёмом (SiO2); её приходится молоть в Миксере.<br><br>Кремнезём + известь, обожжённые вместе, - это и есть настоящий рецепт обычного (натриево-известкового) стекла.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Найди кальцитовый и чёрнокаменный камешки",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cpebble",
+          "itemCount": 1
+        },
+        {
+          "text": "Разотри кальцит в Известковую пыль",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limepowder",
+          "itemCount": 1
+        },
+        {
+          "text": "Размели чёрный камень в Миксере в Кремнезёмную пыль",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-silicapowder",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "x": 240,
+      "y": 620,
+      "radius": 24,
+      "shape": "circle",
+      "title": "Стеклянная капсула",
+      "subtitle": "Первый настоящий сосуд",
+      "description": "В Печи кремнезёмная и известковая пыль наконец сплавляются в стекло - получается пустая многоразовая капсула (по сути, лабораторная ампула). Она понадобится не один раз, поэтому Печь сразу выдаёт по 2 штуки за цикл.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Обожги силикат и известь в Печи и получи 2 стеклянные капсулы",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-1000",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "x": 240,
+      "y": 760,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Капсула воды",
+      "subtitle": "Там, где есть земля, есть и вода",
+      "description": "Между частицами почвы всегда удерживается немного грунтовой влаги - собственно, именно на этом принципе работает обычный колодец. Пустая капсула + немного земли = капсула воды.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Добудь Капсулу воды из пустой капсулы и земли",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-1000-water",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "x": 350,
+      "y": 900,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Экстрактор и питательный гель",
+      "subtitle": "Гидропоника в чистом виде",
+      "description": "Собери Экстрактор жидкостей (Fluid Extractor) из капсулы, булыжника и минеральной пыли. Открой его (Use), поднеси Капсулу воды к ячейке Fluid Input и щёлкни по ней, чтобы перелить воду внутрь, затем положи Минеральную пыль во вторую ячейку.<br><br>Минералы, растворённые в воде, - это и есть питательный раствор, которым в реальности кормят растения при гидропонном выращивании.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Экстрактор жидкостей",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-fluid-extractor",
+          "itemCount": 1
+        },
+        {
+          "text": "Получи Питательный гель в Экстракторе",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-nutrientgel",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "x": 350,
+      "y": 1040,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Гумус и культура тканей",
+      "subtitle": "Единственный не минеральный ингредиент",
+      "description": "Гумус - это остатки давно погибших растений, всё ещё сохранившиеся в почве. Смешай его с Питательным гелем в Миксере и дай постоять (это займёт заметно больше времени, чем обычный помол) - так получится Каллусная культура: настоящий ботанический термин для массы живых, ещё не специализированных клеток растения, выращенных в лаборатории на питательной среде.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Найди комок гумуса (реже, чем обычные камешки)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-humus",
+          "itemCount": 1
+        },
+        {
+          "text": "Вырасти Каллусную культуру в Миксере",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-callusculture",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "x": 350,
+      "y": 1360,
+      "radius": 30,
+      "shape": "star",
+      "title": "Первый саженец",
+      "subtitle": "Синтетическое семя",
+      "description": "Всё готово для сборки. На Верстаке (нужна вся сетка 3х3) выложи в ряд: стерильную стеклянную капсулу, стерильный питательный гель и эмбриогенный каллус. Это и есть настоящая технология искусственного семени: живую, специально подготовленную культуру клеток герметично упаковывают вместе со стерильным питательным запасом, чтобы с ней можно было обращаться и «посадить» её точно как обычное семя.<br><br>Ни один ингредиент не появился из пустоты - только земля, камень, вода и то немногое живое, что пряталось в почве, проведённое через полноценную минералогию, химию стекла и асептику настоящей биотехнологии. Проращивание саженца в настоящее дерево - тема для следующей главы.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери первый Саженец дуба",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sapling",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "x": 460,
+      "y": 620,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Пепел вместо соды",
+      "subtitle": "Обычное стекло - это три оксида, не два",
+      "description": "Кремнезём и известь дают стекловидный расплав только в теории - на практике чистый SiO2 плавится примерно при 1700°C, что печи не по силам. Настоящее оконное/бутылочное стекло веками варили как содово-известковое: SiO2 + CaO + <b>Na2O</b> - щёлочь резко снижает температуру плавления. Третий оксид просто неоткуда взять... кроме золы.<br><br>В Печи (Kiln) прогрев Гумус (без второго ингредиента) - органика выгорает, оставляя минеральный пепел. Выход маленький: гумус и так самая редкая находка при просеивании земли (ALT+Click).",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прокали Гумус в Печи и получи Растительный пепел",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-plantash",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "x": 460,
+      "y": 700,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Щёлок",
+      "subtitle": "Так веками делали поташ",
+      "description": "Исторический способ получить щёлочь: пепел закапывали во влажную землю и давали воде, просачивающейся между частицами грунта, растворить из него растворимые соли калия/натрия - тот же принцип, что уже сработал для добычи воды из земли. Никакой станции не нужно - только пепел и сырая земля в руках.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Смешай Растительный пепел с 2 Землёй и получи Щёлок",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ashlye",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "x": 460,
+      "y": 780,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Кальцинированная сода",
+      "subtitle": "Выпарить досуха",
+      "description": "Вторая половина того же исторического процесса: щёлок нужно уварить/выпарить в Печи, оставив только сухую щелочную соль - соду. Именно её не хватало стеклу.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прокали Щёлок в Печи и получи Соду",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sodaash",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "x": 240,
+      "y": 620,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Стеклянная капсула",
+      "subtitle": "Теперь по настоящей формуле",
+      "description": "Кремнезём + известь + сода, обожжённые вместе в Печи - настоящий содово-известковый рецепт стекла. Без соды-флюса это стекло попросту не спеклось бы.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери в Печи стеклянную капсулу (кремнезём + известь + сода)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-1000",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "x": 240,
+      "y": 1120,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Автоклав",
+      "subtitle": "Обжиг - это ещё не стерильность",
+      "description": "Самая частая причина провала настоящей культуры тканей растений - банальное заражение плесенью или бактериями с непростерилизованной посуды. В лаборатории и посуду, и питательную среду перед работой с живой культурой автоклавируют - влажным паром под давлением (~121°C, ~15-20 мин), а не просто обжигают на огне.<br><br>Собери герметичную камеру: 4 стеклянные капсулы (смотровые/предохранительные порты), 4 булыжника (корпус) и кремнезёмный порошок (термостойкий уплотнитель).",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Автоклав (4 капсулы + 4 булыжника + кремнезём)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-autoclave",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "x": 240,
+      "y": 1200,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Асептика",
+      "subtitle": "Стерилизуй сосуд и среду отдельно",
+      "description": "В Автоклаве простерилизуй пустую стеклянную капсулу (будущую оболочку семени) и отдельно - питательный гель (будущую еду для зародыша). Оба процесса медленные (дольше, чем обжиг в Печи) - настоящий цикл автоклавирования всегда идёт с запасом по времени.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Простерилизуй капсулу",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-sterile",
+          "itemCount": 1
+        },
+        {
+          "text": "Простерилизуй питательный гель",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-nutrientgel-sterile",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "x": 460,
+      "y": 1120,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Раствор регуляторов роста",
+      "subtitle": "Обычный каллус ещё не эмбрион",
+      "description": "Просто выращенная культура клеток (каллус) сама по себе не станет зародышем семени - настоящий соматический эмбриогенез запускают, намеренно обработав каллус синтетическими фитогормонами (ауксинами вроде 2,4-Д/НУК, часто вместе с цитокинином). Их порошковые формы почти нерастворимы в чистой воде - в реальном садоводстве их растворяют как соль, в небольшом количестве слабой щёлочи. Щёлок для этого уже есть в цепочке.<br><br>Смешай Щёлок с Минеральной мукой (источник микроэлементов - бора, цинка, марганца - которыми такие препараты обычно дополняют) в Миксере.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Смешай в Миксере раствор регуляторов роста",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-hormonesolution",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "x": 460,
+      "y": 1200,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Биореактор",
+      "subtitle": "Не механика, а культивирование",
+      "description": "Собери Биореактор - для этого шага нужна не грубая дробилка, а контролируемый сосуд для живой культуры. Требует уже готового стерильного стекла - без Автоклава его не построить.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Биореактор (2 стерильные капсулы + 2 булыжника + минеральная мука)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bioreactor",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "x": 460,
+      "y": 1280,
+      "radius": 20,
+      "shape": "circle",
+      "title": "Эмбриогенный каллус",
+      "subtitle": "Самый долгий процесс во всей цепочке",
+      "description": "В Биореакторе обработай Каллусную культуру Раствором регуляторов роста - это и есть настоящая индукция эмбриогенности: клетки, способные при подходящей дозе гормонов переключиться в режим формирования зародыша. Процесс намеренно самый долгий из всех (180 тиков) - в реальности такое кондиционирование культуры занимает недели.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Получи Эмбриогенный каллус",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-embryogeniccallus",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "x": 400,
+      "y": 620,
+      "radius": 24,
+      "shape": "circle",
+      "title": "Металлургия: Начало",
+      "subtitle": "От камня к железу",
+      "description": "Железо не плавится в примитивной печи - оно ВОССТАНАВЛИВАЕТСЯ из руды при 1150-1250°C. Химия: Fe₂O₃ + 3CO → 2Fe + 3CO₂. Для этого нужна руда (не просто камень), уголь (топливо) и флюс (известняк для шлака).<br><br>Ищи железную руду в земле (ALT+Click) - гематит, магнетит, лимонит или болотную руду.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Найди любой тип железной руды (гематит, магнетит, лимонит или болотная руда)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-hematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "x": 400,
+      "y": 740,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Дробление руды",
+      "subtitle": "Поверхность имеет значение",
+      "description": "Кусковая руда восстанавливается медленно - газ CO проникает только с поверхности. Дробление до размера песка (2-5мм) увеличивает площадь поверхности в сотни раз.<br><br>Построй Жернов (Quern-Stone) - два камня, нижний неподвижный, верхний вращающийся. Загружай руду через центральное отверстие.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Жернов (Quern-Stone)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-quernstone",
+          "itemCount": 1
+        },
+        {
+          "text": "Раздробь руду в дроблёную руду",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedhematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "x": 400,
+      "y": 860,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Гравитационное обогащение",
+      "subtitle": "Тяжёлое тонет, лёгкое всплывает",
+      "description": "Дроблёная руда всё ещё содержит пустую породу (кварц, глина). Промывка в Желобе (Sluice Box) использует разницу плотности: железная руда ~5.0 г/см³, кварцевый песок ~2.65 г/см³.<br><br>Тяжёлые частицы руды оседают за риффелями, лёгкая порода смывается водой.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Желоб (Sluice Box)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sluicebox",
+          "itemCount": 1
+        },
+        {
+          "text": "Получи концентрат руды промывкой",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratehematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "x": 280,
+      "y": 980,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Древесный уголь",
+      "subtitle": "Чистый углерод для чистого железа",
+      "description": "Дрова дают слишком много серы и фосфора - железо станет хрупким. Нужен древесный уголь (почти чистый углерод, 75-90% C).<br><br>Угольная яма (Charcoal Pit): древесина нагревается 400-500°C без доступа воздуха, улетучиваются вода и смолы. Выход: ~20-25% от массы сухой древесины.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Построй Угольную яму (Charcoal Pit)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-charcoalpit",
+          "itemCount": 1
+        },
+        {
+          "text": "Получи древесный уголь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-charcoal",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "x": 520,
+      "y": 980,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Флюс: Известняк",
+      "subtitle": "Химия шлака",
+      "description": "Известняк (CaCO₃) реагирует с кремнезёмом пустой породы, образуя шлак (CaSiO₃). Шлак плавится и всплывает на поверхность железа, защищая от повторного окисления.<br><br>Найди известняк и размельчи его для использования в домнице.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Найди известняк",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limestone",
+          "itemCount": 1
+        },
+        {
+          "text": "Размельчи известняк в дроблёный известняк",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedlimestone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "x": 400,
+      "y": 1100,
+      "radius": 26,
+      "shape": "circle",
+      "title": "Домница (Bloomery)",
+      "subtitle": "Твёрдое восстановление при 1150-1250°C",
+      "description": "Глиняная шахтная печь (~1-2м высотой). Сверху загружаются слоями уголь и руда, снизу мехи подают воздух через фурму. Температура 1150-1250°C - достаточно для восстановления Fe₂O₃ до Fe, НЕ достаточно для плавления железа (1538°C).<br><br>Результат: крица (ком губчатого железа со шлаком). Химия: Fe₂O₃ + 3CO → 2Fe + 3CO₂",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Построй Домницу (Bloomery Furnace)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bloomeryfurnace",
+          "itemCount": 1
+        },
+        {
+          "text": "Выплавь первую крицу из руды",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bloom",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "x": 400,
+      "y": 1240,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Обжимка крицы",
+      "subtitle": "Удаление шлака ковкой",
+      "description": "Крица - это смесь металлического железа, шлака и нередуцированной руды. Нагрей до 1200°C и куй на наковальне, выдавливая шлак. Повторяй нагрев и ковку несколько раз.<br><br>Тяжёлая наковальня (100+ кг) поглощает энергию удара эффективно - лёгкая будет отскакивать.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Тяжёлую наковальню (Heavy Anvil)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-anvil",
+          "itemCount": 1
+        },
+        {
+          "text": "Перекуй крицу в сыродутное железо",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-wroughtironingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "x": 280,
+      "y": 1380,
+      "radius": 24,
+      "shape": "circle",
+      "title": "Коксование угля",
+      "subtitle": "Чистое топливо для высоких температур",
+      "description": "Каменный уголь содержит серу и фосфор - они делают железо хрупким. Коксование (нагрев 1000-1100°C без воздуха) удаляет летучие вещества (смолы, аммиак, сернистые соединения).<br><br>Кокс (~90-95% углерода) горит очень горячо. Изобретён Абрахамом Дерби в 1709 году - ключ к промышленной революции.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Найди каменный уголь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coal",
+          "itemCount": 1
+        },
+        {
+          "text": "Построй Коксовую печь (Coke Oven)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cokeoven",
+          "itemCount": 1
+        },
+        {
+          "text": "Получи кокс из угля",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coke",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "x": 520,
+      "y": 1380,
+      "radius": 24,
+      "shape": "circle",
+      "title": "Кричное горно (Finery Forge)",
+      "subtitle": "Обезуглероживание чугуна",
+      "description": "Чугун (3.5-4.5% C) слишком хрупок для инструментов. В Кричном горне (1400-1500°C) воздух окисляет углерод: C + O₂ → CO₂. Процесс останавливают при нужном содержании углерода.<br><br>Кованое железо (<0.08% C) - почти полное обезуглероживание. Сталь (0.2-2.1% C) - частичное.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Построй Кричное горно (Finery Forge)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-fineryforge",
+          "itemCount": 1
+        },
+        {
+          "text": "Получи стальную крицу",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steelbloom",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "x": 400,
+      "y": 1520,
+      "radius": 24,
+      "shape": "circle",
+      "title": "Тигельная печь",
+      "subtitle": "Плавление стали",
+      "description": "Тигельная печь: герметичный керамический сосуд, нагреваемый до 1600-1700°C. Железо + источник углерода плавятся вместе, углерод равномерно диффундирует.<br><br>Производит однородную высококачественную сталь. Вудцкая сталь (Индия), булат (Центральная Азия), тигельная сталь Хантсмана (Англия, 1740-е).",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Построй Тигельную печь (Crucible Furnace)",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cruciblefurnace",
+          "itemCount": 1
+        },
+        {
+          "text": "Выплавь стальной слиток",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mediumsteelingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "x": 280,
+      "y": 1660,
+      "radius": 22,
+      "shape": "circle",
+      "title": "Пирометр",
+      "subtitle": "Измерение температуры",
+      "description": "Доmodernных термометров металлурги определяли температуру по цвету (чёрный→красный→оранжевый→жёлтый→белый) и поведению материалов (свинец плавится 327°C, медь 1085°C, железо 1538°C).<br><br>Прототип пирометра использует тепловое расширение металлического стержня или цветовые карты. Точность ±25-50°C.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Собери Прототип пирометра",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-pyrometer",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "x": 520,
+      "y": 1660,
+      "radius": 26,
+      "shape": "circle",
+      "title": "Контроль содержания углерода",
+      "subtitle": "0.5% C - баланс твёрдости и вязкости",
+      "description": "Содержание углерода определяет свойства стали:<br>• <0.08% C: Кованое железо (мягкое, не закаливается)<br>• 0.08-0.3% C: Мягкая сталь (конструкционная)<br>• 0.3-0.6% C: Средняя сталь (инструменты)<br>• 0.6-1.5% C: Высокоуглеродистая сталь (режущий инструмент)<br>• >2.1% C: Чугун (хрупкий, литьё)<br><br>Достигни ровно 0.5% C в своей стали.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Получи сталь с содержанием углерода 0.4-0.6%",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mediumsteelingot",
+          "itemCount": 3
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "x": 400,
+      "y": 1800,
+      "radius": 28,
+      "shape": "star",
+      "title": "Сталь",
+      "subtitle": "Мастерство металлурга",
+      "description": "Ты прошёл путь от просеивания земли до производства стали - материала, который определил цивилизацию. Каждая стадия требовала понимания химии и физики:<br><br>• Восстановление оксидов (Fe₂O₃ + 3CO → 2Fe + 3CO₂)<br>• Контроль температуры (1150-1700°C)<br>• Управление содержанием углерода (0.02-4.5%)<br>• Формирование шлака (CaO + SiO₂ → CaSiO₃)<br><br>Теперь ты можешь ковать инструменты, оружие, механизмы. Это начало промышленной эры.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Создай полный набор стальных изделий",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-highcarbonsteelingot",
+          "itemCount": 5
+        },
+        {
+          "text": "Получи все типы стальных слитков",
+          "optional": true,
+          "type": "item",
+          "itemId": "IR-castironingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "x": 110,
+      "y": 1640,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Чистый старт",
+      "subtitle": "Осмотр платформы",
+      "description": "Осмотрите стартовую площадку и сохраните землю: она нужна и для минералов, и для воды.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "x": 290,
+      "y": 1640,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Просеивание без потерь",
+      "subtitle": "Работайте по открытому грунту",
+      "description": "Просеивание доступно только по земле без установленного сверху блока.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "x": 470,
+      "y": 1640,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Справочник JEI",
+      "subtitle": "Рецепт под рукой",
+      "description": "Откройте JEI клавишей J: вкладка «Рецепт» показывает создание, «Использование» — назначение предмета.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "x": 650,
+      "y": 1640,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Два пути к извести",
+      "subtitle": "Ручной помол",
+      "description": "Кальцит можно измельчить вручную. Станок оставьте для более твёрдых пород.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "x": 830,
+      "y": 1640,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Кремнезём",
+      "subtitle": "Чёрный камень",
+      "description": "Два чёрных камешка в мельнице дают кремнезёмный порошок.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "x": 110,
+      "y": 1755,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Минеральная смесь",
+      "subtitle": "Базальт и андезит",
+      "description": "Смешивайте базальт и андезит: это полезная реминерализующая добавка.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "x": 290,
+      "y": 1755,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Тихая печь",
+      "subtitle": "Порядок у горна",
+      "description": "Держите свободную ячейку выхода печи — готовый предмет не должен упереться в полный инвентарь.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "x": 470,
+      "y": 1755,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Зола растений",
+      "subtitle": "Редкий ресурс",
+      "description": "Гумус попадается реже камешков. Не тратьте весь запас до получения щёлока.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "x": 650,
+      "y": 1755,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Стекольная формула",
+      "subtitle": "Три ингредиента",
+      "description": "Кремнезём, известь и сода дают стабильное содово-известковое стекло.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "x": 830,
+      "y": 1755,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Чистая тара",
+      "subtitle": "Сначала стерилизация",
+      "description": "Стерилизуйте сосуд и питательную среду по отдельности, прежде чем соединять культуру.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "x": 110,
+      "y": 1870,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Культура тканей",
+      "subtitle": "Не спешите",
+      "description": "Каллус — промежуточная культура; ему ещё нужны регуляторы роста.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "x": 290,
+      "y": 1870,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Семя как проект",
+      "subtitle": "Три ветви",
+      "description": "Синтетическое семя объединяет стерильную тару, питательную среду и эмбриогенный каллус.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "x": 470,
+      "y": 1870,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Первое дерево",
+      "subtitle": "Возобновляемый материал",
+      "description": "После первого бревна древесина перестаёт быть дефицитом. Сделайте несколько досок заранее.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "x": 650,
+      "y": 1870,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Угольная куча",
+      "subtitle": "Топливо, не отходы",
+      "description": "Древесный уголь нужен домнице; обычные доски не заменяют его в плавке.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "x": 830,
+      "y": 1870,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Глина из почвы",
+      "subtitle": "Материал огнеупора",
+      "description": "Просеивайте землю для глины. Из неё получаются кирпичи и керамические детали.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "x": 110,
+      "y": 1985,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Руда в JEI",
+      "subtitle": "Источник добычи",
+      "description": "У железной руды в JEI теперь указан источник: просеивание земли с Alt.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "x": 290,
+      "y": 1985,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Не вся руда одинакова",
+      "subtitle": "Выбор шихты",
+      "description": "Болотная руда доступна чаще, а гематит и магнетит дают альтернативные пути обогащения.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "x": 470,
+      "y": 1985,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Жернов",
+      "subtitle": "Увеличьте поверхность",
+      "description": "Дробление руды — подготовка к промывке: не пропускайте этот шаг.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "x": 650,
+      "y": 1985,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Промывка",
+      "subtitle": "Тяжёлое остаётся",
+      "description": "Промывочный лоток отделяет тяжёлый железный концентрат от пустой породы.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "x": 830,
+      "y": 1985,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Вода в обороте",
+      "subtitle": "Подготовьте капсулы",
+      "description": "Для каждой промывки нужна капсула воды. Проверьте запас до запуска серии.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "x": 110,
+      "y": 2100,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Известняк",
+      "subtitle": "Флюс для шлака",
+      "description": "Дроблёный известняк связывает примеси в шлак и делает крицу чище.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "x": 290,
+      "y": 2100,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Доменная шихта",
+      "subtitle": "Три части процесса",
+      "description": "Концентрат, флюс и уголь загружаются вместе. JEI покажет точные количества.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "x": 470,
+      "y": 2100,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Крица",
+      "subtitle": "Первый металл",
+      "description": "Крица пористая и содержит шлак — это нормальный результат домницы, а не брак.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "x": 650,
+      "y": 2100,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Ковка крицы",
+      "subtitle": "Уберите шлак",
+      "description": "Ковка уплотняет металл и выдавливает шлаковые включения.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "x": 830,
+      "y": 2100,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Железные заготовки",
+      "subtitle": "Пластины и прутки",
+      "description": "Формованные рецепты превращают кованое железо в пластины, прутки и обручи.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "x": 110,
+      "y": 2215,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Механическая деталь",
+      "subtitle": "Шестерня",
+      "description": "Соберите шестерню по кольцевому рецепту на верстаке.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "x": 290,
+      "y": 2215,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Огнеупор",
+      "subtitle": "Печь для высоких температур",
+      "description": "Огнеупорный кирпич сочетает глиняный кирпич и известь.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "x": 470,
+      "y": 2215,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Коксование",
+      "subtitle": "Горячее топливо",
+      "description": "Кокс даёт больше температуры и подходит для следующей металлургической ступени.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "x": 650,
+      "y": 2215,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Передельный горн",
+      "subtitle": "Чище железо",
+      "description": "Передельный горн снижает содержание углерода и возвращает ковкость металлу.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "x": 830,
+      "y": 2215,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Тигель",
+      "subtitle": "Точная сталь",
+      "description": "Тигельная печь нужна, когда важен контролируемый состав стали.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "x": 110,
+      "y": 2330,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Температура",
+      "subtitle": "Не только время",
+      "description": "Пирометр помогает читать режим процесса; не путайте его с самой печью.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "x": 290,
+      "y": 2330,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Мягкая сталь",
+      "subtitle": "Первый сплав",
+      "description": "Мягкая сталь — спокойный вариант для конструкций и рам.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "x": 470,
+      "y": 2330,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Средняя сталь",
+      "subtitle": "Рабочий материал",
+      "description": "Среднеуглеродистая сталь подходит для прочных деталей и рам.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "x": 650,
+      "y": 2330,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Высокоуглеродистая сталь",
+      "subtitle": "Режущий потенциал",
+      "description": "Высокое содержание углерода даёт твёрдость, но требует аккуратности.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "x": 830,
+      "y": 2330,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Графитовый тигель",
+      "subtitle": "Посуда для расплава",
+      "description": "Графитовый тигель собирается кольцом: оставьте центр пустым.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "x": 110,
+      "y": 2445,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Шлак — это данные",
+      "subtitle": "Читайте результат",
+      "description": "Шлак показывает, что примеси были выведены. Не считайте его бесполезным мусором.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "x": 290,
+      "y": 2445,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Запасные маршруты",
+      "subtitle": "Не один ответ",
+      "description": "У одной цели может быть несколько рудных путей. Смотрите «Использование» в JEI.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "x": 470,
+      "y": 2445,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Чистый инвентарь",
+      "subtitle": "Место для результата",
+      "description": "Перед длинным процессом освободите место: станки не должны терять готовый результат.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "x": 650,
+      "y": 2445,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Проверка цепочки",
+      "subtitle": "От сырья к стали",
+      "description": "Просмотрите JEI от руды назад до просеивания и вперёд до стали.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "x": 830,
+      "y": 2445,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Стальная рама",
+      "subtitle": "Основа станка",
+      "description": "Рама — первый спокойный шаг после стали: она открывает сборку более сложных печей.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "x": 110,
+      "y": 2560,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Большая печь",
+      "subtitle": "После стали",
+      "description": "Соберите тигельную печь, когда готовы к более точным сплавам.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "x": 290,
+      "y": 2560,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Справочник мастера",
+      "subtitle": "Полезная привычка",
+      "description": "Для каждого незнакомого предмета сначала смотрите рецепт, затем применение.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "x": 470,
+      "y": 2560,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Плавная прогрессия",
+      "subtitle": "Без лишнего гринда",
+      "description": "Эти задания объясняют уже доступные системы и не требуют новых ресурсов.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "x": 650,
+      "y": 2560,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Металлургическая карта",
+      "subtitle": "Связи выправлены",
+      "description": "Ветви квестов теперь идут только вперёд: нет циклов и заблокированных тупиков.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "x": 830,
+      "y": 2560,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Небольшой запас",
+      "subtitle": "Планирование",
+      "description": "Держите немного угля, воды и известняка до следующей плавки.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "x": 110,
+      "y": 2675,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Финальная проверка",
+      "subtitle": "Сталь без спешки",
+      "description": "Вы уже знаете весь путь: просеивание → обогащение → крица → сталь.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "x": 290,
+      "y": 2675,
+      "radius": 18,
+      "shape": "circle",
+      "title": "После стали",
+      "subtitle": "Открытый горизонт",
+      "description": "Сталь завершает базовую линию. Дальнейшие станции — улучшение, а не обязательный барьер.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "x": 470,
+      "y": 2675,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Аккуратный журнал",
+      "subtitle": "Завершение",
+      "description": "Отметьте пройденные подсказки, когда захотите: они не блокируют основной прогресс.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "x": 650,
+      "y": 2675,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Мастерская",
+      "subtitle": "Уютный порядок",
+      "description": "Разместите станции так, чтобы между ними было удобно переносить материалы.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "x": 830,
+      "y": 2675,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Свобода выбора",
+      "subtitle": "Итог",
+      "description": "Собирайте материалы удобным путём — JEI теперь показывает и обработку, и добычу.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "x": 110,
+      "y": 2790,
+      "radius": 18,
+      "shape": "circle",
+      "title": "Промышленный рассвет",
+      "subtitle": "Эпилог",
+      "description": "Базовая металлургия завершена. Экспериментируйте со станциями без новых обязательных гринд-стен.",
+      "iconUrl": "",
+      "tasks": [
+        {
+          "text": "Прочитать подсказку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    }
   ],
   "edges": [
-    {"from":1,"to":2},{"from":2,"to":3},{"from":2,"to":4},{"from":3,"to":5},{"from":4,"to":6},{"from":4,"to":7},{"from":5,"to":8},{"from":8,"to":9},{"from":9,"to":10},{"from":6,"to":10},{"from":10,"to":11},{"from":7,"to":13},{"from":13,"to":14},{"from":14,"to":15},{"from":15,"to":16},{"from":16,"to":8},{"from":8,"to":17},{"from":6,"to":19},{"from":19,"to":20},{"from":18,"to":20},{"from":20,"to":21},{"from":21,"to":12},{"from":18,"to":12},{"from":21,"to":22},{"from":22,"to":23},{"from":23,"to":24},{"from":24,"to":25},{"from":24,"to":26},{"from":25,"to":27},{"from":26,"to":27},{"from":27,"to":28},{"from":28,"to":29},{"from":28,"to":30},{"from":29,"to":30},{"from":30,"to":31},{"from":30,"to":32},{"from":31,"to":32},{"from":31,"to":33},{"from":32,"to":34},{"from":33,"to":34}
+    {
+      "from": 1,
+      "to": 2
+    },
+    {
+      "from": 2,
+      "to": 3
+    },
+    {
+      "from": 2,
+      "to": 4
+    },
+    {
+      "from": 3,
+      "to": 5
+    },
+    {
+      "from": 4,
+      "to": 6
+    },
+    {
+      "from": 4,
+      "to": 7
+    },
+    {
+      "from": 6,
+      "to": 8
+    },
+    {
+      "from": 7,
+      "to": 13
+    },
+    {
+      "from": 13,
+      "to": 14
+    },
+    {
+      "from": 14,
+      "to": 15
+    },
+    {
+      "from": 15,
+      "to": 8
+    },
+    {
+      "from": 8,
+      "to": 9
+    },
+    {
+      "from": 9,
+      "to": 10
+    },
+    {
+      "from": 10,
+      "to": 11
+    },
+    {
+      "from": 10,
+      "to": 17
+    },
+    {
+      "from": 11,
+      "to": 19
+    },
+    {
+      "from": 17,
+      "to": 18
+    },
+    {
+      "from": 19,
+      "to": 20
+    },
+    {
+      "from": 18,
+      "to": 21
+    },
+    {
+      "from": 20,
+      "to": 21
+    },
+    {
+      "from": 21,
+      "to": 12
+    },
+    {
+      "from": 12,
+      "to": 22
+    },
+    {
+      "from": 22,
+      "to": 23
+    },
+    {
+      "from": 23,
+      "to": 24
+    },
+    {
+      "from": 24,
+      "to": 25
+    },
+    {
+      "from": 25,
+      "to": 26
+    },
+    {
+      "from": 26,
+      "to": 27
+    },
+    {
+      "from": 27,
+      "to": 28
+    },
+    {
+      "from": 28,
+      "to": 29
+    },
+    {
+      "from": 29,
+      "to": 30
+    },
+    {
+      "from": 30,
+      "to": 31
+    },
+    {
+      "from": 31,
+      "to": 32
+    },
+    {
+      "from": 32,
+      "to": 33
+    },
+    {
+      "from": 33,
+      "to": 34
+    },
+    {
+      "from": 1,
+      "to": 35
+    },
+    {
+      "from": 2,
+      "to": 36
+    },
+    {
+      "from": 2,
+      "to": 37
+    },
+    {
+      "from": 7,
+      "to": 38
+    },
+    {
+      "from": 7,
+      "to": 39
+    },
+    {
+      "from": 6,
+      "to": 40
+    },
+    {
+      "from": 5,
+      "to": 41
+    },
+    {
+      "from": 13,
+      "to": 42
+    },
+    {
+      "from": 15,
+      "to": 43
+    },
+    {
+      "from": 18,
+      "to": 44
+    },
+    {
+      "from": 11,
+      "to": 45
+    },
+    {
+      "from": 21,
+      "to": 46
+    },
+    {
+      "from": 22,
+      "to": 47
+    },
+    {
+      "from": 23,
+      "to": 48
+    },
+    {
+      "from": 24,
+      "to": 49
+    },
+    {
+      "from": 26,
+      "to": 50
+    },
+    {
+      "from": 26,
+      "to": 51
+    },
+    {
+      "from": 27,
+      "to": 52
+    },
+    {
+      "from": 28,
+      "to": 53
+    },
+    {
+      "from": 28,
+      "to": 54
+    },
+    {
+      "from": 9,
+      "to": 55
+    },
+    {
+      "from": 26,
+      "to": 56
+    },
+    {
+      "from": 27,
+      "to": 57
+    },
+    {
+      "from": 28,
+      "to": 58
+    },
+    {
+      "from": 28,
+      "to": 59
+    },
+    {
+      "from": 30,
+      "to": 60
+    },
+    {
+      "from": 30,
+      "to": 61
+    },
+    {
+      "from": 29,
+      "to": 62
+    },
+    {
+      "from": 30,
+      "to": 63
+    },
+    {
+      "from": 31,
+      "to": 64
+    },
+    {
+      "from": 32,
+      "to": 65
+    },
+    {
+      "from": 32,
+      "to": 66
+    },
+    {
+      "from": 33,
+      "to": 67
+    },
+    {
+      "from": 33,
+      "to": 68
+    },
+    {
+      "from": 31,
+      "to": 69
+    },
+    {
+      "from": 27,
+      "to": 70
+    },
+    {
+      "from": 28,
+      "to": 71
+    },
+    {
+      "from": 30,
+      "to": 72
+    },
+    {
+      "from": 34,
+      "to": 73
+    },
+    {
+      "from": 34,
+      "to": 74
+    },
+    {
+      "from": 34,
+      "to": 75
+    },
+    {
+      "from": 34,
+      "to": 76
+    },
+    {
+      "from": 34,
+      "to": 77
+    },
+    {
+      "from": 34,
+      "to": 78
+    },
+    {
+      "from": 34,
+      "to": 79
+    },
+    {
+      "from": 34,
+      "to": 80
+    },
+    {
+      "from": 34,
+      "to": 81
+    },
+    {
+      "from": 34,
+      "to": 82
+    },
+    {
+      "from": 34,
+      "to": 83
+    },
+    {
+      "from": 34,
+      "to": 84
+    },
+    {
+      "from": 34,
+      "to": 85
+    }
   ],
-  "cameraX":0,"cameraY":0,"nextNodeId":35
+  "cameraX": 0,
+  "cameraY": 0,
+  "nextNodeId": 86
 };
 
 const QuestBook = {
@@ -913,33 +2936,6 @@ function setupQuestControls() {
 
     const eyeBtn = document.getElementById('quest-eye-toggle');
     if (eyeBtn) eyeBtn.addEventListener('click', () => QuestBook.toggleShowHidden());
-
-    // Reset progress: requires two taps (arm, then confirm within a short
-    // window) instead of a native confirm() popup, so it's still a
-    // deliberate action but doesn't block the UI with a browser dialog.
-    const resetBtn = document.getElementById('quest-reset-toggle');
-    if (resetBtn) {
-        let armed = false;
-        let armTimer = null;
-        resetBtn.addEventListener('click', () => {
-            if (!armed) {
-                armed = true;
-                resetBtn.classList.add('armed');
-                resetBtn.title = 'Tap again to confirm reset';
-                armTimer = setTimeout(() => {
-                    armed = false;
-                    resetBtn.classList.remove('armed');
-                    resetBtn.title = 'Reset all quest progress';
-                }, 3000);
-            } else {
-                clearTimeout(armTimer);
-                armed = false;
-                resetBtn.classList.remove('armed');
-                resetBtn.title = 'Reset all quest progress';
-                QuestBook.resetProgress();
-            }
-        });
-    }
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'b' || e.key === 'B') {
