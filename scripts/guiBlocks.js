@@ -118,11 +118,23 @@ const GuiBlocks = {
     // `slots` object instead of Inventory.slots - with one extra rule:
     // output slots (slotDef.output) can only be taken FROM, never placed
     // INTO, since they're meant to hold whatever the block produces.
+    // Check if a block is currently processing a recipe
+    isProcessing(x, y) {
+        const key = this.keyFor(x, y);
+        return !!(this.progress[key] && this.progress[key].ticksDone > 0);
+    },
+
     handleSlotClick(slotId) {
         if (!this.open) return;
         const slots = this.getSlots(this.open.x, this.open.y, this.open.guiDef);
         const slotDef = this.open.guiDef.slots.find(s => s.id === slotId);
         const clicked = slots[slotId];
+
+        // BUG FIX: Allow players to remove input items even while processing
+        // This lets them stop a recipe mid-process instead of being forced to
+        // watch it consume all resources. Only output slots remain locked.
+        const isProcessing = this.isProcessing(this.open.x, this.open.y);
+        const isInputSlot = slotDef && !slotDef.output && !slotDef.fluidSlot;
 
         // Fluid slots (registry.js `gui.slots[].fluidSlot: true` - see
         // FluidSlots in fluids.js) work completely differently from a
@@ -149,12 +161,29 @@ const GuiBlocks = {
 
         if (!Inventory.dragging) {
             if (!clicked) return;
+            // BUG FIX: Allow removing input items even while processing
+            // Output slots still can't be picked up from until recipe completes
+            if (slotDef && slotDef.output && isProcessing) {
+                // Can't take from output slot while still processing
+                return;
+            }
             Inventory.dragging = { fromIndex: null, item: clicked };
             slots[slotId] = null;
+            // If we removed an input item while processing, cancel the recipe
+            if (isInputSlot && isProcessing) {
+                const key = this.keyFor(this.open.x, this.open.y);
+                delete this.progress[key];
+            }
             Inventory.displayedItemId = clicked.id;
         } else {
             // Output slots only ever give items out - you can't place into them.
             if (slotDef && slotDef.output) {
+                return;
+            }
+            // BUG FIX: Don't allow placing items into input slots while processing
+            // This prevents confusing behavior where items disappear or recipe breaks
+            if (isInputSlot && isProcessing) {
+                // Show feedback that machine is busy
                 return;
             }
             const dragItem = Inventory.dragging.item;
@@ -205,6 +234,12 @@ const GuiBlocks = {
         const slotDef = this.open.guiDef.slots.find(s => s.id === slotId);
         const clicked = slots[slotId];
 
+        // BUG FIX: Same processing lock as handleSlotClick - let players
+        // remove/modify input items to stop the recipe, but don't allow
+        // modifying inputs once processing has started.
+        const isProcessing = this.isProcessing(this.open.x, this.open.y);
+        const isInputSlot = slotDef && !slotDef.output && !slotDef.fluidSlot;
+
         // Fluid slots have no plain item stack to split - a fluid slot's
         // "amount" is split by capacity, not stack count, so there's
         // nothing for a stack-split gesture to do here.
@@ -214,6 +249,11 @@ const GuiBlocks = {
 
         if (!Inventory.dragging) {
             if (!clicked) return;
+            // If removing from input slot while processing, cancel the recipe
+            if (isInputSlot && isProcessing) {
+                const key = this.keyFor(this.open.x, this.open.y);
+                delete this.progress[key];
+            }
             if (clicked.count <= 1) {
                 Inventory.dragging = { fromIndex: null, item: clicked };
                 slots[slotId] = null;
@@ -243,6 +283,11 @@ const GuiBlocks = {
         }
 
         if (slotDef && slotDef.output) return; // can't place into an output slot
+
+        // Don't allow placing items into input slots while processing
+        if (isInputSlot && isProcessing) {
+            return;
+        }
 
         const dragItem = Inventory.dragging.item;
         if (!clicked) {

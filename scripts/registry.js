@@ -184,7 +184,7 @@ Registry.register({
         type: 'block',
         stackable: true,
         maxStack: 64,
-        breakTimeTicks: 20,
+        breakTimeTicks: 30,  // Increased from 20 (1.5s) - basic but not instant
         hardness: 1,
         color: '#6b8e23',
         dropId: 'IR-dirt',
@@ -205,7 +205,7 @@ Registry.register({
         type: 'block',
         stackable: true,
         maxStack: 64,
-        breakTimeTicks: 40,
+        breakTimeTicks: 60,  // Increased from 40 (3s) - proper stone difficulty
         hardness: 3,
         color: '#808080',
         dropId: 'IR-cobblestone',
@@ -243,7 +243,7 @@ Registry.register({
         type: 'block',
         stackable: true,
         maxStack: 64,
-        breakTimeTicks: 25,
+        breakTimeTicks: 40,  // Increased from 25 (2s) - crafting station takes time to break
         hardness: 2,
         color: '#8a5a34',
         dropId: 'IR-workbench',
@@ -518,15 +518,16 @@ Registry.register({
         texture: 'assets/kiln.png',
         gui: {
             title: 'Kiln',
+            guiTexture: 'assets/kiln_gui.png',
             slots: [
-                { id: 'input1', label: 'Input 1' },
-                { id: 'input2', label: 'Input 2' },
+                { id: 'input1', label: 'Fuel/Input', x: 20, y: 15 },
+                { id: 'input2', label: 'Material 1', x: 20, y: 55 },
                 // 3rd slot: real soda-lime-silica glass needs three oxides
                 // (SiO2 + CaO + Na2O), not two - see kiln-glass-capsule below.
-                { id: 'input3', label: 'Input 3' },
-                { id: 'output', label: 'Output', output: true }
+                { id: 'input3', label: 'Material 2', x: 55, y: 55 },
+                { id: 'output', label: 'Fired Result', output: true, x: 120, y: 35 }
             ],
-            progressBar: { x: 55, y: 35, width: 32, height: 8, direction: 'right' }
+            progressBar: { x: 85, y: 20, width: 28, height: 20, direction: 'up' }
         }
     },
     'IR-autoclave': {
@@ -582,6 +583,31 @@ Registry.register({
             progressBar: { x: 55, y: 35, width: 32, height: 8, direction: 'right' }
         }
     },
+    // Foundational materials and parts used by the processing and
+    // metallurgy recipes below.  These used to be referenced by recipes
+    // without registry entries, which made their JEI icons blank and made
+    // the recipes impossible to complete.
+    'IR-clay': { name: 'Clay', type: 'item', color: '#a87864', icon: '🟤', texture: 'assets/clay.png' },
+    'IR-brick': { name: 'Fired Brick', type: 'item', color: '#a9472d', icon: '🧱', texture: 'assets/brick.png' },
+    'IR-claybrick': { name: 'Clay Brick', type: 'item', color: '#b65d42', icon: '🧱', texture: 'assets/clay_brick.png' },
+    'IR-capsule-1000': { name: 'Empty Glass Capsule', type: 'item', maxStack: 16, color: '#b8e7ef', icon: '🫙', texture: 'assets/capsule_empty.png' },
+    'IR-capsule-1000-water': { name: 'Water Capsule', type: 'item', maxStack: 16, color: '#4aaee8', icon: '💧', texture: 'assets/capsule_water.png' },
+    'IR-fluid-extractor': { name: 'Fluid Extractor', type: 'block', color: '#4a7891', dropId: 'IR-fluid-extractor', overlay: true, icon: '⚗', texture: 'assets/fluid_extractor.png' },
+    'IR-ironplate': { name: 'Iron Plate', type: 'item', color: '#aeb6bd', icon: '▣', texture: 'assets/iron_plate.png' },
+    'IR-ironband': { name: 'Iron Band', type: 'item', color: '#858b91', icon: '◯', texture: 'assets/iron_band.png' },
+    'IR-ironrod': { name: 'Iron Rod', type: 'item', color: '#969da3', icon: '┃', texture: 'assets/iron_rod.png' },
+    'IR-steelframe': { name: 'Steel Frame', type: 'item', color: '#72808a', icon: '▦', texture: 'assets/steel_frame.png' },
+    'IR-refractorybrick': { name: 'Refractory Brick', type: 'item', color: '#d89053', icon: '🧱', texture: 'assets/refractory_brick.png' },
+    'IR-cruciblegraphite': { name: 'Graphite Crucible', type: 'item', color: '#353535', icon: '◒', texture: 'assets/graphite_crucible.png' },
+    'IR-graphite': { name: 'Graphite', type: 'item', color: '#30343a', icon: '◆', texture: 'assets/graphite.png' },
+    'IR-gear': { name: 'Iron Gear', type: 'item', color: '#858b91', icon: '⚙', texture: 'assets/gear.png' },
+    'IR-grindingstone': { name: 'Grinding Stone', type: 'item', color: '#777d82', icon: '●', texture: 'assets/grinding_stone.png' },
+    'IR-woodenriffle': { name: 'Wooden Riffle', type: 'item', color: '#a97c50', icon: '═', texture: 'assets/wooden_riffle.png' },
+    'IR-ceramictube': { name: 'Ceramic Tube', type: 'item', color: '#e7d5b1', icon: '│', texture: 'assets/ceramic_tube.png' },
+    'IR-metalwire': { name: 'Metal Wire', type: 'item', color: '#b9c0c7', icon: '〰', texture: 'assets/metal_wire.png' },
+    'IR-glass': { name: 'Glass', type: 'item', color: '#b8e7ef', icon: '◇', texture: 'assets/glass.png' },
+    'IR-leather': { name: 'Leather', type: 'item', color: '#805334', icon: '▰', texture: 'assets/leather.png' },
+    'IR-stoneblock': { name: 'Stone Block', type: 'item', color: '#777777', icon: '■', texture: 'assets/stone_block.png' },
     // ========================================================
     // METALLURGY EXPANSION - Iron Age to Steel Age
     // ========================================================
@@ -861,6 +887,14 @@ Registry.register({
         color: '#2f2f2f',
         icon: '🌑',
         texture: 'assets/coal.png'
+    },
+    'IR-bituminouscoal': {
+        name: 'Rich Bituminous Coal', type: 'item', maxStack: 64,
+        color: '#252525', icon: '◆', texture: 'assets/bituminous_coal.png'
+    },
+    'IR-coaltar': {
+        name: 'Coal Tar', type: 'item', maxStack: 16,
+        color: '#1c1716', icon: '●', texture: 'assets/coal_tar.png'
     },
     'IR-coke': {
         // Coke: coal heated to 1000-1100°C without air (destructive distillation).
@@ -1671,7 +1705,7 @@ const GuiBlockRecipeRegistry = {
             // Coal heated to 1000-1100°C without air
             // Drives off volatiles (tar, ammonia, sulfur)
             // Yield: ~70-75% by weight
-            id: 'cokeoven-coal-to-coke',
+            id: 'cokeoven-bituminouscoal-to-coke',
             block: 'IR-cokeoven',
             orderMatters: false,
             ingredients: [
@@ -2079,7 +2113,7 @@ const CraftingRegistry = {
             width: 3,
             pattern: [
                 'IR-steelframe', 'IR-steelframe', 'IR-steelframe',
-                'IR-refractorybrick', 'IR-anvilheavy', 'IR-refractorybrick',
+                'IR-refractorybrick', 'IR-anvil', 'IR-refractorybrick',
                 'IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone'
             ],
             result: { id: 'IR-fineryforge', count: 1 }
@@ -2093,7 +2127,7 @@ const CraftingRegistry = {
             type: 'shaped3x3',
             width: 3,
             pattern: [
-                'IR-cruciblegraphite', 'IR-bellowsmechanical', 'IR-cruciblegraphite',
+                'IR-cruciblegraphite', 'IR-bellows', 'IR-cruciblegraphite',
                 'IR-refractorybrick', null, 'IR-refractorybrick',
                 'IR-refractorybrick', 'IR-steelframe', 'IR-refractorybrick'
             ],
@@ -2111,7 +2145,7 @@ const CraftingRegistry = {
                 { id: 'IR-leather', count: 2 },
                 { id: 'IR-ironrod', count: 1 }
             ],
-            result: { id: 'IR-bellowshand', count: 1 }
+            result: { id: 'IR-bellows', count: 1 }
         },
         
         // ---- Mechanical Bellows crafting ----
@@ -2125,7 +2159,7 @@ const CraftingRegistry = {
                 'IR-ironplate', 'IR-gear',
                 'IR-gear', 'IR-ironrod'
             ],
-            result: { id: 'IR-bellowsmechanical', count: 1 }
+            result: { id: 'IR-bellows', count: 1 }
         },
         
         // ---- Heavy Anvil crafting ----
@@ -2139,7 +2173,7 @@ const CraftingRegistry = {
                 'IR-wroughtironingot', 'IR-wroughtironingot',
                 'IR-wroughtironingot', 'IR-stoneblock'
             ],
-            result: { id: 'IR-anvilheavy', count: 1 }
+            result: { id: 'IR-anvil', count: 1 }
         },
         
         // ---- Quern Stone crafting ----
@@ -2181,6 +2215,63 @@ const CraftingRegistry = {
                 { id: 'IR-glass', count: 2 }
             ],
             result: { id: 'IR-pyrometer', count: 1 }
+        },
+
+        // ---- Shaped component recipes ----
+        // These deliberately use silhouettes rather than a long list of
+        // shapeless conversions: the workstation feels like assembly, and
+        // JEI can communicate the intended construction at a glance.
+        {
+            id: 'planks-from-oak-log', type: 'shaped2x2', width: 1,
+            pattern: ['IR-oaklog'], result: { id: 'IR-plank', count: 4 }
+        },
+        {
+            id: 'clay-bricks-from-clay', type: 'shaped2x2', width: 2,
+            pattern: ['IR-clay', 'IR-clay', 'IR-clay', 'IR-clay'], result: { id: 'IR-claybrick', count: 4 }
+        },
+        {
+            id: 'grinding-stone-from-cobble', type: 'shaped2x2', width: 2,
+            pattern: ['IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone'], result: { id: 'IR-grindingstone', count: 2 }
+        },
+        {
+            id: 'wooden-riffles', type: 'shaped2x2', width: 2,
+            pattern: ['IR-plank', null, 'IR-plank', null], result: { id: 'IR-woodenriffle', count: 2 }
+        },
+        {
+            id: 'iron-plate-from-wrought-iron', type: 'shaped2x2', width: 2,
+            pattern: ['IR-wroughtironingot', 'IR-wroughtironingot', null, null], result: { id: 'IR-ironplate', count: 2 }
+        },
+        {
+            id: 'iron-rods-from-wrought-iron', type: 'shaped2x2', width: 1,
+            pattern: ['IR-wroughtironingot', 'IR-wroughtironingot'], result: { id: 'IR-ironrod', count: 4 }
+        },
+        {
+            id: 'iron-band-from-plate', type: 'shaped2x2', width: 2,
+            pattern: ['IR-ironplate', 'IR-ironplate', null, null], result: { id: 'IR-ironband', count: 2 }
+        },
+        {
+            id: 'iron-gear-from-rods', type: 'shaped3x3', width: 3,
+            pattern: ['IR-ironrod', 'IR-ironrod', 'IR-ironrod', 'IR-ironrod', null, 'IR-ironrod', 'IR-ironrod', 'IR-ironrod', 'IR-ironrod'], result: { id: 'IR-gear', count: 1 }
+        },
+        {
+            id: 'steel-frame-from-medium-steel', type: 'shaped3x3', width: 3,
+            pattern: ['IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, 'IR-mediumsteelingot'], result: { id: 'IR-steelframe', count: 1 }
+        },
+        {
+            id: 'ceramic-tubes-from-clay', type: 'shaped3x3', width: 3,
+            pattern: [null, 'IR-clay', null, null, 'IR-clay', null, null, 'IR-clay', null], result: { id: 'IR-ceramictube', count: 2 }
+        },
+        {
+            id: 'metal-wire-from-iron-rods', type: 'shaped3x3', width: 3,
+            pattern: [null, 'IR-ironrod', null, null, 'IR-ironrod', null, null, 'IR-ironrod', null], result: { id: 'IR-metalwire', count: 6 }
+        },
+        {
+            id: 'refractory-bricks-from-clay-and-lime', type: 'shaped3x3', width: 3,
+            pattern: ['IR-claybrick', 'IR-quicklime', 'IR-claybrick', 'IR-quicklime', 'IR-claybrick', 'IR-quicklime', 'IR-claybrick', 'IR-quicklime', 'IR-claybrick'], result: { id: 'IR-refractorybrick', count: 4 }
+        },
+        {
+            id: 'graphite-crucible', type: 'shaped3x3', width: 3,
+            pattern: ['IR-graphite', 'IR-graphite', 'IR-graphite', 'IR-graphite', null, 'IR-graphite', 'IR-graphite', 'IR-graphite', 'IR-graphite'], result: { id: 'IR-cruciblegraphite', count: 1 }
         }
     ]
 }

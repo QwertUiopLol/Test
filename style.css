@@ -1608,17 +1608,6 @@ body {
     background: #3a3a5a;
 }
 
-.quest-reset-btn.armed {
-    color: #ffb0a0;
-    border-color: #d0523a;
-    background: #4a1e18;
-    animation: quest-reset-pulse 0.6s ease-in-out infinite alternate;
-}
-@keyframes quest-reset-pulse {
-    from { box-shadow: 0 0 0 rgba(208, 82, 58, 0); }
-    to { box-shadow: 0 0 8px rgba(208, 82, 58, 0.7); }
-}
-
 .quest-graph-canvas-wrap {
     flex: 1;
     min-height: 0;

@@ -1,48 +1,5 @@
-// ============================================
-// Quest Book
-// ============================================
-// This is the biggest file in the project, but it splits cleanly into
-// three layers - read them in this order if you're new to it:
-//   1. QuestBook (data + rules)      - loads assets/quests.json, tracks
-//      completedTasks/completed per node in localStorage, and answers
-//      "is this quest locked/available/completed/visible?"
-//   2. DOM rendering (renderQuestBook, renderGraphView, renderQuestListView,
-//      renderQuestDetail) - turns QuestBook's state into the list/detail
-//      panels you see when the book is open.
-//   3. QuestGraph - a separate, self-contained <canvas> renderer for the
-//      node-map view (pan/click, draws nodes+edges), read-only counterpart
-//      to whatever the (separate, not-included-here) Quest Editor produces.
-//
-// A "node" is one quest; an "edge" is a prerequisite link (`from` must be
-// completed before `to` becomes reachable). Both come straight out of
-// assets/quests.json, which this file only reads - it never writes back
-// to that file (only to localStorage, via saveProgress/saveUiState).
-//
-// Reads quest data exported from the Quest Editor and placed at
-// assets/quests.json. Tracks per-task completion in localStorage and
-// works out which quests are locked (waiting on other quests),
-// available, or completed.
-//
-// Tasks come in two flavors, set in the Quest Editor:
-//   - "manual"  : the player ticks the checkbox themselves (legacy behaviour).
-//   - "item"    : verified by CODE, not the player - but only ON DEMAND.
-//                 The player presses the "Check" button shown under a
-//                 quest's task list, which runs QuestBook.checkAutoTasks()
-//                 and checks Inventory.countItem(itemId) against
-//                 itemCount right then. It is NOT re-checked automatically
-//                 as the inventory changes. Once satisfied it locks in as
-//                 complete - the player can never fake it by hand, and it
-//                 stays complete even if the item is later spent/crafted
-//                 away.
-//
-// Note: loading assets/quests.json uses fetch(), which browsers block
-// when index.html is opened directly as a file:// URL. Serve the game
-// folder with a local web server (e.g. "npx serve", "python -m
-// http.server", or VSCode's Live Server) for the Quest Book to find the
-// file.
-
 const QUEST_PROGRESS_KEY = 'ir-quest-progress';
-const QUEST_DATA_PATH = 'assets/quests.json';
+const QUEST_UI_KEY = 'ir-quest-ui';
 
 function escapeHtml(str) {
     return String(str === undefined || str === null ? '' : str).replace(/[&<>"']/g, (c) => ({
@@ -50,7 +7,2441 @@ function escapeHtml(str) {
     })[c]);
 }
 
-const QUEST_UI_KEY = 'ir-quest-ui';
+// Embedded quest data - no network required, works on file:// protocol
+const EMBEDDED_QUEST_DATA = {
+  "nodes": [
+    {
+      "id": 1,
+      "radius": 28,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 440,
+      "y": 60,
+      "title": "Путеводитель по миру",
+      "subtitle": "Весь контент — без лишних барьеров",
+      "description": "Квестник полностью переработан. Каждая карточка посвящена конкретному предмету, блоку или процессу. Открывайте JEI клавишей J: там показаны рецепты, применения и источники добычи.",
+      "tasks": [
+        {
+          "text": "Открыть JEI и ознакомиться с вкладками «Рецепт» и «Использование»",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "radius": 25,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 440,
+      "y": 180,
+      "title": "Первые материалы",
+      "subtitle": "Земля, камень и рабочее место",
+      "description": "Начните с доступных ресурсов. Эти задания не образуют обязательную цепочку: выполняйте их в удобном порядке.",
+      "tasks": [
+        {
+          "text": "Открыть главу и выбрать удобный следующий шаг",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 280,
+      "contentId": "IR-dirt",
+      "title": "Земля",
+      "subtitle": "Базовый блок мира",
+      "description": "Земля — базовый блок текущего мира. В JEI можно посмотреть, что он отдаёт при разрушении и где применяется дальше.",
+      "tasks": [
+        {
+          "text": "Прочитать карточку блока",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 280,
+      "contentId": "IR-cobblestone",
+      "title": "Булыжник",
+      "subtitle": "Базовый блок мира",
+      "description": "Булыжник — базовый блок текущего мира. В JEI можно посмотреть, что он отдаёт при разрушении и где применяется дальше.",
+      "tasks": [
+        {
+          "text": "Прочитать карточку блока",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 280,
+      "contentId": "IR-workbench",
+      "title": "Верстак",
+      "subtitle": "Сборка: блок",
+      "description": "Верстак собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Верстак",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-workbench",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 280,
+      "contentId": "IR-mixer",
+      "title": "Мельница-смеситель",
+      "subtitle": "Сборка: блок",
+      "description": "Мельница-смеситель собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Мельница-смеситель",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mixer",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 280,
+      "contentId": "IR-apebble",
+      "title": "Андезитовый камешек",
+      "subtitle": "Добыча: просеивание",
+      "description": "Андезитовый камешек находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Андезитовый камешек",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-apebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 395,
+      "contentId": "IR-cpebble",
+      "title": "Кальцитовый камешек",
+      "subtitle": "Добыча: просеивание",
+      "description": "Кальцитовый камешек находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Кальцитовый камешек",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 395,
+      "contentId": "IR-bpebble",
+      "title": "Базальтовый камешек",
+      "subtitle": "Добыча: просеивание",
+      "description": "Базальтовый камешек находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Базальтовый камешек",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 395,
+      "contentId": "IR-blpebble",
+      "title": "Чернокаменный камешек",
+      "subtitle": "Добыча: просеивание",
+      "description": "Чернокаменный камешек находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Чернокаменный камешек",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-blpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 395,
+      "contentId": "IR-dpebble",
+      "title": "Глубинный камешек",
+      "subtitle": "Добыча: просеивание",
+      "description": "Глубинный камешек находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Глубинный камешек",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-dpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 395,
+      "contentId": "IR-humus",
+      "title": "Гумус",
+      "subtitle": "Добыча: просеивание",
+      "description": "Гумус находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Гумус",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-humus",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "radius": 25,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 440,
+      "y": 880,
+      "title": "Стекло и жизнь",
+      "subtitle": "От минералов к первому дереву",
+      "description": "Эта глава охватывает полный путь синтетического саженца: порошки, стекло, стерилизация и культура тканей.",
+      "tasks": [
+        {
+          "text": "Открыть главу и выбрать удобный следующий шаг",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 980,
+      "contentId": "IR-limestone",
+      "title": "Известняк",
+      "subtitle": "Добыча: просеивание",
+      "description": "Известняк находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Известняк",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limestone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 980,
+      "contentId": "IR-clay",
+      "title": "Глина",
+      "subtitle": "Добыча: просеивание",
+      "description": "Глина находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Глина",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-clay",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 980,
+      "contentId": "IR-limepowder",
+      "title": "Известковый порошок",
+      "subtitle": "Сборка: предмет",
+      "description": "Известковый порошок собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Известковый порошок",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limepowder",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 980,
+      "contentId": "IR-mineralpowder",
+      "title": "Минеральная мука",
+      "subtitle": "Обработка: Мельница-смеситель",
+      "description": "Минеральная мука получается на станции «Мельница-смеситель». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Минеральная мука",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mineralpowder",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 980,
+      "contentId": "IR-silicapowder",
+      "title": "Кремнезёмный порошок",
+      "subtitle": "Обработка: Мельница-смеситель",
+      "description": "Кремнезёмный порошок получается на станции «Мельница-смеситель». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Кремнезёмный порошок",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-silicapowder",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1095,
+      "contentId": "IR-kiln",
+      "title": "Печь обжига",
+      "subtitle": "Сборка: блок",
+      "description": "Печь обжига собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Печь обжига",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-kiln",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 1095,
+      "contentId": "IR-capsule-1000",
+      "title": "Пустая стеклянная капсула",
+      "subtitle": "Обработка: Печь обжига",
+      "description": "Пустая стеклянная капсула получается на станции «Печь обжига». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Пустая стеклянная капсула",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-1000",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1095,
+      "contentId": "IR-capsule-1000-water",
+      "title": "Капсула воды",
+      "subtitle": "Сборка: предмет",
+      "description": "Капсула воды собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Капсула воды",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-1000-water",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 1095,
+      "contentId": "IR-fluid-extractor",
+      "title": "Экстрактор жидкости",
+      "subtitle": "Сборка: блок",
+      "description": "Экстрактор жидкости собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Экстрактор жидкости",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-fluid-extractor",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 1095,
+      "contentId": "IR-nutrientgel",
+      "title": "Питательный гель",
+      "subtitle": "Справочная карточка",
+      "description": "Питательный гель учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Питательный гель в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1210,
+      "contentId": "IR-plantash",
+      "title": "Растительная зола",
+      "subtitle": "Обработка: Печь обжига",
+      "description": "Растительная зола получается на станции «Печь обжига». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Растительная зола",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-plantash",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 1210,
+      "contentId": "IR-ashlye",
+      "title": "Зольный щёлок",
+      "subtitle": "Сборка: предмет",
+      "description": "Зольный щёлок собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Зольный щёлок",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ashlye",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1210,
+      "contentId": "IR-sodaash",
+      "title": "Кальцинированная сода",
+      "subtitle": "Обработка: Печь обжига",
+      "description": "Кальцинированная сода получается на станции «Печь обжига». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Кальцинированная сода",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sodaash",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 1210,
+      "contentId": "IR-autoclave",
+      "title": "Автоклав",
+      "subtitle": "Сборка: блок",
+      "description": "Автоклав собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Автоклав",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-autoclave",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 1210,
+      "contentId": "IR-capsule-sterile",
+      "title": "Стерильная капсула",
+      "subtitle": "Обработка: Автоклав",
+      "description": "Стерильная капсула получается на станции «Автоклав». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Стерильная капсула",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-sterile",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1325,
+      "contentId": "IR-nutrientgel-sterile",
+      "title": "Стерильный питательный гель",
+      "subtitle": "Обработка: Автоклав",
+      "description": "Стерильный питательный гель получается на станции «Автоклав». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Стерильный питательный гель",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-nutrientgel-sterile",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 1325,
+      "contentId": "IR-bioreactor",
+      "title": "Биореактор",
+      "subtitle": "Сборка: блок",
+      "description": "Биореактор собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Биореактор",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bioreactor",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1325,
+      "contentId": "IR-callusculture",
+      "title": "Культура каллуса",
+      "subtitle": "Обработка: Мельница-смеситель",
+      "description": "Культура каллуса получается на станции «Мельница-смеситель». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Культура каллуса",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-callusculture",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 1325,
+      "contentId": "IR-hormonesolution",
+      "title": "Раствор регуляторов роста",
+      "subtitle": "Обработка: Мельница-смеситель",
+      "description": "Раствор регуляторов роста получается на станции «Мельница-смеситель». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Раствор регуляторов роста",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-hormonesolution",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 1325,
+      "contentId": "IR-embryogeniccallus",
+      "title": "Эмбриогенный каллус",
+      "subtitle": "Обработка: Биореактор",
+      "description": "Эмбриогенный каллус получается на станции «Биореактор». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Эмбриогенный каллус",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-embryogeniccallus",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1440,
+      "contentId": "IR-sapling",
+      "title": "Синтетический саженец дуба",
+      "subtitle": "Сборка: предмет",
+      "description": "Синтетический саженец дуба собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Синтетический саженец дуба",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sapling",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 1440,
+      "contentId": "IR-oaklog",
+      "title": "Дубовое бревно",
+      "subtitle": "Базовый блок мира",
+      "description": "Дубовое бревно — базовый блок текущего мира. В JEI можно посмотреть, что он отдаёт при разрушении и где применяется дальше.",
+      "tasks": [
+        {
+          "text": "Прочитать карточку блока",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1440,
+      "contentId": "IR-plank",
+      "title": "Доски",
+      "subtitle": "Сборка: предмет",
+      "description": "Доски собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Доски",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-plank",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "radius": 25,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1580,
+      "title": "Руда и обогащение",
+      "subtitle": "Подготовьте чистую шихту",
+      "description": "Все варианты железной руды собраны в одной главе. Любой доступный концентрат — это рабочий путь, а не скрытая «правильная» руда.",
+      "tasks": [
+        {
+          "text": "Открыть главу и выбрать удобный следующий шаг",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1680,
+      "contentId": "IR-quernstone",
+      "title": "Жернов",
+      "subtitle": "Сборка: блок",
+      "description": "Жернов собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Жернов",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-quernstone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 1680,
+      "contentId": "IR-grindingstone",
+      "title": "Точильный камень",
+      "subtitle": "Сборка: предмет",
+      "description": "Точильный камень собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Точильный камень",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-grindingstone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1680,
+      "contentId": "IR-bogironore",
+      "title": "Болотная железная руда",
+      "subtitle": "Добыча: просеивание",
+      "description": "Болотная железная руда находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Болотная железная руда",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bogironore",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 1680,
+      "contentId": "IR-hematite",
+      "title": "Гематит",
+      "subtitle": "Добыча: просеивание",
+      "description": "Гематит находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Гематит",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-hematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 1680,
+      "contentId": "IR-magnetite",
+      "title": "Магнетит",
+      "subtitle": "Добыча: просеивание",
+      "description": "Магнетит находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Магнетит",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-magnetite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1795,
+      "contentId": "IR-limonite",
+      "title": "Лимонит",
+      "subtitle": "Добыча: просеивание",
+      "description": "Лимонит находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Лимонит",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limonite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 1795,
+      "contentId": "IR-ironore",
+      "title": "Железная руда",
+      "subtitle": "Добыча: просеивание",
+      "description": "Железная руда находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Железная руда",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironore",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1795,
+      "contentId": "IR-crushedbogiron",
+      "title": "Дроблёная болотная руда",
+      "subtitle": "Обработка: Жернов",
+      "description": "Дроблёная болотная руда получается на станции «Жернов». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Дроблёная болотная руда",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedbogiron",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 1795,
+      "contentId": "IR-crushedhematite",
+      "title": "Дроблёный гематит",
+      "subtitle": "Обработка: Жернов",
+      "description": "Дроблёный гематит получается на станции «Жернов». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Дроблёный гематит",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedhematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 1795,
+      "contentId": "IR-crushedmagnetite",
+      "title": "Дроблёный магнетит",
+      "subtitle": "Обработка: Жернов",
+      "description": "Дроблёный магнетит получается на станции «Жернов». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Дроблёный магнетит",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedmagnetite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1910,
+      "contentId": "IR-crushedlimonite",
+      "title": "Дроблёный лимонит",
+      "subtitle": "Обработка: Жернов",
+      "description": "Дроблёный лимонит получается на станции «Жернов». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Дроблёный лимонит",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedlimonite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 1910,
+      "contentId": "IR-crushedironore",
+      "title": "Дроблёная железная руда",
+      "subtitle": "Обработка: Жернов",
+      "description": "Дроблёная железная руда получается на станции «Жернов». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Дроблёная железная руда",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedironore",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1910,
+      "contentId": "IR-crushedlimestone",
+      "title": "Crushed Limestone",
+      "subtitle": "Обработка: Жернов",
+      "description": "Crushed Limestone получается на станции «Жернов». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Crushed Limestone",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedlimestone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 1910,
+      "contentId": "IR-sluicebox",
+      "title": "Промывочный лоток",
+      "subtitle": "Сборка: блок",
+      "description": "Промывочный лоток собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Промывочный лоток",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sluicebox",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 1910,
+      "contentId": "IR-woodenriffle",
+      "title": "Деревянные рифли",
+      "subtitle": "Сборка: предмет",
+      "description": "Деревянные рифли собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Деревянные рифли",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-woodenriffle",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 2025,
+      "contentId": "IR-concentratebogiron",
+      "title": "Концентрат болотной руды",
+      "subtitle": "Обработка: Промывочный лоток",
+      "description": "Концентрат болотной руды получается на станции «Промывочный лоток». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Концентрат болотной руды",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratebogiron",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 2025,
+      "contentId": "IR-concentratehematite",
+      "title": "Концентрат гематита",
+      "subtitle": "Обработка: Промывочный лоток",
+      "description": "Концентрат гематита получается на станции «Промывочный лоток». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Концентрат гематита",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratehematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2025,
+      "contentId": "IR-concentratemagnetite",
+      "title": "Концентрат магнетита",
+      "subtitle": "Обработка: Промывочный лоток",
+      "description": "Концентрат магнетита получается на станции «Промывочный лоток». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Концентрат магнетита",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratemagnetite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 2025,
+      "contentId": "IR-concentratelimonite",
+      "title": "Концентрат лимонита",
+      "subtitle": "Обработка: Промывочный лоток",
+      "description": "Концентрат лимонита получается на станции «Промывочный лоток». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Концентрат лимонита",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratelimonite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 2025,
+      "contentId": "IR-concentrateironore",
+      "title": "Концентрат железной руды",
+      "subtitle": "Обработка: Промывочный лоток",
+      "description": "Концентрат железной руды получается на станции «Промывочный лоток». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Концентрат железной руды",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentrateironore",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 2140,
+      "contentId": "IR-charcoalpit",
+      "title": "Угольная яма",
+      "subtitle": "Сборка: блок",
+      "description": "Угольная яма собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Угольная яма",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-charcoalpit",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 2140,
+      "contentId": "IR-charcoal",
+      "title": "Древесный уголь",
+      "subtitle": "Обработка: Угольная яма",
+      "description": "Древесный уголь получается на станции «Угольная яма». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Древесный уголь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-charcoal",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "radius": 25,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2280,
+      "title": "Домница и заготовки",
+      "subtitle": "Первое железо и механические детали",
+      "description": "Домница превращает концентрат в крицу. Далее кованое железо становится деталями для станков; шлак здесь является нормальным побочным продуктом.",
+      "tasks": [
+        {
+          "text": "Открыть главу и выбрать удобный следующий шаг",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 2380,
+      "contentId": "IR-claybrick",
+      "title": "Глиняный кирпич",
+      "subtitle": "Сборка: предмет",
+      "description": "Глиняный кирпич собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Глиняный кирпич",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-claybrick",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 2380,
+      "contentId": "IR-brick",
+      "title": "Обожжённый кирпич",
+      "subtitle": "Справочная карточка",
+      "description": "Обожжённый кирпич учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Обожжённый кирпич в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2380,
+      "contentId": "IR-quicklime",
+      "title": "Негашёная известь",
+      "subtitle": "Обработка: Печь обжига",
+      "description": "Негашёная известь получается на станции «Печь обжига». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Негашёная известь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-quicklime",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 2380,
+      "contentId": "IR-refractorybrick",
+      "title": "Огнеупорный кирпич",
+      "subtitle": "Сборка: предмет",
+      "description": "Огнеупорный кирпич собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Огнеупорный кирпич",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-refractorybrick",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 2380,
+      "contentId": "IR-bloomeryfurnace",
+      "title": "Домница",
+      "subtitle": "Сборка: блок",
+      "description": "Домница собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Домница",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bloomeryfurnace",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 2495,
+      "contentId": "IR-bloom",
+      "title": "Крица",
+      "subtitle": "Обработка: Домница",
+      "description": "Крица получается на станции «Домница». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Крица",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bloom",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 2495,
+      "contentId": "IR-slag",
+      "title": "Шлак",
+      "subtitle": "Обработка: Домница",
+      "description": "Шлак получается на станции «Домница». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Шлак",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-slag",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2495,
+      "contentId": "IR-richslag",
+      "title": "Железистый шлак",
+      "subtitle": "Обработка: Домница",
+      "description": "Железистый шлак получается на станции «Домница». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Железистый шлак",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-richslag",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 2495,
+      "contentId": "IR-anvil",
+      "title": "Тяжёлая наковальня",
+      "subtitle": "Сборка: блок",
+      "description": "Тяжёлая наковальня собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Тяжёлая наковальня",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-anvil",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 2495,
+      "contentId": "IR-wroughtironingot",
+      "title": "Кричное железо",
+      "subtitle": "Обработка: Передельный горн",
+      "description": "Кричное железо получается на станции «Передельный горн». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Кричное железо",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-wroughtironingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 2610,
+      "contentId": "IR-ironplate",
+      "title": "Железная пластина",
+      "subtitle": "Сборка: предмет",
+      "description": "Железная пластина собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Железная пластина",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironplate",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 2610,
+      "contentId": "IR-ironrod",
+      "title": "Железный пруток",
+      "subtitle": "Сборка: предмет",
+      "description": "Железный пруток собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Железный пруток",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironrod",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2610,
+      "contentId": "IR-ironband",
+      "title": "Железный обруч",
+      "subtitle": "Сборка: предмет",
+      "description": "Железный обруч собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Железный обруч",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironband",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 2610,
+      "contentId": "IR-gear",
+      "title": "Железная шестерня",
+      "subtitle": "Сборка: предмет",
+      "description": "Железная шестерня собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Железная шестерня",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-gear",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 2610,
+      "contentId": "IR-bellows",
+      "title": "Меха",
+      "subtitle": "Сборка: блок",
+      "description": "Меха собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Меха",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bellows",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 2725,
+      "contentId": "IR-pyrometer",
+      "title": "Пирометр",
+      "subtitle": "Сборка: блок",
+      "description": "Пирометр собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Пирометр",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-pyrometer",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 2725,
+      "contentId": "IR-glass",
+      "title": "Стекло",
+      "subtitle": "Справочная карточка",
+      "description": "Стекло учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Стекло в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2725,
+      "contentId": "IR-ceramictube",
+      "title": "Керамическая трубка",
+      "subtitle": "Сборка: предмет",
+      "description": "Керамическая трубка собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Керамическая трубка",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ceramictube",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 2725,
+      "contentId": "IR-metalwire",
+      "title": "Металлическая проволока",
+      "subtitle": "Сборка: предмет",
+      "description": "Металлическая проволока собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Металлическая проволока",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-metalwire",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 2725,
+      "contentId": "IR-stoneblock",
+      "title": "Каменный блок",
+      "subtitle": "Справочная карточка",
+      "description": "Каменный блок учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Каменный блок в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 2840,
+      "contentId": "IR-leather",
+      "title": "Кожа",
+      "subtitle": "Справочная карточка",
+      "description": "Кожа учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Кожа в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "radius": 25,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2980,
+      "title": "Сталь и промышленность",
+      "subtitle": "Коксование, передел и тигель",
+      "description": "Финальная глава объединяет топливо, передел железа и три класса стали. Она раскрывает весь текущий металлургический контент, но не добавляет обязательных ворот к уже доступным заданиям.",
+      "tasks": [
+        {
+          "text": "Открыть главу и выбрать удобный следующий шаг",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 3080,
+      "contentId": "IR-coal",
+      "title": "Каменный уголь",
+      "subtitle": "Добыча: просеивание",
+      "description": "Каменный уголь находится при просеивании открытой земли. Зажмите Alt и используйте действие разрушения по земле без блока сверху. В JEI этот источник показан на вкладке «Рецепт».",
+      "tasks": [
+        {
+          "text": "Получить: Каменный уголь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coal",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 3080,
+      "contentId": "IR-bituminouscoal",
+      "title": "Богатый каменный уголь",
+      "subtitle": "Справочная карточка",
+      "description": "Богатый каменный уголь учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Богатый каменный уголь в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3080,
+      "contentId": "IR-coke",
+      "title": "Кокс",
+      "subtitle": "Обработка: Коксовая печь",
+      "description": "Кокс получается на станции «Коксовая печь». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Кокс",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coke",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 3080,
+      "contentId": "IR-coaltar",
+      "title": "Каменноугольная смола",
+      "subtitle": "Обработка: Коксовая печь",
+      "description": "Каменноугольная смола получается на станции «Коксовая печь». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Каменноугольная смола",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coaltar",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 3080,
+      "contentId": "IR-cokeoven",
+      "title": "Коксовая печь",
+      "subtitle": "Сборка: блок",
+      "description": "Коксовая печь собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Коксовая печь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cokeoven",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 3195,
+      "contentId": "IR-fineryforge",
+      "title": "Передельный горн",
+      "subtitle": "Сборка: блок",
+      "description": "Передельный горн собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Передельный горн",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-fineryforge",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 3195,
+      "contentId": "IR-cruciblefurnace",
+      "title": "Тигельная печь",
+      "subtitle": "Сборка: блок",
+      "description": "Тигельная печь собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Тигельная печь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cruciblefurnace",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3195,
+      "contentId": "IR-graphite",
+      "title": "Графит",
+      "subtitle": "Справочная карточка",
+      "description": "Графит учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Графит в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 3195,
+      "contentId": "IR-cruciblegraphite",
+      "title": "Графитовый тигель",
+      "subtitle": "Сборка: предмет",
+      "description": "Графитовый тигель собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Графитовый тигель",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cruciblegraphite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 3195,
+      "contentId": "IR-pigiron",
+      "title": "Передельный чугун",
+      "subtitle": "Справочная карточка",
+      "description": "Передельный чугун учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Передельный чугун в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 3310,
+      "contentId": "IR-spongeiron",
+      "title": "Губчатое железо",
+      "subtitle": "Справочная карточка",
+      "description": "Губчатое железо учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Губчатое железо в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 3310,
+      "contentId": "IR-steelbloom",
+      "title": "Стальная крица",
+      "subtitle": "Справочная карточка",
+      "description": "Стальная крица учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Стальная крица в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3310,
+      "contentId": "IR-mildsteelingot",
+      "title": "Мягкая сталь",
+      "subtitle": "Обработка: Тигельная печь",
+      "description": "Мягкая сталь получается на станции «Тигельная печь». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Мягкая сталь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mildsteelingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 600,
+      "y": 3310,
+      "contentId": "IR-mediumsteelingot",
+      "title": "Среднеуглеродистая сталь",
+      "subtitle": "Обработка: Тигельная печь",
+      "description": "Среднеуглеродистая сталь получается на станции «Тигельная печь». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Среднеуглеродистая сталь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mediumsteelingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 3310,
+      "contentId": "IR-highcarbonsteelingot",
+      "title": "Высокоуглеродистая сталь",
+      "subtitle": "Обработка: Тигельная печь",
+      "description": "Высокоуглеродистая сталь получается на станции «Тигельная печь». Откройте предмет в JEI, чтобы увидеть точные входы, количество и порядок обработки. Не обязательно выполнять эту карточку для открытия соседних.",
+      "tasks": [
+        {
+          "text": "Получить: Высокоуглеродистая сталь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-highcarbonsteelingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 3425,
+      "contentId": "IR-castironingot",
+      "title": "Литейный чугун",
+      "subtitle": "Справочная карточка",
+      "description": "Литейный чугун учтён в текущем наборе предметов как материал, промежуточный продукт или побочный результат. Проверьте JEI, чтобы увидеть все уже реализованные применения и не потерять его из вида.",
+      "tasks": [
+        {
+          "text": "Открыть Литейный чугун в JEI",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "radius": 19,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 280,
+      "y": 3425,
+      "contentId": "IR-steelframe",
+      "title": "Стальная рама",
+      "subtitle": "Сборка: предмет",
+      "description": "Стальная рама собирается в сетке крафта. Откройте его в JEI: контур shaped-рецепта показывает расположение деталей, а shapeless-рецепт можно разложить в любом порядке.",
+      "tasks": [
+        {
+          "text": "Создать: Стальная рама",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steelframe",
+          "itemCount": 1
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": 1,
+      "to": 2
+    },
+    {
+      "from": 2,
+      "to": 3
+    },
+    {
+      "from": 2,
+      "to": 4
+    },
+    {
+      "from": 2,
+      "to": 5
+    },
+    {
+      "from": 2,
+      "to": 6
+    },
+    {
+      "from": 2,
+      "to": 7
+    },
+    {
+      "from": 2,
+      "to": 8
+    },
+    {
+      "from": 2,
+      "to": 9
+    },
+    {
+      "from": 2,
+      "to": 10
+    },
+    {
+      "from": 2,
+      "to": 11
+    },
+    {
+      "from": 2,
+      "to": 12
+    },
+    {
+      "from": 1,
+      "to": 13
+    },
+    {
+      "from": 13,
+      "to": 14
+    },
+    {
+      "from": 13,
+      "to": 15
+    },
+    {
+      "from": 13,
+      "to": 16
+    },
+    {
+      "from": 13,
+      "to": 17
+    },
+    {
+      "from": 13,
+      "to": 18
+    },
+    {
+      "from": 13,
+      "to": 19
+    },
+    {
+      "from": 13,
+      "to": 20
+    },
+    {
+      "from": 13,
+      "to": 21
+    },
+    {
+      "from": 13,
+      "to": 22
+    },
+    {
+      "from": 13,
+      "to": 23
+    },
+    {
+      "from": 13,
+      "to": 24
+    },
+    {
+      "from": 13,
+      "to": 25
+    },
+    {
+      "from": 13,
+      "to": 26
+    },
+    {
+      "from": 13,
+      "to": 27
+    },
+    {
+      "from": 13,
+      "to": 28
+    },
+    {
+      "from": 13,
+      "to": 29
+    },
+    {
+      "from": 13,
+      "to": 30
+    },
+    {
+      "from": 13,
+      "to": 31
+    },
+    {
+      "from": 13,
+      "to": 32
+    },
+    {
+      "from": 13,
+      "to": 33
+    },
+    {
+      "from": 13,
+      "to": 34
+    },
+    {
+      "from": 13,
+      "to": 35
+    },
+    {
+      "from": 13,
+      "to": 36
+    },
+    {
+      "from": 1,
+      "to": 37
+    },
+    {
+      "from": 37,
+      "to": 38
+    },
+    {
+      "from": 37,
+      "to": 39
+    },
+    {
+      "from": 37,
+      "to": 40
+    },
+    {
+      "from": 37,
+      "to": 41
+    },
+    {
+      "from": 37,
+      "to": 42
+    },
+    {
+      "from": 37,
+      "to": 43
+    },
+    {
+      "from": 37,
+      "to": 44
+    },
+    {
+      "from": 37,
+      "to": 45
+    },
+    {
+      "from": 37,
+      "to": 46
+    },
+    {
+      "from": 37,
+      "to": 47
+    },
+    {
+      "from": 37,
+      "to": 48
+    },
+    {
+      "from": 37,
+      "to": 49
+    },
+    {
+      "from": 37,
+      "to": 50
+    },
+    {
+      "from": 37,
+      "to": 51
+    },
+    {
+      "from": 37,
+      "to": 52
+    },
+    {
+      "from": 37,
+      "to": 53
+    },
+    {
+      "from": 37,
+      "to": 54
+    },
+    {
+      "from": 37,
+      "to": 55
+    },
+    {
+      "from": 37,
+      "to": 56
+    },
+    {
+      "from": 37,
+      "to": 57
+    },
+    {
+      "from": 37,
+      "to": 58
+    },
+    {
+      "from": 37,
+      "to": 59
+    },
+    {
+      "from": 1,
+      "to": 60
+    },
+    {
+      "from": 60,
+      "to": 61
+    },
+    {
+      "from": 60,
+      "to": 62
+    },
+    {
+      "from": 60,
+      "to": 63
+    },
+    {
+      "from": 60,
+      "to": 64
+    },
+    {
+      "from": 60,
+      "to": 65
+    },
+    {
+      "from": 60,
+      "to": 66
+    },
+    {
+      "from": 60,
+      "to": 67
+    },
+    {
+      "from": 60,
+      "to": 68
+    },
+    {
+      "from": 60,
+      "to": 69
+    },
+    {
+      "from": 60,
+      "to": 70
+    },
+    {
+      "from": 60,
+      "to": 71
+    },
+    {
+      "from": 60,
+      "to": 72
+    },
+    {
+      "from": 60,
+      "to": 73
+    },
+    {
+      "from": 60,
+      "to": 74
+    },
+    {
+      "from": 60,
+      "to": 75
+    },
+    {
+      "from": 60,
+      "to": 76
+    },
+    {
+      "from": 60,
+      "to": 77
+    },
+    {
+      "from": 60,
+      "to": 78
+    },
+    {
+      "from": 60,
+      "to": 79
+    },
+    {
+      "from": 60,
+      "to": 80
+    },
+    {
+      "from": 60,
+      "to": 81
+    },
+    {
+      "from": 1,
+      "to": 82
+    },
+    {
+      "from": 82,
+      "to": 83
+    },
+    {
+      "from": 82,
+      "to": 84
+    },
+    {
+      "from": 82,
+      "to": 85
+    },
+    {
+      "from": 82,
+      "to": 86
+    },
+    {
+      "from": 82,
+      "to": 87
+    },
+    {
+      "from": 82,
+      "to": 88
+    },
+    {
+      "from": 82,
+      "to": 89
+    },
+    {
+      "from": 82,
+      "to": 90
+    },
+    {
+      "from": 82,
+      "to": 91
+    },
+    {
+      "from": 82,
+      "to": 92
+    },
+    {
+      "from": 82,
+      "to": 93
+    },
+    {
+      "from": 82,
+      "to": 94
+    },
+    {
+      "from": 82,
+      "to": 95
+    },
+    {
+      "from": 82,
+      "to": 96
+    },
+    {
+      "from": 82,
+      "to": 97
+    },
+    {
+      "from": 82,
+      "to": 98
+    },
+    {
+      "from": 82,
+      "to": 99
+    }
+  ],
+  "cameraX": 0,
+  "cameraY": 0,
+  "nextNodeId": 100
+};
 
 const QuestBook = {
     isOpen: false,
@@ -58,21 +2449,20 @@ const QuestBook = {
     nodes: [],
     edges: [],
     progress: {},
-    openNodeId: null, // node currently shown in detail view; null = graph view
-    viewMode: 'graph', // 'graph' | 'list'
-    showHidden: false, // "eye" toggle: reveal not-yet-reachable quests, greyed out
+    openNodeId: null,
+    viewMode: 'graph',
+    showHidden: false,
 
     async init() {
         this.progress = this.loadProgress();
         try {
-            const res = await fetch(QUEST_DATA_PATH, { cache: 'no-store' });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            this.nodes = Array.isArray(data.nodes) ? data.nodes : [];
-            this.edges = Array.isArray(data.edges) ? data.edges : [];
+            this.nodes = Array.isArray(EMBEDDED_QUEST_DATA.nodes) ? EMBEDDED_QUEST_DATA.nodes : [];
+            this.edges = Array.isArray(EMBEDDED_QUEST_DATA.edges) ? EMBEDDED_QUEST_DATA.edges : [];
         } catch (err) {
-            console.warn('Quest Book: could not load ' + QUEST_DATA_PATH, err);
+            console.warn('Quest Book: could not load embedded quest data', err);
             this.loadError = true;
+            this.nodes = [];
+            this.edges = [];
         }
         this.syncCompletion();
         this.checkAutoTasks({ silent: true });
@@ -915,33 +3305,6 @@ function setupQuestControls() {
 
     const eyeBtn = document.getElementById('quest-eye-toggle');
     if (eyeBtn) eyeBtn.addEventListener('click', () => QuestBook.toggleShowHidden());
-
-    // Reset progress: requires two taps (arm, then confirm within a short
-    // window) instead of a native confirm() popup, so it's still a
-    // deliberate action but doesn't block the UI with a browser dialog.
-    const resetBtn = document.getElementById('quest-reset-toggle');
-    if (resetBtn) {
-        let armed = false;
-        let armTimer = null;
-        resetBtn.addEventListener('click', () => {
-            if (!armed) {
-                armed = true;
-                resetBtn.classList.add('armed');
-                resetBtn.title = 'Tap again to confirm reset';
-                armTimer = setTimeout(() => {
-                    armed = false;
-                    resetBtn.classList.remove('armed');
-                    resetBtn.title = 'Reset all quest progress';
-                }, 3000);
-            } else {
-                clearTimeout(armTimer);
-                armed = false;
-                resetBtn.classList.remove('armed');
-                resetBtn.title = 'Reset all quest progress';
-                QuestBook.resetProgress();
-            }
-        });
-    }
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'b' || e.key === 'B') {
