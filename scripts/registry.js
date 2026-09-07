@@ -583,6 +583,31 @@ Registry.register({
             progressBar: { x: 55, y: 35, width: 32, height: 8, direction: 'right' }
         }
     },
+    // Foundational materials and parts used by the processing and
+    // metallurgy recipes below.  These used to be referenced by recipes
+    // without registry entries, which made their JEI icons blank and made
+    // the recipes impossible to complete.
+    'IR-clay': { name: 'Clay', type: 'item', color: '#a87864', icon: '🟤', texture: 'assets/clay.png' },
+    'IR-brick': { name: 'Fired Brick', type: 'item', color: '#a9472d', icon: '🧱', texture: 'assets/brick.png' },
+    'IR-claybrick': { name: 'Clay Brick', type: 'item', color: '#b65d42', icon: '🧱', texture: 'assets/clay_brick.png' },
+    'IR-capsule-1000': { name: 'Empty Glass Capsule', type: 'item', maxStack: 16, color: '#b8e7ef', icon: '🫙', texture: 'assets/capsule_empty.png' },
+    'IR-capsule-1000-water': { name: 'Water Capsule', type: 'item', maxStack: 16, color: '#4aaee8', icon: '💧', texture: 'assets/capsule_water.png' },
+    'IR-fluid-extractor': { name: 'Fluid Extractor', type: 'block', color: '#4a7891', dropId: 'IR-fluid-extractor', overlay: true, icon: '⚗', texture: 'assets/fluid_extractor.png' },
+    'IR-ironplate': { name: 'Iron Plate', type: 'item', color: '#aeb6bd', icon: '▣', texture: 'assets/iron_plate.png' },
+    'IR-ironband': { name: 'Iron Band', type: 'item', color: '#858b91', icon: '◯', texture: 'assets/iron_band.png' },
+    'IR-ironrod': { name: 'Iron Rod', type: 'item', color: '#969da3', icon: '┃', texture: 'assets/iron_rod.png' },
+    'IR-steelframe': { name: 'Steel Frame', type: 'item', color: '#72808a', icon: '▦', texture: 'assets/steel_frame.png' },
+    'IR-refractorybrick': { name: 'Refractory Brick', type: 'item', color: '#d89053', icon: '🧱', texture: 'assets/refractory_brick.png' },
+    'IR-cruciblegraphite': { name: 'Graphite Crucible', type: 'item', color: '#353535', icon: '◒', texture: 'assets/graphite_crucible.png' },
+    'IR-graphite': { name: 'Graphite', type: 'item', color: '#30343a', icon: '◆', texture: 'assets/graphite.png' },
+    'IR-gear': { name: 'Iron Gear', type: 'item', color: '#858b91', icon: '⚙', texture: 'assets/gear.png' },
+    'IR-grindingstone': { name: 'Grinding Stone', type: 'item', color: '#777d82', icon: '●', texture: 'assets/grinding_stone.png' },
+    'IR-woodenriffle': { name: 'Wooden Riffle', type: 'item', color: '#a97c50', icon: '═', texture: 'assets/wooden_riffle.png' },
+    'IR-ceramictube': { name: 'Ceramic Tube', type: 'item', color: '#e7d5b1', icon: '│', texture: 'assets/ceramic_tube.png' },
+    'IR-metalwire': { name: 'Metal Wire', type: 'item', color: '#b9c0c7', icon: '〰', texture: 'assets/metal_wire.png' },
+    'IR-glass': { name: 'Glass', type: 'item', color: '#b8e7ef', icon: '◇', texture: 'assets/glass.png' },
+    'IR-leather': { name: 'Leather', type: 'item', color: '#805334', icon: '▰', texture: 'assets/leather.png' },
+    'IR-stoneblock': { name: 'Stone Block', type: 'item', color: '#777777', icon: '■', texture: 'assets/stone_block.png' },
     // ========================================================
     // METALLURGY EXPANSION - Iron Age to Steel Age
     // ========================================================
@@ -862,6 +887,14 @@ Registry.register({
         color: '#2f2f2f',
         icon: '🌑',
         texture: 'assets/coal.png'
+    },
+    'IR-bituminouscoal': {
+        name: 'Rich Bituminous Coal', type: 'item', maxStack: 64,
+        color: '#252525', icon: '◆', texture: 'assets/bituminous_coal.png'
+    },
+    'IR-coaltar': {
+        name: 'Coal Tar', type: 'item', maxStack: 16,
+        color: '#1c1716', icon: '●', texture: 'assets/coal_tar.png'
     },
     'IR-coke': {
         // Coke: coal heated to 1000-1100°C without air (destructive distillation).
@@ -1471,6 +1504,22 @@ const GuiBlockRecipeRegistry = {
             result: { id: 'IR-sodaash', count: 1 },
             ticks: 60
         },
+        {
+            id: 'kiln-fire-clay-bricks',
+            block: 'IR-kiln',
+            orderMatters: false,
+            ingredients: [{ id: 'IR-claybrick', count: 1 }],
+            result: { id: 'IR-brick', count: 1 },
+            ticks: 70
+        },
+        {
+            id: 'kiln-recycle-glass-capsule',
+            block: 'IR-kiln',
+            orderMatters: false,
+            ingredients: [{ id: 'IR-capsule-1000', count: 1 }],
+            result: { id: 'IR-glass', count: 1 },
+            ticks: 50
+        },
         // ---- Autoclave recipes: moist heat + pressure sterilization ----
         {
             // Sterilizing the empty glass vessel itself, BEFORE anything
@@ -1672,7 +1721,7 @@ const GuiBlockRecipeRegistry = {
             // Coal heated to 1000-1100°C without air
             // Drives off volatiles (tar, ammonia, sulfur)
             // Yield: ~70-75% by weight
-            id: 'cokeoven-coal-to-coke',
+            id: 'cokeoven-bituminouscoal-to-coke',
             block: 'IR-cokeoven',
             orderMatters: false,
             ingredients: [
@@ -1709,6 +1758,24 @@ const GuiBlockRecipeRegistry = {
             orderMatters: false,
             ingredients: [
                 { id: 'IR-concentratemagnetite', count: 4 },
+                { id: 'IR-crushedlimestone', count: 2 },
+                { id: 'IR-charcoal', count: 6 }
+            ],
+            result: { id: 'IR-bloom', count: 1 },
+            ticks: 300,
+            byproduct: { id: 'IR-slag', count: 2 },
+            minTemp: 1150,
+            maxTemp: 1250
+        },
+        {
+            // Generic iron ore follows the same complete beneficiation
+            // route as the named ores, so the main quest path never asks
+            // the player to make a concentrate the bloomery cannot use.
+            id: 'bloomery-smelt-ironore',
+            block: 'IR-bloomeryfurnace',
+            orderMatters: false,
+            ingredients: [
+                { id: 'IR-concentrateironore', count: 4 },
                 { id: 'IR-crushedlimestone', count: 2 },
                 { id: 'IR-charcoal', count: 6 }
             ],
@@ -2059,14 +2126,14 @@ const CraftingRegistry = {
         
         // ---- Bloomery Furnace crafting ----
         {
-            // Clay bloomery furnace: assembled from clay bricks, stone
-            // base, and iron bands. Shapeless recipe for flexibility.
+            // Clay bloomery furnace: assembled from clay bricks and a
+            // stone base. It must be available before the first iron is
+            // produced, so iron bands cannot be a hidden circular gate.
             id: 'bloomeryfurnace-from-clay-stone',
             type: 'shapeless',
             ingredients: [
                 { id: 'IR-claybrick', count: 8 },
-                { id: 'IR-cobblestone', count: 4 },
-                { id: 'IR-ironband', count: 2 }
+                { id: 'IR-cobblestone', count: 4 }
             ],
             result: { id: 'IR-bloomeryfurnace', count: 1 }
         },
@@ -2080,7 +2147,7 @@ const CraftingRegistry = {
             width: 3,
             pattern: [
                 'IR-steelframe', 'IR-steelframe', 'IR-steelframe',
-                'IR-refractorybrick', 'IR-anvilheavy', 'IR-refractorybrick',
+                'IR-refractorybrick', 'IR-anvil', 'IR-refractorybrick',
                 'IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone'
             ],
             result: { id: 'IR-fineryforge', count: 1 }
@@ -2094,9 +2161,9 @@ const CraftingRegistry = {
             type: 'shaped3x3',
             width: 3,
             pattern: [
-                'IR-cruciblegraphite', 'IR-bellowsmechanical', 'IR-cruciblegraphite',
+                'IR-cruciblegraphite', 'IR-bellows', 'IR-cruciblegraphite',
                 'IR-refractorybrick', null, 'IR-refractorybrick',
-                'IR-refractorybrick', 'IR-steelframe', 'IR-refractorybrick'
+                'IR-refractorybrick', 'IR-ironplate', 'IR-refractorybrick'
             ],
             result: { id: 'IR-cruciblefurnace', count: 1 }
         },
@@ -2112,7 +2179,7 @@ const CraftingRegistry = {
                 { id: 'IR-leather', count: 2 },
                 { id: 'IR-ironrod', count: 1 }
             ],
-            result: { id: 'IR-bellowshand', count: 1 }
+            result: { id: 'IR-bellows', count: 1 }
         },
         
         // ---- Mechanical Bellows crafting ----
@@ -2126,7 +2193,7 @@ const CraftingRegistry = {
                 'IR-ironplate', 'IR-gear',
                 'IR-gear', 'IR-ironrod'
             ],
-            result: { id: 'IR-bellowsmechanical', count: 1 }
+            result: { id: 'IR-bellows', count: 1 }
         },
         
         // ---- Heavy Anvil crafting ----
@@ -2140,7 +2207,7 @@ const CraftingRegistry = {
                 'IR-wroughtironingot', 'IR-wroughtironingot',
                 'IR-wroughtironingot', 'IR-stoneblock'
             ],
-            result: { id: 'IR-anvilheavy', count: 1 }
+            result: { id: 'IR-anvil', count: 1 }
         },
         
         // ---- Quern Stone crafting ----
@@ -2182,6 +2249,97 @@ const CraftingRegistry = {
                 { id: 'IR-glass', count: 2 }
             ],
             result: { id: 'IR-pyrometer', count: 1 }
+        },
+
+        // ---- Shaped component recipes ----
+        // These deliberately use silhouettes rather than a long list of
+        // shapeless conversions: the workstation feels like assembly, and
+        // JEI can communicate the intended construction at a glance.
+        {
+            id: 'planks-from-oak-log', type: 'shaped2x2', width: 1,
+            pattern: ['IR-oaklog'], result: { id: 'IR-plank', count: 4 }
+        },
+        {
+            id: 'clay-bricks-from-clay', type: 'shaped2x2', width: 2,
+            pattern: ['IR-clay', 'IR-clay', 'IR-clay', 'IR-clay'], result: { id: 'IR-claybrick', count: 4 }
+        },
+        {
+            id: 'grinding-stone-from-cobble', type: 'shaped2x2', width: 2,
+            pattern: ['IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone'], result: { id: 'IR-grindingstone', count: 2 }
+        },
+        {
+            id: 'wooden-riffles', type: 'shaped2x2', width: 2,
+            pattern: ['IR-plank', null, 'IR-plank', null], result: { id: 'IR-woodenriffle', count: 2 }
+        },
+        {
+            id: 'iron-plate-from-wrought-iron', type: 'shaped2x2', width: 2,
+            pattern: ['IR-wroughtironingot', 'IR-wroughtironingot', null, null], result: { id: 'IR-ironplate', count: 2 }
+        },
+        {
+            id: 'iron-rods-from-wrought-iron', type: 'shaped2x2', width: 1,
+            pattern: ['IR-wroughtironingot', 'IR-wroughtironingot'], result: { id: 'IR-ironrod', count: 4 }
+        },
+        {
+            id: 'iron-band-from-plate', type: 'shaped2x2', width: 2,
+            pattern: ['IR-ironplate', 'IR-ironplate', null, null], result: { id: 'IR-ironband', count: 2 }
+        },
+        {
+            id: 'iron-gear-from-rods', type: 'shaped3x3', width: 3,
+            pattern: ['IR-ironrod', 'IR-ironrod', 'IR-ironrod', 'IR-ironrod', null, 'IR-ironrod', 'IR-ironrod', 'IR-ironrod', 'IR-ironrod'], result: { id: 'IR-gear', count: 1 }
+        },
+        {
+            id: 'steel-frame-from-medium-steel', type: 'shaped3x3', width: 3,
+            pattern: ['IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, 'IR-mediumsteelingot'], result: { id: 'IR-steelframe', count: 1 }
+        },
+        {
+            id: 'ceramic-tubes-from-clay', type: 'shaped3x3', width: 3,
+            pattern: [null, 'IR-clay', null, null, 'IR-clay', null, null, 'IR-clay', null], result: { id: 'IR-ceramictube', count: 2 }
+        },
+        {
+            id: 'metal-wire-from-iron-rods', type: 'shaped3x3', width: 3,
+            pattern: [null, 'IR-ironrod', null, null, 'IR-ironrod', null, null, 'IR-ironrod', null], result: { id: 'IR-metalwire', count: 6 }
+        },
+        {
+            id: 'refractory-bricks-from-clay-and-lime', type: 'shaped3x3', width: 3,
+            pattern: ['IR-claybrick', 'IR-quicklime', 'IR-claybrick', 'IR-quicklime', 'IR-claybrick', 'IR-quicklime', 'IR-claybrick', 'IR-quicklime', 'IR-claybrick'], result: { id: 'IR-refractorybrick', count: 4 }
+        },
+        {
+            id: 'graphite-crucible', type: 'shaped3x3', width: 3,
+            pattern: ['IR-graphite', 'IR-graphite', 'IR-graphite', 'IR-graphite', null, 'IR-graphite', 'IR-graphite', 'IR-graphite', 'IR-graphite'], result: { id: 'IR-cruciblegraphite', count: 1 }
+        },
+        // A placed synthetic seed is not simulated as a full tree yet;
+        // this explicit conversion is the playable growth step and keeps
+        // the wood/charcoal branch reachable without a hidden debug grant.
+        {
+            id: 'oak-log-from-synthetic-sapling', type: 'shaped2x2', width: 1,
+            pattern: ['IR-sapling'], result: { id: 'IR-oaklog', count: 1 }
+        },
+        {
+            id: 'stone-block-from-cobblestone', type: 'shaped2x2', width: 2,
+            pattern: ['IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone', 'IR-cobblestone'], result: { id: 'IR-stoneblock', count: 1 }
+        },
+        // Intermediate metallurgy forms used by the existing stations.
+        // They make every registered material discoverable and give JEI a
+        // concrete producing recipe instead of a dead-end entry.
+        {
+            id: 'sponge-iron-from-bloom', type: 'shaped2x2', width: 1,
+            pattern: ['IR-bloom'], result: { id: 'IR-spongeiron', count: 1 }
+        },
+        {
+            id: 'pig-iron-from-sponge-iron', type: 'shaped2x2', width: 2,
+            pattern: ['IR-spongeiron', 'IR-charcoal', 'IR-spongeiron', 'IR-charcoal'], result: { id: 'IR-pigiron', count: 1 }
+        },
+        {
+            id: 'wrought-iron-from-sponge-iron', type: 'shaped2x2', width: 2,
+            pattern: ['IR-spongeiron', 'IR-spongeiron', 'IR-cobblestone', 'IR-cobblestone'], result: { id: 'IR-wroughtironingot', count: 1 }
+        },
+        {
+            id: 'steel-bloom-from-wrought-iron', type: 'shaped2x2', width: 2,
+            pattern: ['IR-wroughtironingot', 'IR-coke', 'IR-wroughtironingot', 'IR-coke'], result: { id: 'IR-steelbloom', count: 1 }
+        },
+        {
+            id: 'cast-iron-from-pig-iron', type: 'shaped2x2', width: 2,
+            pattern: ['IR-pigiron', 'IR-coke', 'IR-pigiron', 'IR-coke'], result: { id: 'IR-castironingot', count: 1 }
         }
     ]
 }

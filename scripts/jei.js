@@ -171,7 +171,52 @@ const JEI = {
         const processed = (typeof GuiBlockRecipeRegistry !== 'undefined' ? GuiBlockRecipeRegistry.recipes : [])
             .filter(r => r.result && r.result.id === id)
             .map(r => ({ ...r, source: 'gui' }));
-        return [...crafted, ...processed];
+        // Fluid processors deliberately live in FluidRecipeRegistry because
+        // their input is measured in mB rather than item stacks.  They are
+        // still a production route, so omitting them here made Nutrient Gel
+        // look unobtainable in JEI.
+        const fluid = (typeof FluidRecipeRegistry !== 'undefined' ? FluidRecipeRegistry.recipes : [])
+            .filter(r => r.result && r.result.id === id)
+            .map(r => ({
+                ...r,
+                source: 'fluid',
+                // The card needs an item-shaped visual for the liquid input.
+                // A filled water capsule is the player-facing way to supply
+                // water to the extractor; the label below preserves the
+                // exact 250 mB requirement.
+                ingredients: [
+                    ...(r.ingredient ? [r.ingredient] : []),
+                    { id: 'IR-capsule-1000-water', count: 1, fluidAmount: r.fluidAmount }
+                ]
+            }));
+        return [...crafted, ...processed, ...fluid, ...this.gatheringSourcesFor(id)];
+    },
+
+    // Not every item enters the game through a crafting grid or a machine.
+    // Sifting is a real acquisition route, so expose it alongside recipes
+    // instead of leaving raw drops with the misleading "No known recipes"
+    // message.  Keeping this derived from ALT_DROP_POOL makes the tooltip
+    // automatically stay in sync when the drop table is balanced later.
+    gatheringSourcesFor(id) {
+        const sifted = typeof ALT_DROP_POOL === 'undefined' ? [] : ALT_DROP_POOL
+            .filter(entry => entry.id === id)
+            .map(entry => ({
+                id: `sifting-${entry.id}`,
+                source: 'gathering',
+                method: 'Sift dirt',
+                ingredients: [{ id: 'IR-dirt', count: 1 }],
+                result: { id: entry.id, count: 1 }
+            }));
+        const blockDrops = Object.values(Registry.blocks)
+            .filter(block => block.dropId === id && block.id !== id)
+            .map(block => ({
+                id: `breaking-${block.id}`,
+                source: 'gathering',
+                method: `Break ${block.name}`,
+                ingredients: [{ id: block.id, count: 1 }],
+                result: { id, count: 1 }
+            }));
+        return [...sifted, ...blockDrops];
     },
 
     // All recipes/processes that CONSUME this item as an ingredient - the
@@ -301,7 +346,7 @@ function jeiSlotHTML(entry) {
 // stone around the border. Reuses the same .craft-slot/.item-icon classes
 // as the real crafting UI so it looks identical, just not interactive.
 function jeiRecipeGridHTML(recipe) {
-    if (recipe.type === 'shapeless') {
+    if (recipe.type === 'shapeless' || recipe.source === 'fluid') {
         // No fixed layout - just list each ingredient as its own slot,
         // stacked in a row, since position doesn't matter for shapeless.
         // Width the grid to exactly how many ingredients there are (up to
@@ -367,10 +412,18 @@ function jeiGuiRecipeGridHTML(recipe) {
 }
 
 function jeiRecipeTypeLabel(recipe) {
+    if (recipe.source === 'gathering') {
+        return `${recipe.method} — hold Alt and use Break on exposed dirt`;
+    }
     if (recipe.source === 'gui') {
         const stationData = Registry.get(recipe.block);
         const stationName = stationData ? stationData.name : recipe.block;
         return `${stationName} \u2014 auto-process (${recipe.ticks} ticks)`;
+    }
+    if (recipe.source === 'fluid') {
+        const stationData = Registry.get(recipe.block);
+        const stationName = stationData ? stationData.name : recipe.block;
+        return `${stationName} — ${recipe.fluidAmount} mB ${recipe.fluid} (${recipe.ticks} ticks)`;
     }
     if (recipe.type === 'shapeless') return 'Shapeless (any position)';
     if (recipe.type === 'shaped3x3') return 'Shaped \u2014 Workbench (3x3)';

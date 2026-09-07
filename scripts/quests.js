@@ -10,45 +10,2465 @@ function escapeHtml(str) {
 // Embedded quest data - no network required, works on file:// protocol
 const EMBEDDED_QUEST_DATA = {
   "nodes": [
-    {"id":1,"x":240,"y":60,"radius":22,"shape":"circle","title":"Prologue","subtitle":"No trees nearby","description":"Only earth and stone surround you. A sapling must be CREATED from minerals, water, and ancient organic matter.","iconUrl":"","tasks":[]},
-    {"id":2,"x":240,"y":200,"radius":22,"shape":"circle","title":"Soil Science","subtitle":"Earth is not just dirt","description":"Hold ALT+Click on Dirt to sift soil by hand. You may get pebbles or rarely humus.","iconUrl":"","tasks":[{"text":"Find Andesite Pebble via ALT+Click","optional":false,"type":"item","itemId":"IR-apebble","itemCount":1}]},
-    {"id":3,"x":130,"y":340,"radius":20,"shape":"circle","title":"Stone Table","subtitle":"Craft Workbench","description":"Arrange 4 Cobblestone in 2x2 square to craft Workbench.","iconUrl":"","tasks":[{"text":"Craft Workbench","optional":false,"type":"item","itemId":"IR-workbench","itemCount":1}]},
-    {"id":4,"x":350,"y":340,"radius":20,"shape":"circle","title":"Hand Mill","subtitle":"Build Mixer","description":"Find Daisleyte pebble and craft Mixer with 2 Cobblestone.","iconUrl":"","tasks":[{"text":"Find Daisleyte Pebble","optional":false,"type":"item","itemId":"IR-dpebble","itemCount":1},{"text":"Craft Mixer","optional":false,"type":"item","itemId":"IR-mixer","itemCount":1}]},
-    {"id":5,"x":130,"y":480,"radius":20,"shape":"circle","title":"Kiln","subtitle":"Build Kiln","description":"Arrange 8 Cobblestone in ring on Workbench for Kiln.","iconUrl":"","tasks":[{"text":"Build Kiln","optional":false,"type":"item","itemId":"IR-kiln","itemCount":1}]},
-    {"id":6,"x":350,"y":480,"radius":20,"shape":"circle","title":"Volcanic Flour","subtitle":"Mineral Powder","description":"Grind Andesite and Basalt in Mixer into Mineral Powder.","iconUrl":"","tasks":[{"text":"Find Basalt Pebble","optional":false,"type":"item","itemId":"IR-bpebble","itemCount":1},{"text":"Craft Mineral Powder x2","optional":false,"type":"item","itemId":"IR-mineralpowder","itemCount":2}]},
-    {"id":7,"x":460,"y":480,"radius":20,"shape":"circle","title":"Glass Ingredients","subtitle":"Lime and Silica","description":"Grind Calcite into Lime Powder, Blackstone into Silica Powder.","iconUrl":"","tasks":[{"text":"Find Calcite Pebble","optional":false,"type":"item","itemId":"IR-cpebble","itemCount":1},{"text":"Craft Lime Powder","optional":false,"type":"item","itemId":"IR-limepowder","itemCount":1},{"text":"Craft Silica Powder","optional":false,"type":"item","itemId":"IR-silicapowder","itemCount":1}]},
-    {"id":8,"x":240,"y":620,"radius":24,"shape":"circle","title":"Glass Capsule","subtitle":"First Vessel","description":"Fire Silica and Lime in Kiln to get Glass Capsules.","iconUrl":"","tasks":[{"text":"Craft Glass Capsule x2","optional":false,"type":"item","itemId":"IR-capsule-1000","itemCount":2}]},
-    {"id":9,"x":240,"y":760,"radius":20,"shape":"circle","title":"Water Capsule","subtitle":"Extract Water","description":"Fill empty capsule with water from dirt.","iconUrl":"","tasks":[{"text":"Craft Water Capsule","optional":false,"type":"item","itemId":"IR-capsule-1000-water","itemCount":1}]},
-    {"id":10,"x":350,"y":900,"radius":22,"shape":"circle","title":"Nutrient Gel","subtitle":"Hydroponics","description":"Craft Fluid Extractor and make Nutrient Gel.","iconUrl":"","tasks":[{"text":"Craft Fluid Extractor","optional":false,"type":"item","itemId":"IR-fluid-extractor","itemCount":1},{"text":"Craft Nutrient Gel x2","optional":false,"type":"item","itemId":"IR-nutrientgel","itemCount":2}]},
-    {"id":11,"x":350,"y":1040,"radius":20,"shape":"circle","title":"Tissue Culture","subtitle":"Callus Growth","description":"Find Humus and grow Callus Culture in Mixer.","iconUrl":"","tasks":[{"text":"Find Humus","optional":false,"type":"item","itemId":"IR-humus","itemCount":1},{"text":"Craft Callus Culture","optional":false,"type":"item","itemId":"IR-callusculture","itemCount":1}]},
-    {"id":12,"x":350,"y":1360,"radius":30,"shape":"star","title":"First Sapling","subtitle":"Synthetic Seed FINALE","description":"Create first Oak Sapling through biotechnology.","iconUrl":"","tasks":[{"text":"Craft Oak Sapling","optional":false,"type":"item","itemId":"IR-sapling","itemCount":1}]},
-    {"id":13,"x":460,"y":620,"radius":20,"shape":"circle","title":"Plant Ash","subtitle":"Alkali Source","description":"Calcine Humus in Kiln to get Plant Ash.","iconUrl":"","tasks":[{"text":"Craft Plant Ash","optional":false,"type":"item","itemId":"IR-plantash","itemCount":1}]},
-    {"id":14,"x":460,"y":700,"radius":20,"shape":"circle","title":"Lye","subtitle":"Potash Solution","description":"Mix Plant Ash with 2 Dirt to get Lye.","iconUrl":"","tasks":[{"text":"Craft Lye","optional":false,"type":"item","itemId":"IR-ashlye","itemCount":1}]},
-    {"id":15,"x":460,"y":780,"radius":20,"shape":"circle","title":"Soda Ash","subtitle":"Glass Flux","description":"Calcine Lye in Kiln to get Soda Ash.","iconUrl":"","tasks":[{"text":"Craft Soda Ash","optional":false,"type":"item","itemId":"IR-sodaash","itemCount":1}]},
-    {"id":16,"x":240,"y":620,"radius":22,"shape":"circle","title":"Better Glass","subtitle":"Soda-Lime Formula","description":"Craft glass with soda flux for better quality.","iconUrl":"","tasks":[{"text":"Craft Glass Capsule (with soda)","optional":false,"type":"item","itemId":"IR-capsule-1000","itemCount":1}]},
-    {"id":17,"x":240,"y":1120,"radius":20,"shape":"circle","title":"Autoclave","subtitle":"Sterilization","description":"Craft Autoclave for sterile processing.","iconUrl":"","tasks":[{"text":"Craft Autoclave","optional":false,"type":"item","itemId":"IR-autoclave","itemCount":1}]},
-    {"id":18,"x":240,"y":1200,"radius":20,"shape":"circle","title":"Asepsis","subtitle":"Sterile Materials","description":"Sterilize capsule and nutrient gel separately.","iconUrl":"","tasks":[{"text":"Sterilize Capsule","optional":false,"type":"item","itemId":"IR-capsule-sterile","itemCount":1},{"text":"Sterilize Nutrient Gel","optional":false,"type":"item","itemId":"IR-nutrientgel-sterile","itemCount":1}]},
-    {"id":19,"x":460,"y":1120,"radius":20,"shape":"circle","title":"Growth Regulators","subtitle":"Plant Hormones","description":"Create Growth Regulator Solution.","iconUrl":"","tasks":[{"text":"Craft Growth Regulator","optional":false,"type":"item","itemId":"IR-growthregulator","itemCount":1}]},
-    {"id":20,"x":460,"y":1200,"radius":20,"shape":"circle","title":"Embryogenic Callus","subtitle":"Differentiated Cells","description":"Create Embryogenic Callus.","iconUrl":"","tasks":[{"text":"Craft Embryogenic Callus","optional":false,"type":"item","itemId":"IR-embryocallus","itemCount":1}]},
-    {"id":21,"x":350,"y":1280,"radius":22,"shape":"circle","title":"Encapsulation","subtitle":"Synthetic Seed","description":"Assemble Synthetic Seed.","iconUrl":"","tasks":[{"text":"Craft Synthetic Seed","optional":false,"type":"item","itemId":"IR-synthetic-seed","itemCount":1}]},
-    {"id":22,"x":350,"y":1440,"radius":28,"shape":"star","title":"Living Tree","subtitle":"Life from Stone","description":"Grow Oak Tree from Synthetic Seed.","iconUrl":"","tasks":[{"text":"Grow Oak Tree","optional":false,"type":"item","itemId":"IR-oaklog","itemCount":1}]},
-    {"id":23,"x":550,"y":340,"radius":20,"shape":"circle","title":"Charcoal","subtitle":"Carbon for Metallurgy","description":"Produce Charcoal in Kiln.","iconUrl":"","tasks":[{"text":"Craft Charcoal x4","optional":false,"type":"item","itemId":"IR-charcoal","itemCount":4}]},
-    {"id":24,"x":550,"y":480,"radius":20,"shape":"circle","title":"Refractory Brick","subtitle":"Furnace Materials","description":"Find Clay and fire into Bricks.","iconUrl":"","tasks":[{"text":"Find Clay x4","optional":false,"type":"item","itemId":"IR-clay","itemCount":4},{"text":"Craft Brick x4","optional":false,"type":"item","itemId":"IR-brick","itemCount":4}]},
-    {"id":25,"x":550,"y":620,"radius":22,"shape":"circle","title":"Bloomery","subtitle":"Iron Age Begins","description":"Build Bloomery Furnace.","iconUrl":"","tasks":[{"text":"Build Bloomery","optional":false,"type":"item","itemId":"IR-bloomery","itemCount":1}]},
-    {"id":26,"x":660,"y":620,"radius":20,"shape":"circle","title":"Iron Ore","subtitle":"Red Stones","description":"Find Iron Ore by sifting.","iconUrl":"","tasks":[{"text":"Find Iron Ore x4","optional":false,"type":"item","itemId":"IR-ironore","itemCount":4}]},
-    {"id":27,"x":605,"y":760,"radius":24,"shape":"circle","title":"Iron Bloom","subtitle":"Sponge Iron","description":"Smelt Iron Bloom in Bloomery.","iconUrl":"","tasks":[{"text":"Smelt Iron Bloom","optional":false,"type":"item","itemId":"IR-ironbloom","itemCount":1}]},
-    {"id":28,"x":605,"y":900,"radius":20,"shape":"circle","title":"Wrought Iron","subtitle":"Pure Iron","description":"Forge Wrought Iron from bloom.","iconUrl":"","tasks":[{"text":"Forge Wrought Iron","optional":false,"type":"item","itemId":"IR-wroughtiron","itemCount":1}]},
-    {"id":29,"x":720,"y":900,"radius":20,"shape":"circle","title":"Steel Bloom","subtitle":"Carburization","description":"Create Steel Bloom via carburization.","iconUrl":"","tasks":[{"text":"Create Steel Bloom","optional":false,"type":"item","itemId":"IR-steelbloom","itemCount":1}]},
-    {"id":30,"x":605,"y":1040,"radius":22,"shape":"circle","title":"Medium Steel","subtitle":"Tool Steel","description":"Forge Medium Steel Ingot.","iconUrl":"","tasks":[{"text":"Forge Medium Steel Ingot","optional":false,"type":"item","itemId":"IR-mediumsteelingot","itemCount":1}]},
-    {"id":31,"x":720,"y":1040,"radius":20,"shape":"circle","title":"High Carbon Steel","subtitle":"Cutting Steel","description":"Create High Carbon Steel Ingot.","iconUrl":"","tasks":[{"text":"Create High Carbon Steel Ingot","optional":false,"type":"item","itemId":"IR-highcarbonsteelingot","itemCount":1}]},
-    {"id":32,"x":605,"y":1180,"radius":20,"shape":"circle","title":"Steel Tools","subtitle":"Industrial Revolution","description":"Craft Steel Pickaxe and Axe.","iconUrl":"","tasks":[{"text":"Craft Steel Pickaxe","optional":false,"type":"item","itemId":"IR-steel-pickaxe","itemCount":1},{"text":"Craft Steel Axe","optional":false,"type":"item","itemId":"IR-steel-axe","itemCount":1}]},
-    {"id":33,"x":720,"y":1180,"radius":20,"shape":"circle","title":"Cast Iron","subtitle":"Molten Iron","description":"Produce Cast Iron Ingot (optional).","iconUrl":"","tasks":[{"text":"Produce Cast Iron Ingot","optional":true,"type":"item","itemId":"IR-castironingot","itemCount":1}]},
-    {"id":34,"x":660,"y":1320,"radius":32,"shape":"star","title":"STEEL AGE","subtitle":"MASTER OF METAL - FINAL QUEST","description":"You have conquered metallurgy! From rock to steel - Industrial Revolution begins.<br><br>FINAL QUEST: Create high carbon steel products.","iconUrl":"","tasks":[{"text":"Create High Carbon Steel x5","optional":false,"type":"item","itemId":"IR-highcarbonsteelingot","itemCount":5},{"text":"Obtain Cast Iron (optional)","optional":true,"type":"item","itemId":"IR-castironingot","itemCount":1}]}
+    {
+      "id": 1,
+      "radius": 28,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 440,
+      "y": 50,
+      "title": "Путь от земли к стали",
+      "subtitle": "Основная линия и дополнительные ветви",
+      "description": "Основная линия идёт сверху вниз: каждое следующее задание открывается только после предыдущего и проверяет предмет в инвентаре. Боковые задания не блокируют прогресс, но раскрывают альтернативные руды, топливо, детали и побочные продукты.",
+      "tasks": [
+        {
+          "text": "Открыть квестник и начать путь",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 150,
+      "contentId": "IR-dirt",
+      "title": "Первые шаги",
+      "subtitle": "Подними землю",
+      "description": "Начальная площадка — твой единственный безопасный ресурс. Земля нужна и для просеивания, и для воды.",
+      "tasks": [
+        {
+          "text": "Получить: Первые шаги",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-dirt",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 268,
+      "contentId": "IR-cobblestone",
+      "title": "Каменный край",
+      "subtitle": "Добыть булыжник",
+      "description": "Сломай край стартовой платформы и сохрани первый камень для верстака.",
+      "tasks": [
+        {
+          "text": "Получить: Каменный край ×8",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cobblestone",
+          "itemCount": 8
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 386,
+      "contentId": "IR-apebble",
+      "title": "Ручное просеивание",
+      "subtitle": "Андезит",
+      "description": "Зажми Alt и ломай открытую землю: камешки появляются без разрушения блока.",
+      "tasks": [
+        {
+          "text": "Получить: Ручное просеивание",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-apebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 504,
+      "contentId": "IR-workbench",
+      "title": "Каменный верстак",
+      "subtitle": "Собрать верстак",
+      "description": "Четыре булыжника квадратом открывают 3×3 рецепты.",
+      "tasks": [
+        {
+          "text": "Получить: Каменный верстак",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-workbench",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 622,
+      "contentId": "IR-dpebble",
+      "title": "Твёрдый камень",
+      "subtitle": "Глубинный камешек",
+      "description": "Просеивай землю, пока не найдёшь плотный глубинный камешек для мельницы.",
+      "tasks": [
+        {
+          "text": "Получить: Твёрдый камень",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-dpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 740,
+      "contentId": "IR-mixer",
+      "title": "Мельница",
+      "subtitle": "Собрать мельницу",
+      "description": "Мельница превращает камешки в нужные для жизни порошки.",
+      "tasks": [
+        {
+          "text": "Получить: Мельница",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mixer",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 858,
+      "contentId": "IR-bpebble",
+      "title": "Вулканическая мука",
+      "subtitle": "Базальтовый камешек",
+      "description": "Базальт вместе с андезитом даёт минеральную муку.",
+      "tasks": [
+        {
+          "text": "Получить: Вулканическая мука",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 976,
+      "contentId": "IR-mineralpowder",
+      "title": "Минеральное питание",
+      "subtitle": "Сделать минеральную муку",
+      "description": "Помести базальт и андезит в мельницу; освободи ячейку результата.",
+      "tasks": [
+        {
+          "text": "Получить: Минеральное питание ×2",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mineralpowder",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1094,
+      "contentId": "IR-cpebble",
+      "title": "Мягкий минерал",
+      "subtitle": "Кальцитовый камешек",
+      "description": "Кальцит можно размолоть вручную — это самый простой путь к извести.",
+      "tasks": [
+        {
+          "text": "Получить: Мягкий минерал",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1212,
+      "contentId": "IR-blpebble",
+      "title": "Стекольный песок",
+      "subtitle": "Чернокаменный камешек",
+      "description": "Два чернокаменных камешка мельница превращает в кремнезёмный порошок.",
+      "tasks": [
+        {
+          "text": "Получить: Стекольный песок",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-blpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1330,
+      "contentId": "IR-limepowder",
+      "title": "Известь",
+      "subtitle": "Сделать известковый порошок",
+      "description": "Измельчи кальцит в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Известь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limepowder",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1448,
+      "contentId": "IR-silicapowder",
+      "title": "Кремнезём",
+      "subtitle": "Сделать кремнезёмный порошок",
+      "description": "Это основа стекла; проверь рецепт в JEI, если забыл количество.",
+      "tasks": [
+        {
+          "text": "Получить: Кремнезём",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-silicapowder",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1566,
+      "contentId": "IR-kiln",
+      "title": "Печь обжига",
+      "subtitle": "Собрать печь",
+      "description": "Кольцо из булыжника собирается только на верстаке 3×3.",
+      "tasks": [
+        {
+          "text": "Получить: Печь обжига",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-kiln",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1684,
+      "contentId": "IR-humus",
+      "title": "Органика в почве",
+      "subtitle": "Найти гумус",
+      "description": "Гумус выпадает редко, поэтому просеивай запас земли, не разрушая площадку.",
+      "tasks": [
+        {
+          "text": "Получить: Органика в почве ×2",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-humus",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1802,
+      "contentId": "IR-plantash",
+      "title": "Растительная зола",
+      "subtitle": "Обжечь гумус",
+      "description": "Зола нужна для щёлока и не является мусором.",
+      "tasks": [
+        {
+          "text": "Получить: Растительная зола",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-plantash",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 1920,
+      "contentId": "IR-ashlye",
+      "title": "Щёлок",
+      "subtitle": "Выщелочить золу",
+      "description": "Соедини золу с землёй: вода в почве растворяет щелочные соли.",
+      "tasks": [
+        {
+          "text": "Получить: Щёлок",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ashlye",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2038,
+      "contentId": "IR-sodaash",
+      "title": "Сода",
+      "subtitle": "Обжечь щёлок",
+      "description": "Сода снижает температуру плавления стекла.",
+      "tasks": [
+        {
+          "text": "Получить: Сода",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sodaash",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2156,
+      "contentId": "IR-capsule-1000",
+      "title": "Первая капсула",
+      "subtitle": "Сварить стекло",
+      "description": "Соедини кремнезём, известь и соду в печи.",
+      "tasks": [
+        {
+          "text": "Получить: Первая капсула ×4",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-1000",
+          "itemCount": 4
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2274,
+      "contentId": "IR-capsule-1000-water",
+      "title": "Вода в таре",
+      "subtitle": "Наполнить капсулу",
+      "description": "Капсула и земля дают запас воды для обработки.",
+      "tasks": [
+        {
+          "text": "Получить: Вода в таре",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-1000-water",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2392,
+      "contentId": "IR-fluid-extractor",
+      "title": "Экстрактор",
+      "subtitle": "Собрать экстрактор",
+      "description": "Экстрактор использует жидкость отдельно от предметного слота.",
+      "tasks": [
+        {
+          "text": "Получить: Экстрактор",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-fluid-extractor",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2510,
+      "contentId": "IR-nutrientgel",
+      "title": "Питательный гель",
+      "subtitle": "Растворить минеральную муку",
+      "description": "Подай воду в жидкостный слот и минеральную муку в предметный. JEI показывает объём воды.",
+      "tasks": [
+        {
+          "text": "Получить: Питательный гель",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-nutrientgel",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2628,
+      "contentId": "IR-callusculture",
+      "title": "Культура клеток",
+      "subtitle": "Вырастить каллус",
+      "description": "Соедини гумус и питательный гель в мельнице.",
+      "tasks": [
+        {
+          "text": "Получить: Культура клеток",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-callusculture",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2746,
+      "contentId": "IR-autoclave",
+      "title": "Автоклав",
+      "subtitle": "Собрать автоклав",
+      "description": "Стерильность нужна до работы с живой культурой.",
+      "tasks": [
+        {
+          "text": "Получить: Автоклав",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-autoclave",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2864,
+      "contentId": "IR-capsule-sterile",
+      "title": "Стерильная тара",
+      "subtitle": "Стерилизовать капсулу",
+      "description": "Сначала обработай сам сосуд.",
+      "tasks": [
+        {
+          "text": "Получить: Стерильная тара",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-capsule-sterile",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 2982,
+      "contentId": "IR-nutrientgel-sterile",
+      "title": "Стерильная среда",
+      "subtitle": "Стерилизовать гель",
+      "description": "Среду стерилизуют отдельно от капсулы.",
+      "tasks": [
+        {
+          "text": "Получить: Стерильная среда",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-nutrientgel-sterile",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3100,
+      "contentId": "IR-hormonesolution",
+      "title": "Регуляторы роста",
+      "subtitle": "Сделать раствор",
+      "description": "Щёлок и минеральная мука дают раствор для дифференциации клеток.",
+      "tasks": [
+        {
+          "text": "Получить: Регуляторы роста",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-hormonesolution",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3218,
+      "contentId": "IR-bioreactor",
+      "title": "Биореактор",
+      "subtitle": "Собрать биореактор",
+      "description": "Это последняя станция биотехнологической ветви.",
+      "tasks": [
+        {
+          "text": "Получить: Биореактор",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bioreactor",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3336,
+      "contentId": "IR-embryogeniccallus",
+      "title": "Эмбриогенный каллус",
+      "subtitle": "Подготовить эмбрион",
+      "description": "Биореактор объединяет каллус с регуляторами роста.",
+      "tasks": [
+        {
+          "text": "Получить: Эмбриогенный каллус",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-embryogeniccallus",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3454,
+      "contentId": "IR-sapling",
+      "title": "Синтетическое семя",
+      "subtitle": "Собрать саженец",
+      "description": "На верстаке объедини стерильную капсулу, гель и эмбриогенный каллус.",
+      "tasks": [
+        {
+          "text": "Получить: Синтетическое семя",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sapling",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3572,
+      "contentId": "IR-oaklog",
+      "title": "Первое дерево",
+      "subtitle": "Вырастить бревно",
+      "description": "В этой версии саженец превращается в бревно через рецепт роста — это игровой шаг посадки.",
+      "tasks": [
+        {
+          "text": "Получить: Первое дерево",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-oaklog",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3690,
+      "contentId": "IR-plank",
+      "title": "Древесина",
+      "subtitle": "Распустить бревно",
+      "description": "Доски открывают угольную яму и механические детали.",
+      "tasks": [
+        {
+          "text": "Получить: Древесина",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-plank",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3808,
+      "contentId": "IR-clay",
+      "title": "Глина",
+      "subtitle": "Найти глину",
+      "description": "Просеивание даёт и глину: подготовь её для домницы.",
+      "tasks": [
+        {
+          "text": "Получить: Глина ×8",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-clay",
+          "itemCount": 8
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 3926,
+      "contentId": "IR-claybrick",
+      "title": "Сырой кирпич",
+      "subtitle": "Сформовать глиняный кирпич",
+      "description": "Четыре порции глины формируют партию сырца.",
+      "tasks": [
+        {
+          "text": "Получить: Сырой кирпич ×8",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-claybrick",
+          "itemCount": 8
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4044,
+      "contentId": "IR-brick",
+      "title": "Обожжённый кирпич",
+      "subtitle": "Обжечь кирпич",
+      "description": "Печь делает из сырца прочный строительный материал.",
+      "tasks": [
+        {
+          "text": "Получить: Обожжённый кирпич",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-brick",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4162,
+      "contentId": "IR-charcoalpit",
+      "title": "Угольная яма",
+      "subtitle": "Собрать угольную яму",
+      "description": "Угольная яма превращает доски в металлургическое топливо.",
+      "tasks": [
+        {
+          "text": "Получить: Угольная яма",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-charcoalpit",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4280,
+      "contentId": "IR-charcoal",
+      "title": "Древесный уголь",
+      "subtitle": "Получить уголь",
+      "description": "Уголь нужен домнице, а не только следующему крафту.",
+      "tasks": [
+        {
+          "text": "Получить: Древесный уголь ×6",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-charcoal",
+          "itemCount": 6
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4398,
+      "contentId": "IR-grindingstone",
+      "title": "Точильный камень",
+      "subtitle": "Сделать точильный камень",
+      "description": "Четыре булыжника дают пару камней для жернова.",
+      "tasks": [
+        {
+          "text": "Получить: Точильный камень",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-grindingstone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4516,
+      "contentId": "IR-quernstone",
+      "title": "Жернов",
+      "subtitle": "Собрать жернов",
+      "description": "Жернов дробит руду и известняк перед плавкой.",
+      "tasks": [
+        {
+          "text": "Получить: Жернов",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-quernstone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4634,
+      "contentId": "IR-ironore",
+      "title": "Железная руда",
+      "subtitle": "Найти железную руду",
+      "description": "Руда добывается просеиванием; JEI показывает этот источник.",
+      "tasks": [
+        {
+          "text": "Получить: Железная руда ×4",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironore",
+          "itemCount": 4
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4752,
+      "contentId": "IR-crushedironore",
+      "title": "Дроблёная руда",
+      "subtitle": "Раздробить железную руду",
+      "description": "Увеличь поверхность руды в жернове.",
+      "tasks": [
+        {
+          "text": "Получить: Дроблёная руда ×8",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedironore",
+          "itemCount": 8
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4870,
+      "contentId": "IR-woodenriffle",
+      "title": "Деревянные рифли",
+      "subtitle": "Сделать рифли",
+      "description": "Рифли удерживают тяжёлые зёрна в промывочном лотке.",
+      "tasks": [
+        {
+          "text": "Получить: Деревянные рифли",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-woodenriffle",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 4988,
+      "contentId": "IR-sluicebox",
+      "title": "Промывочный лоток",
+      "subtitle": "Собрать лоток",
+      "description": "Промывка требует воды и дроблёной руды.",
+      "tasks": [
+        {
+          "text": "Получить: Промывочный лоток",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-sluicebox",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5106,
+      "contentId": "IR-concentrateironore",
+      "title": "Железный концентрат",
+      "subtitle": "Промыть руду",
+      "description": "Концентрат — правильная шихта для домницы.",
+      "tasks": [
+        {
+          "text": "Получить: Железный концентрат ×4",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentrateironore",
+          "itemCount": 4
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5224,
+      "contentId": "IR-crushedlimestone",
+      "title": "Флюс",
+      "subtitle": "Раздробить известняк",
+      "description": "Флюс связывает примеси в шлак.",
+      "tasks": [
+        {
+          "text": "Получить: Флюс ×2",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedlimestone",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5342,
+      "contentId": "IR-bloomeryfurnace",
+      "title": "Домница",
+      "subtitle": "Собрать домницу",
+      "description": "Домница больше не требует железных деталей до первой плавки.",
+      "tasks": [
+        {
+          "text": "Получить: Домница",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bloomeryfurnace",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5460,
+      "contentId": "IR-bloom",
+      "title": "Крица",
+      "subtitle": "Выплавить крицу",
+      "description": "Загрузи концентрат, флюс и древесный уголь; забери результат и шлак.",
+      "tasks": [
+        {
+          "text": "Получить: Крица",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bloom",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5578,
+      "contentId": "IR-spongeiron",
+      "title": "Губчатое железо",
+      "subtitle": "Проковать крицу",
+      "description": "Первичная заготовка ещё пористая и содержит примеси.",
+      "tasks": [
+        {
+          "text": "Получить: Губчатое железо ×2",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-spongeiron",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5696,
+      "contentId": "IR-wroughtironingot",
+      "title": "Кричное железо",
+      "subtitle": "Уплотнить железо",
+      "description": "Кованое железо открывает пластины, прутки и следующие машины.",
+      "tasks": [
+        {
+          "text": "Получить: Кричное железо ×4",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-wroughtironingot",
+          "itemCount": 4
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5814,
+      "contentId": "IR-ironplate",
+      "title": "Железная пластина",
+      "subtitle": "Проковать пластину",
+      "description": "Пластины нужны для печей и станин.",
+      "tasks": [
+        {
+          "text": "Получить: Железная пластина ×2",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironplate",
+          "itemCount": 2
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 5932,
+      "contentId": "IR-ironrod",
+      "title": "Железный пруток",
+      "subtitle": "Вытянуть пруток",
+      "description": "Прутки становятся шестернями, проволокой и мехами.",
+      "tasks": [
+        {
+          "text": "Получить: Железный пруток ×4",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironrod",
+          "itemCount": 4
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6050,
+      "contentId": "IR-bellows",
+      "title": "Меха",
+      "subtitle": "Собрать меха",
+      "description": "Меха дают нужный поток воздуха для горячих процессов.",
+      "tasks": [
+        {
+          "text": "Получить: Меха",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bellows",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6168,
+      "contentId": "IR-graphite",
+      "title": "Графит",
+      "subtitle": "Найти графит",
+      "description": "Редкий графит находится при просеивании и нужен для тигля.",
+      "tasks": [
+        {
+          "text": "Получить: Графит ×8",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-graphite",
+          "itemCount": 8
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6286,
+      "contentId": "IR-cruciblegraphite",
+      "title": "Графитовый тигель",
+      "subtitle": "Собрать тигель",
+      "description": "Собери кольцо из графита, оставив центр пустым.",
+      "tasks": [
+        {
+          "text": "Получить: Графитовый тигель",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cruciblegraphite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6404,
+      "contentId": "IR-refractorybrick",
+      "title": "Огнеупор",
+      "subtitle": "Сделать огнеупорный кирпич",
+      "description": "Глиняный кирпич и известь создают кладку для высоких температур.",
+      "tasks": [
+        {
+          "text": "Получить: Огнеупор ×4",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-refractorybrick",
+          "itemCount": 4
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6522,
+      "contentId": "IR-cruciblefurnace",
+      "title": "Тигельная печь",
+      "subtitle": "Собрать тигельную печь",
+      "description": "Тигель, меха, огнеупор и пластина открывают производство стали.",
+      "tasks": [
+        {
+          "text": "Получить: Тигельная печь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cruciblefurnace",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6640,
+      "contentId": "IR-mildsteelingot",
+      "title": "Мягкая сталь",
+      "subtitle": "Выплавить мягкую сталь",
+      "description": "Первый контролируемый стальной сплав.",
+      "tasks": [
+        {
+          "text": "Получить: Мягкая сталь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mildsteelingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6758,
+      "contentId": "IR-mediumsteelingot",
+      "title": "Средняя сталь",
+      "subtitle": "Выплавить среднюю сталь",
+      "description": "Этот сорт стали нужен для стальной рамы.",
+      "tasks": [
+        {
+          "text": "Получить: Средняя сталь",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mediumsteelingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 440,
+      "y": 6876,
+      "contentId": "IR-steelframe",
+      "title": "Стальная рама",
+      "subtitle": "Собрать раму",
+      "description": "Основная прогрессия завершена: теперь доступны улучшенные металлургические машины.",
+      "tasks": [
+        {
+          "text": "Получить: Стальная рама",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steelframe",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "radius": 23,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 120,
+      "y": 386,
+      "title": "Дополнительно: другие камешки",
+      "subtitle": "Необязательная ветка",
+      "description": "Эти задания открываются после соответствующей точки основной линии. Они требуют реальные предметы, но не задерживают основной прогресс.",
+      "tasks": [
+        {
+          "text": "Открыть дополнительную ветку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "radius": 23,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 120,
+      "y": 1566,
+      "title": "Дополнительно: стекольная мастерская",
+      "subtitle": "Необязательная ветка",
+      "description": "Эти задания открываются после соответствующей точки основной линии. Они требуют реальные предметы, но не задерживают основной прогресс.",
+      "tasks": [
+        {
+          "text": "Открыть дополнительную ветку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "radius": 23,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 120,
+      "y": 4516,
+      "title": "Дополнительно: другие руды",
+      "subtitle": "Необязательная ветка",
+      "description": "Эти задания открываются после соответствующей точки основной линии. Они требуют реальные предметы, но не задерживают основной прогресс.",
+      "tasks": [
+        {
+          "text": "Открыть дополнительную ветку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 4606,
+      "contentId": "IR-limestone",
+      "title": "Limestone",
+      "subtitle": "Дополнительный материал",
+      "description": "Limestone — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Limestone",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limestone",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 4606,
+      "contentId": "IR-bogironore",
+      "title": "Bog Iron Ore",
+      "subtitle": "Дополнительный материал",
+      "description": "Bog Iron Ore — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Bog Iron Ore",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bogironore",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 4714,
+      "contentId": "IR-hematite",
+      "title": "Hematite",
+      "subtitle": "Дополнительный материал",
+      "description": "Hematite — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Hematite",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-hematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 4714,
+      "contentId": "IR-magnetite",
+      "title": "Magnetite",
+      "subtitle": "Дополнительный материал",
+      "description": "Magnetite — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Magnetite",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-magnetite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 4822,
+      "contentId": "IR-limonite",
+      "title": "Limonite",
+      "subtitle": "Дополнительный материал",
+      "description": "Limonite — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Limonite",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-limonite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 4822,
+      "contentId": "IR-crushedbogiron",
+      "title": "Crushed Bog Iron",
+      "subtitle": "Дополнительный материал",
+      "description": "Crushed Bog Iron — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Crushed Bog Iron",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedbogiron",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 4930,
+      "contentId": "IR-crushedhematite",
+      "title": "Crushed Hematite",
+      "subtitle": "Дополнительный материал",
+      "description": "Crushed Hematite — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Crushed Hematite",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedhematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 4930,
+      "contentId": "IR-crushedmagnetite",
+      "title": "Crushed Magnetite",
+      "subtitle": "Дополнительный материал",
+      "description": "Crushed Magnetite — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Crushed Magnetite",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedmagnetite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 5038,
+      "contentId": "IR-crushedlimonite",
+      "title": "Crushed Limonite",
+      "subtitle": "Дополнительный материал",
+      "description": "Crushed Limonite — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Crushed Limonite",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-crushedlimonite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 5038,
+      "contentId": "IR-concentratebogiron",
+      "title": "Bog Iron Concentrate",
+      "subtitle": "Дополнительный материал",
+      "description": "Bog Iron Concentrate — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Bog Iron Concentrate",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratebogiron",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 5146,
+      "contentId": "IR-concentratehematite",
+      "title": "Hematite Concentrate",
+      "subtitle": "Дополнительный материал",
+      "description": "Hematite Concentrate — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Hematite Concentrate",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratehematite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 5146,
+      "contentId": "IR-concentratemagnetite",
+      "title": "Magnetite Concentrate",
+      "subtitle": "Дополнительный материал",
+      "description": "Magnetite Concentrate — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Magnetite Concentrate",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratemagnetite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 5254,
+      "contentId": "IR-concentratelimonite",
+      "title": "Limonite Concentrate",
+      "subtitle": "Дополнительный материал",
+      "description": "Limonite Concentrate — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Limonite Concentrate",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-concentratelimonite",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "radius": 23,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 120,
+      "y": 5696,
+      "title": "Дополнительно: железные детали",
+      "subtitle": "Необязательная ветка",
+      "description": "Эти задания открываются после соответствующей точки основной линии. Они требуют реальные предметы, но не задерживают основной прогресс.",
+      "tasks": [
+        {
+          "text": "Открыть дополнительную ветку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 5786,
+      "contentId": "IR-quicklime",
+      "title": "Quicklime",
+      "subtitle": "Дополнительный материал",
+      "description": "Quicklime — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Quicklime",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-quicklime",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 5786,
+      "contentId": "IR-ironband",
+      "title": "Iron Band",
+      "subtitle": "Дополнительный материал",
+      "description": "Iron Band — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Iron Band",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironband",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 5894,
+      "contentId": "IR-gear",
+      "title": "Iron Gear",
+      "subtitle": "Дополнительный материал",
+      "description": "Iron Gear — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Iron Gear",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-gear",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 5894,
+      "contentId": "IR-metalwire",
+      "title": "Metal Wire",
+      "subtitle": "Дополнительный материал",
+      "description": "Metal Wire — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Metal Wire",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-metalwire",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 6002,
+      "contentId": "IR-ceramictube",
+      "title": "Ceramic Tube",
+      "subtitle": "Дополнительный материал",
+      "description": "Ceramic Tube — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Ceramic Tube",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ceramictube",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 6002,
+      "contentId": "IR-glass",
+      "title": "Glass",
+      "subtitle": "Дополнительный материал",
+      "description": "Glass — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Glass",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-glass",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 6110,
+      "contentId": "IR-stoneblock",
+      "title": "Stone Block",
+      "subtitle": "Дополнительный материал",
+      "description": "Stone Block — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Stone Block",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-stoneblock",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 6110,
+      "contentId": "IR-pyrometer",
+      "title": "Pyrometer Prototype",
+      "subtitle": "Дополнительный материал",
+      "description": "Pyrometer Prototype — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Pyrometer Prototype",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-pyrometer",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 6218,
+      "contentId": "IR-anvil",
+      "title": "Heavy Anvil",
+      "subtitle": "Дополнительный материал",
+      "description": "Heavy Anvil — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Heavy Anvil",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-anvil",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 6218,
+      "contentId": "IR-leather",
+      "title": "Leather",
+      "subtitle": "Дополнительный материал",
+      "description": "Leather — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Leather",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-leather",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "radius": 23,
+      "shape": "star",
+      "iconUrl": "",
+      "x": 120,
+      "y": 6994,
+      "title": "Дополнительно: кокс и передел",
+      "subtitle": "Необязательная ветка",
+      "description": "Эти задания открываются после соответствующей точки основной линии. Они требуют реальные предметы, но не задерживают основной прогресс.",
+      "tasks": [
+        {
+          "text": "Открыть дополнительную ветку",
+          "optional": false,
+          "type": "manual"
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 7084,
+      "contentId": "IR-coal",
+      "title": "Bituminous Coal",
+      "subtitle": "Дополнительный материал",
+      "description": "Bituminous Coal — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Bituminous Coal",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coal",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 7084,
+      "contentId": "IR-bituminouscoal",
+      "title": "Rich Bituminous Coal",
+      "subtitle": "Дополнительный материал",
+      "description": "Rich Bituminous Coal — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Rich Bituminous Coal",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bituminouscoal",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 7192,
+      "contentId": "IR-cokeoven",
+      "title": "Coke Oven",
+      "subtitle": "Дополнительный материал",
+      "description": "Coke Oven — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Coke Oven",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cokeoven",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 7192,
+      "contentId": "IR-coke",
+      "title": "Coke",
+      "subtitle": "Дополнительный материал",
+      "description": "Coke — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Coke",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coke",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 7300,
+      "contentId": "IR-coaltar",
+      "title": "Coal Tar",
+      "subtitle": "Дополнительный материал",
+      "description": "Coal Tar — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Coal Tar",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-coaltar",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 7300,
+      "contentId": "IR-pigiron",
+      "title": "Pig Iron",
+      "subtitle": "Дополнительный материал",
+      "description": "Pig Iron — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Pig Iron",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-pigiron",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 7408,
+      "contentId": "IR-castironingot",
+      "title": "Cast Iron Ingot",
+      "subtitle": "Дополнительный материал",
+      "description": "Cast Iron Ingot — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Cast Iron Ingot",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-castironingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 7408,
+      "contentId": "IR-fineryforge",
+      "title": "Finery Forge",
+      "subtitle": "Дополнительный материал",
+      "description": "Finery Forge — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Finery Forge",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-fineryforge",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 7516,
+      "contentId": "IR-highcarbonsteelingot",
+      "title": "High Carbon Steel Ingot",
+      "subtitle": "Дополнительный материал",
+      "description": "High Carbon Steel Ingot — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: High Carbon Steel Ingot",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-highcarbonsteelingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 7516,
+      "contentId": "IR-steelbloom",
+      "title": "Steel Bloom",
+      "subtitle": "Дополнительный материал",
+      "description": "Steel Bloom — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Steel Bloom",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steelbloom",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 760,
+      "y": 7624,
+      "contentId": "IR-slag",
+      "title": "Slag",
+      "subtitle": "Дополнительный материал",
+      "description": "Slag — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Slag",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-slag",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "radius": 20,
+      "shape": "circle",
+      "iconUrl": "",
+      "x": 120,
+      "y": 7624,
+      "contentId": "IR-richslag",
+      "title": "Iron-Rich Slag",
+      "subtitle": "Дополнительный материал",
+      "description": "Iron-Rich Slag — часть дополнительной ветви. Открой JEI, чтобы посмотреть все рецепты, станки и добычу; выполнение этой карточки проверяет предмет в инвентаре.",
+      "tasks": [
+        {
+          "text": "Получить: Iron-Rich Slag",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-richslag",
+          "itemCount": 1
+        }
+      ]
+    }
   ],
   "edges": [
-    {"from":1,"to":2},{"from":2,"to":3},{"from":2,"to":4},{"from":3,"to":5},{"from":4,"to":6},{"from":4,"to":7},{"from":5,"to":8},{"from":8,"to":9},{"from":9,"to":10},{"from":6,"to":10},{"from":10,"to":11},{"from":7,"to":13},{"from":13,"to":14},{"from":14,"to":15},{"from":15,"to":16},{"from":16,"to":8},{"from":8,"to":17},{"from":6,"to":19},{"from":19,"to":20},{"from":18,"to":20},{"from":20,"to":21},{"from":21,"to":12},{"from":18,"to":12},{"from":21,"to":22},{"from":22,"to":23},{"from":23,"to":24},{"from":24,"to":25},{"from":24,"to":26},{"from":25,"to":27},{"from":26,"to":27},{"from":27,"to":28},{"from":28,"to":29},{"from":28,"to":30},{"from":29,"to":30},{"from":30,"to":31},{"from":30,"to":32},{"from":31,"to":32},{"from":31,"to":33},{"from":32,"to":34},{"from":33,"to":34}
+    {
+      "from": 1,
+      "to": 2
+    },
+    {
+      "from": 2,
+      "to": 3
+    },
+    {
+      "from": 3,
+      "to": 4
+    },
+    {
+      "from": 4,
+      "to": 5
+    },
+    {
+      "from": 5,
+      "to": 6
+    },
+    {
+      "from": 6,
+      "to": 7
+    },
+    {
+      "from": 7,
+      "to": 8
+    },
+    {
+      "from": 8,
+      "to": 9
+    },
+    {
+      "from": 9,
+      "to": 10
+    },
+    {
+      "from": 10,
+      "to": 11
+    },
+    {
+      "from": 11,
+      "to": 12
+    },
+    {
+      "from": 12,
+      "to": 13
+    },
+    {
+      "from": 13,
+      "to": 14
+    },
+    {
+      "from": 14,
+      "to": 15
+    },
+    {
+      "from": 15,
+      "to": 16
+    },
+    {
+      "from": 16,
+      "to": 17
+    },
+    {
+      "from": 17,
+      "to": 18
+    },
+    {
+      "from": 18,
+      "to": 19
+    },
+    {
+      "from": 19,
+      "to": 20
+    },
+    {
+      "from": 20,
+      "to": 21
+    },
+    {
+      "from": 21,
+      "to": 22
+    },
+    {
+      "from": 22,
+      "to": 23
+    },
+    {
+      "from": 23,
+      "to": 24
+    },
+    {
+      "from": 24,
+      "to": 25
+    },
+    {
+      "from": 25,
+      "to": 26
+    },
+    {
+      "from": 26,
+      "to": 27
+    },
+    {
+      "from": 27,
+      "to": 28
+    },
+    {
+      "from": 28,
+      "to": 29
+    },
+    {
+      "from": 29,
+      "to": 30
+    },
+    {
+      "from": 30,
+      "to": 31
+    },
+    {
+      "from": 31,
+      "to": 32
+    },
+    {
+      "from": 32,
+      "to": 33
+    },
+    {
+      "from": 33,
+      "to": 34
+    },
+    {
+      "from": 34,
+      "to": 35
+    },
+    {
+      "from": 35,
+      "to": 36
+    },
+    {
+      "from": 36,
+      "to": 37
+    },
+    {
+      "from": 37,
+      "to": 38
+    },
+    {
+      "from": 38,
+      "to": 39
+    },
+    {
+      "from": 39,
+      "to": 40
+    },
+    {
+      "from": 40,
+      "to": 41
+    },
+    {
+      "from": 41,
+      "to": 42
+    },
+    {
+      "from": 42,
+      "to": 43
+    },
+    {
+      "from": 43,
+      "to": 44
+    },
+    {
+      "from": 44,
+      "to": 45
+    },
+    {
+      "from": 45,
+      "to": 46
+    },
+    {
+      "from": 46,
+      "to": 47
+    },
+    {
+      "from": 47,
+      "to": 48
+    },
+    {
+      "from": 48,
+      "to": 49
+    },
+    {
+      "from": 49,
+      "to": 50
+    },
+    {
+      "from": 50,
+      "to": 51
+    },
+    {
+      "from": 51,
+      "to": 52
+    },
+    {
+      "from": 52,
+      "to": 53
+    },
+    {
+      "from": 53,
+      "to": 54
+    },
+    {
+      "from": 54,
+      "to": 55
+    },
+    {
+      "from": 55,
+      "to": 56
+    },
+    {
+      "from": 56,
+      "to": 57
+    },
+    {
+      "from": 57,
+      "to": 58
+    },
+    {
+      "from": 58,
+      "to": 59
+    },
+    {
+      "from": 4,
+      "to": 60
+    },
+    {
+      "from": 14,
+      "to": 61
+    },
+    {
+      "from": 39,
+      "to": 62
+    },
+    {
+      "from": 62,
+      "to": 63
+    },
+    {
+      "from": 63,
+      "to": 64
+    },
+    {
+      "from": 64,
+      "to": 65
+    },
+    {
+      "from": 65,
+      "to": 66
+    },
+    {
+      "from": 66,
+      "to": 67
+    },
+    {
+      "from": 67,
+      "to": 68
+    },
+    {
+      "from": 68,
+      "to": 69
+    },
+    {
+      "from": 69,
+      "to": 70
+    },
+    {
+      "from": 70,
+      "to": 71
+    },
+    {
+      "from": 71,
+      "to": 72
+    },
+    {
+      "from": 72,
+      "to": 73
+    },
+    {
+      "from": 73,
+      "to": 74
+    },
+    {
+      "from": 74,
+      "to": 75
+    },
+    {
+      "from": 49,
+      "to": 76
+    },
+    {
+      "from": 76,
+      "to": 77
+    },
+    {
+      "from": 77,
+      "to": 78
+    },
+    {
+      "from": 78,
+      "to": 79
+    },
+    {
+      "from": 79,
+      "to": 80
+    },
+    {
+      "from": 80,
+      "to": 81
+    },
+    {
+      "from": 81,
+      "to": 82
+    },
+    {
+      "from": 82,
+      "to": 83
+    },
+    {
+      "from": 83,
+      "to": 84
+    },
+    {
+      "from": 84,
+      "to": 85
+    },
+    {
+      "from": 85,
+      "to": 86
+    },
+    {
+      "from": 60,
+      "to": 87
+    },
+    {
+      "from": 87,
+      "to": 88
+    },
+    {
+      "from": 88,
+      "to": 89
+    },
+    {
+      "from": 89,
+      "to": 90
+    },
+    {
+      "from": 90,
+      "to": 91
+    },
+    {
+      "from": 91,
+      "to": 92
+    },
+    {
+      "from": 92,
+      "to": 93
+    },
+    {
+      "from": 93,
+      "to": 94
+    },
+    {
+      "from": 94,
+      "to": 95
+    },
+    {
+      "from": 95,
+      "to": 96
+    },
+    {
+      "from": 96,
+      "to": 97
+    },
+    {
+      "from": 97,
+      "to": 98
+    },
+    {
+      "from": 98,
+      "to": 99
+    }
   ],
-  "cameraX":0,"cameraY":0,"nextNodeId":35
+  "cameraX": 0,
+  "cameraY": 0,
+  "nextNodeId": 100
 };
 
 const QuestBook = {
@@ -193,6 +2613,11 @@ const QuestBook = {
         const silent = opts && opts.silent;
         let changed = false;
         this.nodes.forEach(node => {
+            // Do not pre-complete future nodes just because the player is
+            // already carrying their item.  Item conditions are meant to
+            // validate the current point in the progression graph; checking
+            // a quest must not silently skip a chain of locked quests.
+            if (!this.isUnlocked(node.id)) return;
             const tasks = node.tasks || [];
             if (!tasks.some(t => t.type === 'item')) return;
             const prog = this.getNodeProgress(node.id);
@@ -913,33 +3338,6 @@ function setupQuestControls() {
 
     const eyeBtn = document.getElementById('quest-eye-toggle');
     if (eyeBtn) eyeBtn.addEventListener('click', () => QuestBook.toggleShowHidden());
-
-    // Reset progress: requires two taps (arm, then confirm within a short
-    // window) instead of a native confirm() popup, so it's still a
-    // deliberate action but doesn't block the UI with a browser dialog.
-    const resetBtn = document.getElementById('quest-reset-toggle');
-    if (resetBtn) {
-        let armed = false;
-        let armTimer = null;
-        resetBtn.addEventListener('click', () => {
-            if (!armed) {
-                armed = true;
-                resetBtn.classList.add('armed');
-                resetBtn.title = 'Tap again to confirm reset';
-                armTimer = setTimeout(() => {
-                    armed = false;
-                    resetBtn.classList.remove('armed');
-                    resetBtn.title = 'Reset all quest progress';
-                }, 3000);
-            } else {
-                clearTimeout(armTimer);
-                armed = false;
-                resetBtn.classList.remove('armed');
-                resetBtn.title = 'Reset all quest progress';
-                QuestBook.resetProgress();
-            }
-        });
-    }
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'b' || e.key === 'B') {
