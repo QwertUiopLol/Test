@@ -31,7 +31,7 @@
 // see isWalkable() below (walking is unrestricted) and initInventory() in
 // inventory.js (gives starter items). Flip to false for "real" behavior.
 
-const TEST_MODE = false;
+const TEST_MODE = true;
 const CHUNK_SIZE = 16;      // world is split into CHUNK_SIZE x CHUNK_SIZE chunks
 const SELECTION_RADIUS = 5; // how far from the player the selection cursor can reach
 
