@@ -903,7 +903,38 @@ const EMBEDDED_QUEST_DATA = {
     add(55, 'HV', 3360, 300, 'IR-cleanroom-controller', 'Cleanroom Controller', 'Чистые помещения', 'Чистая комната требует герметичной структуры, maintenance hatch и стабильного HV питания.', [54, 52], 'IR-maintenance-hatch');
     add(56, 'HV', 3360, 520, 'IR-precision-circuit', 'Прецизионная схема', 'Чистое производство', 'Изготовьте схему в cleanroom: она открывает высокоточные компоненты, не заменяя ранние ветви.', [55, 54], 'IR-first-circuit');
     add(57, 'HV', 3580, 440, 'IR-observatory-telescope', 'Промышленный телескоп', 'Начало космоса', 'Телескоп — первая космическая веха HV: изучение неба до ракет и межпланетной логистики.', [55, 56], 'IR-precision-circuit');
-    EMBEDDED_QUEST_DATA.nextNodeId = 58;
+    // Five long-form tabs turn the roadmap into 300 authored milestones.
+    // Each task names a real registered component and explains why it matters;
+    // tracks are independent after their entry gate so players can specialize.
+    const tracks = [
+        ['Energy', 42, ['IR-coal-generator', 'IR-tin-cable', 'IR-lv-cable', 'IR-lv-battery-box', 'IR-solar-generator', 'IR-mv-cable', 'IR-mv-battery-box', 'IR-hv-cable', 'IR-hv-battery-box', 'IR-energy-meter'], 'Энергосеть'],
+        ['Multiblocks', 50, MULTIBLOCK_PROJECTS ? MULTIBLOCK_PROJECTS.map(p => p[0]) : ['IR-electric-blast-furnace', 'IR-distillation-tower', 'IR-cleanroom-controller'], 'Мультиблок'],
+        ['Industry', 46, ['IR-copper-ingot', 'IR-zinc-ingot', 'IR-brass-ingot', 'IR-copper-coil', 'IR-terminal-block', 'IR-circuit-board', 'IR-first-circuit', 'IR-precision-circuit', 'IR-steelframe'], 'Промышленный узел'],
+        ['Steam', 39, ['IR-bronze-boiler', 'IR-small-steam-pipe', 'IR-steam-bender', 'IR-steam-alloy-smelter', 'IR-steam-engine', 'IR-pressure-valve'], 'Паровой контур'],
+        ['HV', 54, ['IR-hv-transformer', 'IR-cleanroom-controller', 'IR-observatory-telescope', 'IR-hv-battery-box', 'IR-orbital-launchpad'], 'Высоковольтный проект']
+    ];
+    let generatedId = 58;
+    tracks.forEach(([category, gate, components, label], trackIndex) => {
+        let previous = gate;
+        const milestones = 243 / tracks.length; // 48.6: distribute the remainder below
+        const count = trackIndex < 3 ? 49 : 48;
+        for (let step = 0; step < count; step++) {
+            const contentId = components[step % components.length];
+            const id = generatedId++;
+            const phase = Math.floor(step / components.length) + 1;
+            const title = `${label}: этап ${step + 1}`;
+            EMBEDDED_QUEST_DATA.nodes.push({
+                id, category, x: 3820 + (step % 9) * 205, y: 180 + trackIndex * 235 + Math.floor(step / 9) * 42,
+                radius: 20, shape: step % 7 === 0 ? '6' : 'circle', iconUrl: '', contentId, title,
+                subtitle: `Фаза ${phase} · ${Registry.get(contentId)?.name || contentId}`,
+                description: `Спроектируйте и изготовьте «${Registry.get(contentId)?.name || contentId}». Этап ${step + 1} закрепляет ${category === 'Energy' ? 'баланс генерации, проводов и накопителей' : category === 'Multiblocks' ? 'сборку корпуса, hatch-ов и контроллера' : 'производственную цепочку и запас компонентов'}; храните резерв деталей перед следующим узлом.`,
+                tasks: [{ text: `Изготовить: ${Registry.get(contentId)?.name || contentId}`, optional: false, type: 'item', itemId: contentId, itemCount: 1 }]
+            });
+            EMBEDDED_QUEST_DATA.edges.push({ from: previous, to: id });
+            previous = id;
+        }
+    });
+    EMBEDDED_QUEST_DATA.nextNodeId = generatedId;
 })();
 
 const QuestBook = {
