@@ -1570,6 +1570,16 @@ body {
     gap: 6px;
     flex-shrink: 0;
 }
+.quest-zoom-controls {
+    display: flex;
+    gap: 3px;
+}
+.quest-zoom-controls .quest-mode-btn {
+    width: 30px;
+}
+.quest-zoom-controls #quest-zoom-fit {
+    font-size: 14px;
+}
 
 .quest-search {
     width: 100%;

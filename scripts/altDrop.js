@@ -58,7 +58,9 @@ const ALT_DROP_POOL = [
     { id: 'IR-ironore', weight: 1 },
     { id: 'IR-hematite', weight: 1 },
     { id: 'IR-magnetite', weight: 1 },
-    { id: 'IR-limonite', weight: 1 }
+    { id: 'IR-limonite', weight: 1 },
+    { id: 'IR-copperore', weight: 1 },
+    { id: 'IR-zincore', weight: 1 }
 ];
 
 function pickAltDropItem() {
