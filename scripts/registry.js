@@ -2385,3 +2385,57 @@ const CraftingRegistry = {
         { id: 'lv-cable', type: 'shapeless', ingredients: [{ id: 'IR-insulated-wire', count: 2 }, { id: 'IR-rubber', count: 1 }], result: { id: 'IR-lv-cable', count: 2 } }
     ]
 }
+
+// Electrical infrastructure and fifteen documented multiblock controllers.
+// Each entry carries its operating data, so rendering, JEI and the PowerGrid
+// share one source of truth rather than maintaining parallel id lists.
+Registry.register({
+    'IR-coal-generator': { name: 'Coal Generator (32 EU/t)', type: 'block', color: '#4a4d52', icon: '⚡', overlay: true, power: { output: 32 }, wrenchConfigurable: true },
+    'IR-solar-generator': { name: 'Solar Generator (16 EU/t)', type: 'block', color: '#6489a4', icon: '☀', overlay: true, power: { output: 16 }, wrenchConfigurable: true },
+    'IR-lv-battery-box': { name: 'LV Battery Box (10,000 EU)', type: 'block', color: '#596a49', icon: '🔋', overlay: true, power: { capacity: 10000, chargeRate: 32, dischargeRate: 32 }, wrenchConfigurable: true },
+    'IR-mv-battery-box': { name: 'MV Battery Box (100,000 EU)', type: 'block', color: '#64708a', icon: '🔋', overlay: true, power: { capacity: 100000, chargeRate: 128, dischargeRate: 128 }, wrenchConfigurable: true },
+    'IR-hv-battery-box': { name: 'HV Battery Bank (1,000,000 EU)', type: 'block', color: '#8a6c45', icon: '🔋', overlay: true, power: { capacity: 1000000, chargeRate: 512, dischargeRate: 512 }, wrenchConfigurable: true },
+    'IR-tin-cable': { name: 'Tin Cable (16 EU/t)', type: 'block', color: '#aebac1', icon: '━', overlay: true, cable: { voltage: 16, amps: 1, loss: 1, tier: 'ULV' }, wrenchConfigurable: true },
+    'IR-hv-cable': { name: 'HV Gold Cable (512 EU/t)', type: 'block', color: '#d8ae42', icon: '━', overlay: true, cable: { voltage: 512, amps: 2, loss: 2, tier: 'HV' }, wrenchConfigurable: true },
+    'IR-redstone-battery': { name: 'Redstone Battery', type: 'item', color: '#a83838', icon: '🔋' },
+    'IR-lithium-battery': { name: 'Lithium Battery', type: 'item', color: '#86a4b3', icon: '🔋' },
+    'IR-energy-meter': { name: 'Energy Meter', type: 'item', color: '#7bc2d6', icon: '▥' }
+});
+
+const MULTIBLOCK_PROJECTS = [
+    ['IR-coke-oven', 'Coke Oven', 'Steam', '3×3×3 refractory-brick oven for charcoal-to-coke conversion.'],
+    ['IR-bronze-blast-furnace', 'Bronze Blast Furnace', 'Steam', 'Early hot-metal furnace with air and fuel hatches.'],
+    ['IR-electric-arc-furnace', 'Electric Arc Furnace', 'MV', 'High-temperature electric alloy furnace.'],
+    ['IR-implosion-compressor', 'Implosion Compressor', 'HV', 'Dense-component press with a reinforced chamber.'],
+    ['IR-large-chemical-reactor', 'Large Chemical Reactor', 'MV', 'Parallel chemical batches with fluid hatches.'],
+    ['IR-vacuum-freezer', 'Vacuum Freezer', 'HV', 'Rapid cooling chamber for heat-treated alloys.'],
+    ['IR-oil-cracker', 'Oil Cracking Unit', 'MV', 'Separates heavy hydrocarbons into useful fractions.'],
+    ['IR-assembly-line', 'Assembly Line', 'HV', 'Long-form high-volume component assembly.'],
+    ['IR-fusion-reactor', 'Fusion Reactor', 'HV', 'Experimental plasma energy project.'],
+    ['IR-large-turbine', 'Large Turbine', 'MV', 'Converts a shared steam flow into EU.'],
+    ['IR-industrial-centrifuge', 'Industrial Centrifuge', 'MV', 'Bulk ore and chemical separation.'],
+    ['IR-ore-washer-array', 'Ore Washer Array', 'LV', 'Water-backed mineral purification plant.'],
+    ['IR-thermal-centrifuge', 'Thermal Centrifuge', 'HV', 'Heat-assisted fine material separation.'],
+    ['IR-rocket-assembly-bay', 'Rocket Assembly Bay', 'HV', 'Final assembly structure for space hardware.'],
+    ['IR-orbital-launchpad', 'Orbital Launchpad', 'HV', 'Launch structure requiring stable grid power.']
+];
+Registry.register(Object.fromEntries(MULTIBLOCK_PROJECTS.map(([id, name, tier, description]) => [id, {
+    name: `${name} Controller`, type: 'block', color: '#6d7480', icon: '▣', overlay: true,
+    multiblock: { controller: true, tier, size: tier === 'HV' ? '5×5×5' : '3×3×3', requiredHatches: ['energy', 'inputBus', 'outputBus', 'maintenance'], description },
+    machine: { tier, eu: tier === 'HV' ? 480 : tier === 'MV' ? 120 : 30 }, wrenchConfigurable: true
+}])));
+
+// Core electrical recipes plus a controller recipe for every multiblock make
+// every new placeable obtainable through the existing crafting UI.
+CraftingRegistry.recipes.push(
+    { id: 'tin-cable', type: 'shapeless', ingredients: [{ id: 'IR-metalwire', count: 1 }, { id: 'IR-rubber', count: 1 }], result: { id: 'IR-tin-cable', count: 2 } },
+    { id: 'hv-cable', type: 'shapeless', ingredients: [{ id: 'IR-insulated-wire', count: 4 }, { id: 'IR-rubber', count: 2 }], result: { id: 'IR-hv-cable', count: 2 } },
+    { id: 'coal-generator', type: 'shaped3x3', width: 3, pattern: ['IR-ironplate', 'IR-steam-engine', 'IR-ironplate', 'IR-ironrod', 'IR-dynamo', 'IR-ironrod', 'IR-ironplate', 'IR-pressure-valve', 'IR-ironplate'], result: { id: 'IR-coal-generator', count: 1 } },
+    { id: 'lv-battery-box', type: 'shapeless', ingredients: [{ id: 'IR-galvanic-cell', count: 4 }, { id: 'IR-terminal-block', count: 2 }, { id: 'IR-first-circuit', count: 1 }], result: { id: 'IR-lv-battery-box', count: 1 } },
+    { id: 'mv-battery-box', type: 'shapeless', ingredients: [{ id: 'IR-lv-battery-box', count: 1 }, { id: 'IR-galvanic-cell', count: 8 }, { id: 'IR-first-circuit', count: 2 }], result: { id: 'IR-mv-battery-box', count: 1 } },
+    { id: 'hv-battery-box', type: 'shapeless', ingredients: [{ id: 'IR-mv-battery-box', count: 1 }, { id: 'IR-lithium-battery', count: 4 }, { id: 'IR-precision-circuit', count: 1 }], result: { id: 'IR-hv-battery-box', count: 1 } }
+);
+MULTIBLOCK_PROJECTS.forEach(([id, , tier]) => CraftingRegistry.recipes.push({
+    id: `${id.slice(3)}-controller`, type: 'shapeless',
+    ingredients: [{ id: 'IR-steelframe', count: tier === 'HV' ? 4 : 2 }, { id: 'IR-first-circuit', count: tier === 'Steam' ? 1 : 2 }, { id: 'IR-maintenance-hatch', count: 1 }], result: { id, count: 1 }
+}));

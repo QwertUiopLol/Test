@@ -26,7 +26,7 @@
 
 const SaveGame = {
     KEY: 'ir-savegame',
-    VERSION: 1,
+    VERSION: 2,
 
     // Every placed GUI block also needs its own persistent per-block
     // storage layer's name (see guiBlocks.js's `GuiBlocks.storage`) -
@@ -67,6 +67,7 @@ const SaveGame = {
                 grid3x3: Crafting.grid3x3.cells
             } : null,
             guiBlocks: (typeof GuiBlocks !== 'undefined') ? GuiBlocks.storage : null,
+            power: (typeof PowerGrid !== 'undefined') ? PowerGrid.snapshot() : null,
             fluids: {
                 tanks: (typeof TankState !== 'undefined') ? TankState.tanks : null,
                 buffers: (typeof FluidSlots !== 'undefined') ? FluidSlots.buffers : null,
@@ -196,6 +197,8 @@ const SaveGame = {
             for (const k in GuiBlocks.storage) delete GuiBlocks.storage[k];
             Object.assign(GuiBlocks.storage, data.guiBlocks);
         }
+
+        if (data.power && typeof PowerGrid !== 'undefined') PowerGrid.restore(data.power);
 
         if (data.fluids) {
             if (data.fluids.tanks && typeof TankState !== 'undefined') {

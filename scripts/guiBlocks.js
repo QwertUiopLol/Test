@@ -330,6 +330,12 @@ const GuiBlocks = {
             const blockId = getGlobalOverlayType(Number(x), Number(y)) || getGlobalCellType(Number(x), Number(y));
             const recipes = GuiBlockRecipeRegistry.recipes.filter(r => r.block === blockId);
             if (recipes.length === 0) continue;
+            const blockData = Registry.get(blockId);
+            // Electric recipes only advance after the power network reserves their EU/t.
+            if (blockData && blockData.machine && blockData.machine.eu > 0 &&
+                typeof PowerGrid !== 'undefined' && !PowerGrid.hasPower(Number(x), Number(y), blockData.machine.eu)) {
+                continue;
+            }
 
             const slots = this.storage[key];
             const recipe = recipes.find(r => this.canProcess(slots, r));
