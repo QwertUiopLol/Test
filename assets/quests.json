@@ -19,7 +19,8 @@
           "itemId": "IR-workbench",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 2,
@@ -40,7 +41,8 @@
           "itemId": "IR-mixer",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 3,
@@ -61,7 +63,8 @@
           "itemId": "IR-apebble",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 4,
@@ -82,7 +85,8 @@
           "itemId": "IR-limepowder",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 5,
@@ -103,7 +107,8 @@
           "itemId": "IR-kiln",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 6,
@@ -124,7 +129,8 @@
           "itemId": "IR-capsule-1000",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 7,
@@ -145,7 +151,8 @@
           "itemId": "IR-capsule-1000-water",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 8,
@@ -166,7 +173,8 @@
           "itemId": "IR-fluid-extractor",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 9,
@@ -187,7 +195,8 @@
           "itemId": "IR-ashlye",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 10,
@@ -208,7 +217,8 @@
           "itemId": "IR-autoclave",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 11,
@@ -229,7 +239,8 @@
           "itemId": "IR-bioreactor",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 12,
@@ -250,7 +261,8 @@
           "itemId": "IR-sapling",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Beginning"
     },
     {
       "id": 13,
@@ -271,7 +283,8 @@
           "itemId": "IR-quernstone",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 14,
@@ -292,7 +305,8 @@
           "itemId": "IR-bogironore",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 15,
@@ -313,7 +327,8 @@
           "itemId": "IR-crushedbogiron",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 16,
@@ -334,7 +349,8 @@
           "itemId": "IR-sluicebox",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 17,
@@ -355,7 +371,8 @@
           "itemId": "IR-concentratebogiron",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 18,
@@ -376,7 +393,8 @@
           "itemId": "IR-charcoalpit",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 19,
@@ -397,7 +415,8 @@
           "itemId": "IR-charcoal",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 20,
@@ -418,7 +437,8 @@
           "itemId": "IR-claybrick",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 21,
@@ -439,7 +459,8 @@
           "itemId": "IR-refractorybrick",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 22,
@@ -460,7 +481,8 @@
           "itemId": "IR-bloomeryfurnace",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 23,
@@ -481,7 +503,8 @@
           "itemId": "IR-bloom",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 24,
@@ -502,7 +525,8 @@
           "itemId": "IR-anvil",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 25,
@@ -523,7 +547,8 @@
           "itemId": "IR-wroughtironingot",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 26,
@@ -544,7 +569,8 @@
           "itemId": "IR-ironplate",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 27,
@@ -565,7 +591,8 @@
           "itemId": "IR-bellows",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 28,
@@ -586,7 +613,8 @@
           "itemId": "IR-pyrometer",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 29,
@@ -607,7 +635,8 @@
           "itemId": "IR-cokeoven",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 30,
@@ -628,7 +657,8 @@
           "itemId": "IR-fineryforge",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 31,
@@ -649,7 +679,8 @@
           "itemId": "IR-cruciblefurnace",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 32,
@@ -670,7 +701,8 @@
           "itemId": "IR-cruciblegraphite",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 33,
@@ -691,7 +723,8 @@
           "itemId": "IR-mildsteelingot",
           "itemCount": 1
         }
-      ]
+      ],
+      "category": "Steam"
     },
     {
       "id": 34,
@@ -710,6 +743,674 @@
           "optional": false,
           "type": "item",
           "itemId": "IR-steelframe",
+          "itemCount": 1
+        }
+      ],
+      "category": "Steam"
+    },
+    {
+      "id": 35,
+      "category": "Steam",
+      "x": 1080,
+      "y": 500,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-flint-pickaxe",
+      "title": "Кремниевая кирка",
+      "subtitle": "Steam Age",
+      "description": "Кремниевая кирка: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Кремниевая кирка",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-flint-pickaxe",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-dpebble",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "category": "Steam",
+      "x": 1080,
+      "y": 680,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-steel-axe",
+      "title": "Стальной топор",
+      "subtitle": "Steam Age",
+      "description": "Стальной топор: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Стальной топор",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steel-axe",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-oaklog",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "category": "Steam",
+      "x": 1300,
+      "y": 500,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-wrench",
+      "title": "Инженерный ключ",
+      "subtitle": "Steam Age",
+      "description": "Инженерный ключ: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Инженерный ключ",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-wrench",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironrod",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "category": "Steam",
+      "x": 1300,
+      "y": 680,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-small-steam-pipe",
+      "title": "Паровая магистраль",
+      "subtitle": "Steam Age",
+      "description": "Паровая магистраль: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Паровая магистраль",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-small-steam-pipe",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steam-pipe",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "category": "Steam",
+      "x": 1520,
+      "y": 500,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-bronze-boiler",
+      "title": "Бронзовый котёл",
+      "subtitle": "Steam Age",
+      "description": "Бронзовый котёл: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Бронзовый котёл",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-bronze-boiler",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-pressure-valve",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "category": "Steam",
+      "x": 1520,
+      "y": 680,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-steam-bender",
+      "title": "Паровой гибочный станок",
+      "subtitle": "Steam Age",
+      "description": "Паровой гибочный станок: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Паровой гибочный станок",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steam-bender",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironplate",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "category": "Steam",
+      "x": 1740,
+      "y": 680,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-steam-alloy-smelter",
+      "title": "Паровая плавильня сплавов",
+      "subtitle": "Steam Age",
+      "description": "Паровая плавильня сплавов: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Паровая плавильня сплавов",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-steam-alloy-smelter",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-brass-ingot",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "category": "LV",
+      "x": 1740,
+      "y": 440,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-dynamo",
+      "title": "Динамо-машина",
+      "subtitle": "LV Age",
+      "description": "Динамо-машина: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Динамо-машина",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-dynamo",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-copper-coil",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "category": "LV",
+      "x": 1960,
+      "y": 350,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-lv-cable",
+      "title": "LV сеть 32 EU/t",
+      "subtitle": "LV Age",
+      "description": "LV сеть 32 EU/t: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: LV сеть 32 EU/t",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-lv-cable",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-insulated-wire",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "category": "LV",
+      "x": 1960,
+      "y": 530,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-energy-hatch-lv",
+      "title": "LV Energy Hatch",
+      "subtitle": "LV Age",
+      "description": "LV Energy Hatch: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: LV Energy Hatch",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-energy-hatch-lv",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-terminal-block",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "category": "LV",
+      "x": 1960,
+      "y": 710,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-input-bus-lv",
+      "title": "LV Input Bus",
+      "subtitle": "LV Age",
+      "description": "LV Input Bus: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: LV Input Bus",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-input-bus-lv",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-ironplate",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "category": "LV",
+      "x": 2180,
+      "y": 440,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-first-circuit",
+      "title": "Первая микросхема",
+      "subtitle": "LV Age",
+      "description": "Первая микросхема: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Первая микросхема",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-first-circuit",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-circuit-board",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "category": "LV",
+      "x": 2400,
+      "y": 300,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-lv-assembler",
+      "title": "LV Assembler",
+      "subtitle": "LV Age",
+      "description": "LV Assembler: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: LV Assembler",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-lv-assembler",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-first-circuit",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "category": "LV",
+      "x": 2400,
+      "y": 500,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-lv-chemical-reactor",
+      "title": "LV Chemical Reactor",
+      "subtitle": "LV Age",
+      "description": "LV Chemical Reactor: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: LV Chemical Reactor",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-lv-chemical-reactor",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-first-circuit",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "category": "LV",
+      "x": 2400,
+      "y": 700,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-lv-centrifuge",
+      "title": "LV Centrifuge",
+      "subtitle": "LV Age",
+      "description": "LV Centrifuge: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: LV Centrifuge",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-lv-centrifuge",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-first-circuit",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "category": "MV",
+      "x": 2660,
+      "y": 440,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-mv-transformer",
+      "title": "MV Transformer",
+      "subtitle": "MV Age",
+      "description": "MV Transformer: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: MV Transformer",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mv-transformer",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-first-circuit",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "category": "MV",
+      "x": 2880,
+      "y": 300,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-mv-cable",
+      "title": "MV сеть 128 EU/t",
+      "subtitle": "MV Age",
+      "description": "MV сеть 128 EU/t: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: MV сеть 128 EU/t",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mv-cable",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-rubber",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "category": "MV",
+      "x": 2880,
+      "y": 500,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-electric-blast-furnace",
+      "title": "Electric Blast Furnace",
+      "subtitle": "MV Age",
+      "description": "Electric Blast Furnace: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Electric Blast Furnace",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-electric-blast-furnace",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-maintenance-hatch",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "category": "MV",
+      "x": 2880,
+      "y": 700,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-distillation-tower",
+      "title": "Distillation Tower",
+      "subtitle": "MV Age",
+      "description": "Distillation Tower: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Distillation Tower",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-distillation-tower",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-gas-pipe",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "category": "HV",
+      "x": 3140,
+      "y": 440,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-hv-transformer",
+      "title": "HV Transformer",
+      "subtitle": "HV Age",
+      "description": "HV Transformer: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: HV Transformer",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-hv-transformer",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-mv-cable",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "category": "HV",
+      "x": 3360,
+      "y": 300,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-cleanroom-controller",
+      "title": "Cleanroom Controller",
+      "subtitle": "HV Age",
+      "description": "Cleanroom Controller: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Cleanroom Controller",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-cleanroom-controller",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-maintenance-hatch",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "category": "HV",
+      "x": 3360,
+      "y": 520,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-precision-circuit",
+      "title": "Прецизионная схема",
+      "subtitle": "HV Age",
+      "description": "Прецизионная схема: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Прецизионная схема",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-precision-circuit",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-first-circuit",
+          "itemCount": 1
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "category": "HV",
+      "x": 3580,
+      "y": 440,
+      "radius": 22,
+      "shape": "circle",
+      "iconUrl": "",
+      "contentId": "IR-observatory-telescope",
+      "title": "Промышленный телескоп",
+      "subtitle": "HV Age",
+      "description": "Промышленный телескоп: технологический этап с двумя обязательными условиями. Карта использует параллельные ветви и объединяет их только в критических узлах.",
+      "tasks": [
+        {
+          "text": "Получить: Промышленный телескоп",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-observatory-telescope",
+          "itemCount": 1
+        },
+        {
+          "text": "Подготовить сопутствующий компонент",
+          "optional": false,
+          "type": "item",
+          "itemId": "IR-precision-circuit",
           "itemCount": 1
         }
       ]
@@ -847,9 +1548,217 @@
     {
       "from": 33,
       "to": 34
+    },
+    {
+      "from": 13,
+      "to": 35
+    },
+    {
+      "from": 14,
+      "to": 35
+    },
+    {
+      "from": 12,
+      "to": 36
+    },
+    {
+      "from": 34,
+      "to": 36
+    },
+    {
+      "from": 26,
+      "to": 37
+    },
+    {
+      "from": 34,
+      "to": 37
+    },
+    {
+      "from": 37,
+      "to": 38
+    },
+    {
+      "from": 34,
+      "to": 38
+    },
+    {
+      "from": 38,
+      "to": 39
+    },
+    {
+      "from": 7,
+      "to": 39
+    },
+    {
+      "from": 28,
+      "to": 39
+    },
+    {
+      "from": 38,
+      "to": 40
+    },
+    {
+      "from": 37,
+      "to": 40
+    },
+    {
+      "from": 38,
+      "to": 41
+    },
+    {
+      "from": 37,
+      "to": 41
+    },
+    {
+      "from": 39,
+      "to": 42
+    },
+    {
+      "from": 40,
+      "to": 42
+    },
+    {
+      "from": 41,
+      "to": 42
+    },
+    {
+      "from": 34,
+      "to": 42
+    },
+    {
+      "from": 42,
+      "to": 43
+    },
+    {
+      "from": 37,
+      "to": 43
+    },
+    {
+      "from": 43,
+      "to": 44
+    },
+    {
+      "from": 42,
+      "to": 44
+    },
+    {
+      "from": 40,
+      "to": 45
+    },
+    {
+      "from": 43,
+      "to": 45
+    },
+    {
+      "from": 42,
+      "to": 46
+    },
+    {
+      "from": 43,
+      "to": 46
+    },
+    {
+      "from": 44,
+      "to": 46
+    },
+    {
+      "from": 45,
+      "to": 46
+    },
+    {
+      "from": 46,
+      "to": 47
+    },
+    {
+      "from": 45,
+      "to": 47
+    },
+    {
+      "from": 46,
+      "to": 48
+    },
+    {
+      "from": 41,
+      "to": 48
+    },
+    {
+      "from": 46,
+      "to": 49
+    },
+    {
+      "from": 35,
+      "to": 49
+    },
+    {
+      "from": 47,
+      "to": 50
+    },
+    {
+      "from": 48,
+      "to": 50
+    },
+    {
+      "from": 49,
+      "to": 50
+    },
+    {
+      "from": 50,
+      "to": 51
+    },
+    {
+      "from": 50,
+      "to": 52
+    },
+    {
+      "from": 44,
+      "to": 52
+    },
+    {
+      "from": 50,
+      "to": 53
+    },
+    {
+      "from": 48,
+      "to": 53
+    },
+    {
+      "from": 51,
+      "to": 54
+    },
+    {
+      "from": 52,
+      "to": 54
+    },
+    {
+      "from": 53,
+      "to": 54
+    },
+    {
+      "from": 54,
+      "to": 55
+    },
+    {
+      "from": 52,
+      "to": 55
+    },
+    {
+      "from": 55,
+      "to": 56
+    },
+    {
+      "from": 54,
+      "to": 56
+    },
+    {
+      "from": 55,
+      "to": 57
+    },
+    {
+      "from": 56,
+      "to": 57
     }
   ],
   "cameraX": 460,
   "cameraY": 680,
-  "nextNodeId": 35
+  "nextNodeId": 58
 }
