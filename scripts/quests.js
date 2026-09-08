@@ -2973,6 +2973,9 @@ const QuestGraph = {
     ctx: null,
     cameraX: 0,
     cameraY: 0,
+    zoom: 1,
+    minZoom: 0.45,
+    maxZoom: 2.5,
     dpr: 1,
     initialized: false,
     isDragging: false,
@@ -2991,6 +2994,7 @@ const QuestGraph = {
         this.canvas.addEventListener('pointermove', (e) => this.onPointerMove(e));
         this.canvas.addEventListener('pointerup', (e) => this.onPointerUp(e));
         this.canvas.addEventListener('pointerleave', (e) => this.onPointerUp(e));
+        this.canvas.addEventListener('wheel', (e) => this.onWheel(e), { passive: false });
         window.addEventListener('resize', () => { this.resize(); this.draw(); });
 
         // Note: there is no search in the graph view by design - search is
@@ -3033,17 +3037,45 @@ const QuestGraph = {
     },
 
     fitToNodes() {
-        const nodes = QuestBook.nodes;
+        const nodes = QuestBook.nodes.filter(node => questVisibleForBrowsing(node.id));
         if (!this.canvas || nodes.length === 0) return;
-        const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
-        const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-        const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
-        this.cameraX = cx - (this.cssWidth || this.canvas.width) / 2;
-        this.cameraY = cy - (this.cssHeight || this.canvas.height) / 2;
+        const minX = Math.min(...nodes.map(node => node.x));
+        const maxX = Math.max(...nodes.map(node => node.x));
+        const minY = Math.min(...nodes.map(node => node.y));
+        const maxY = Math.max(...nodes.map(node => node.y));
+        const width = Math.max(1, maxX - minX + 100);
+        const height = Math.max(1, maxY - minY + 100);
+        this.zoom = Math.max(this.minZoom, Math.min(this.maxZoom,
+            Math.min((this.cssWidth || 1) / width, (this.cssHeight || 1) / height)));
+        this.cameraX = (minX + maxX) / 2;
+        this.cameraY = (minY + maxY) / 2;
     },
 
-    screenToWorld(sx, sy) { return { x: sx + this.cameraX, y: sy + this.cameraY }; },
-    worldToScreen(wx, wy) { return { x: wx - this.cameraX, y: wy - this.cameraY }; },
+    screenToWorld(sx, sy) {
+        return {
+            x: this.cameraX + (sx - (this.cssWidth || 0) / 2) / this.zoom,
+            y: this.cameraY + (sy - (this.cssHeight || 0) / 2) / this.zoom
+        };
+    },
+
+    worldToScreen(wx, wy) {
+        return {
+            x: (this.cssWidth || 0) / 2 + (wx - this.cameraX) * this.zoom,
+            y: (this.cssHeight || 0) / 2 + (wy - this.cameraY) * this.zoom
+        };
+    },
+
+    setZoom(nextZoom, anchorX, anchorY) {
+        const oldWorld = this.screenToWorld(anchorX, anchorY);
+        this.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, nextZoom));
+        this.cameraX = oldWorld.x - (anchorX - (this.cssWidth || 0) / 2) / this.zoom;
+        this.cameraY = oldWorld.y - (anchorY - (this.cssHeight || 0) / 2) / this.zoom;
+        this.draw();
+    },
+
+    zoomBy(factor) {
+        this.setZoom(this.zoom * factor, (this.cssWidth || 0) / 2, (this.cssHeight || 0) / 2);
+    },
 
     getEventPos(e) {
         const rect = this.canvas.getBoundingClientRect();
@@ -3055,7 +3087,7 @@ const QuestGraph = {
             if (!questVisibleForBrowsing(node.id)) continue;
             const s = this.worldToScreen(node.x, node.y);
             const dx = mx - s.x, dy = my - s.y;
-            const r = (node.radius || 18) + 6;
+            const r = (node.radius || 18) * this.zoom + 6;
             if (dx * dx + dy * dy <= r * r) return node.id;
         }
         return null;
@@ -3074,9 +3106,15 @@ const QuestGraph = {
         const p = this.getEventPos(e);
         const dx = p.x - this.dragStart.x, dy = p.y - this.dragStart.y;
         if (Math.hypot(dx, dy) > 4) this.dragMoved = true;
-        this.cameraX = this.dragCameraStart.x - dx;
-        this.cameraY = this.dragCameraStart.y - dy;
+        this.cameraX = this.dragCameraStart.x - dx / this.zoom;
+        this.cameraY = this.dragCameraStart.y - dy / this.zoom;
         this.draw();
+    },
+
+    onWheel(e) {
+        e.preventDefault();
+        const p = this.getEventPos(e);
+        this.setZoom(this.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15), p.x, p.y);
     },
 
     onPointerUp(e) {
@@ -3163,10 +3201,11 @@ const QuestGraph = {
         ctx.fillRect(0, 0, W, H);
 
         // subtle dotted grid, matches the site's dark palette
-        const spacing = 56;
+        const spacing = 56 * this.zoom;
         ctx.fillStyle = 'rgba(255,255,255,0.05)';
-        const startX = -(((this.cameraX % spacing) + spacing) % spacing);
-        const startY = -(((this.cameraY % spacing) + spacing) % spacing);
+        const centerX = W / 2, centerY = H / 2;
+        const startX = centerX - ((((this.cameraX * this.zoom) % spacing) + spacing) % spacing);
+        const startY = centerY - ((((this.cameraY * this.zoom) % spacing) + spacing) % spacing);
         for (let x = startX; x < W; x += spacing) {
             for (let y = startY; y < H; y += spacing) {
                 ctx.beginPath();
@@ -3203,7 +3242,7 @@ const QuestGraph = {
             if (!drawable(node.id)) return;
             const revealed = QuestBook.isVisible(node.id);
             const s = this.worldToScreen(node.x, node.y);
-            const r = node.radius || 18;
+            const r = (node.radius || 18) * this.zoom;
             if (s.x < -r - 60 || s.x > W + r + 60 ||
                 s.y < -r - 60 || s.y > H + r + 60) return;
 
@@ -3305,6 +3344,13 @@ function setupQuestControls() {
 
     const eyeBtn = document.getElementById('quest-eye-toggle');
     if (eyeBtn) eyeBtn.addEventListener('click', () => QuestBook.toggleShowHidden());
+
+    const zoomInBtn = document.getElementById('quest-zoom-in');
+    if (zoomInBtn) zoomInBtn.addEventListener('click', () => QuestGraph.zoomBy(1.2));
+    const zoomOutBtn = document.getElementById('quest-zoom-out');
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => QuestGraph.zoomBy(1 / 1.2));
+    const zoomFitBtn = document.getElementById('quest-zoom-fit');
+    if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => { QuestGraph.fitToNodes(); QuestGraph.draw(); });
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'b' || e.key === 'B') {

@@ -124,8 +124,13 @@
                 <div id="quest-graph-view" class="quest-graph-view">
                     <div class="quest-toolbar">
                         <input id="quest-list-search" class="quest-search" type="text" placeholder="Search quests..." style="display:none;">
-                        <button id="quest-list-toggle" class="quest-mode-btn" title="List view">☰</button>
-                        <button id="quest-eye-toggle" class="quest-mode-btn" title="Show all quests (greyed out)">👁</button>
+                        <button id="quest-list-toggle" class="quest-mode-btn" title="List view" aria-label="Switch to list view">☰</button>
+                        <button id="quest-eye-toggle" class="quest-mode-btn" title="Show all quests (greyed out)" aria-label="Show all quests">👁</button>
+                        <div class="quest-zoom-controls" aria-label="Quest map zoom">
+                            <button id="quest-zoom-out" class="quest-mode-btn" title="Zoom out" aria-label="Zoom out">−</button>
+                            <button id="quest-zoom-fit" class="quest-mode-btn" title="Fit quest map" aria-label="Fit quest map">⤢</button>
+                            <button id="quest-zoom-in" class="quest-mode-btn" title="Zoom in" aria-label="Zoom in">+</button>
+                        </div>
                     </div>
                     <div id="quest-graph-canvas-wrap" class="quest-graph-canvas-wrap">
                         <canvas id="quest-graph-canvas"></canvas>
