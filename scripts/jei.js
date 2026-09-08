@@ -1,28 +1,4 @@
-// ============================================
-// JEI-style Item List ("Just Enough Items")
-// ============================================
-// This file's job: given the Registry (registry.js) and every recipe
-// source (CraftingRegistry + GuiBlockRecipeRegistry), let the player
-// browse "what exists" and "how do I make/use it" without needing to
-// already know the recipes. It reads other systems' data but doesn't
-// mutate world/inventory state itself except via JEI.give() (TEST_MODE
-// cheat-give) and clicking through recipe chains (pure navigation).
-//
-// Shows every registered block/item in one searchable grid (no top-level
-// station tabs cluttering the main list - a station's own recipes live on
-// that station item's own detail view instead, see below).
-//
-// Tapping any item opens its detail view, which has up to three sub-tabs:
-//   - "Recipe"  : every recipe that crafts this item (what you already had).
-//   - "Usage"   : every recipe/process that CONSUMES this item - i.e. what
-//                 it's good for. Covers both player crafting-grid recipes
-//                 (CraftingRegistry) and automatic GUI-block processing
-//                 recipes (GuiBlockRecipeRegistry, e.g. the Mixer).
-//   - "Produce" : station items only (any block with a `gui` entry, e.g.
-//                 Workbench/Mixer) - what that station can make. Hidden
-//                 for non-station items. What consumes the station block
-//                 itself lives on that item's own "Usage" tab instead
-//                 (usagesFor) - not duplicated in here.
+// Item and recipe browser.
 
 const JEI = {
     isOpen: false,
@@ -164,14 +140,35 @@ const JEI = {
     // Covers both player-crafted recipes and GUI-block auto-processing
     // recipes, tagged with `source` so the recipe card knows how to
     // render + which station it belongs to.
+    recipeIndex: null,
+
+    buildRecipeIndex() {
+        if (this.recipeIndex) return this.recipeIndex;
+        const madeBy = new Map(), usedIn = new Map();
+        const add = (map, id, recipe) => {
+            if (!id) return;
+            const entries = map.get(id) || [];
+            entries.push(recipe);
+            map.set(id, entries);
+        };
+        const addRecipe = (recipe, source) => {
+            const entry = { ...recipe, source };
+            add(madeBy, recipe.result && recipe.result.id, entry);
+            const ingredients = source === 'craft'
+                ? (recipe.type === 'shapeless' ? recipe.ingredients : recipe.pattern.map(id => id && ({ id, count: 1 })))
+                : Object.values(recipe.ingredients || {});
+            const usedIds = new Set(ingredients.map(ingredient => ingredient && ingredient.id));
+            usedIds.forEach(id => add(usedIn, id, entry));
+        };
+        CraftingRegistry.recipes.forEach(recipe => addRecipe(recipe, 'craft'));
+        (typeof GuiBlockRecipeRegistry === 'undefined' ? [] : GuiBlockRecipeRegistry.recipes)
+            .forEach(recipe => addRecipe(recipe, 'gui'));
+        this.recipeIndex = { madeBy, usedIn };
+        return this.recipeIndex;
+    },
+
     recipesFor(id) {
-        const crafted = CraftingRegistry.recipes
-            .filter(r => r.result && r.result.id === id)
-            .map(r => ({ ...r, source: 'craft' }));
-        const processed = (typeof GuiBlockRecipeRegistry !== 'undefined' ? GuiBlockRecipeRegistry.recipes : [])
-            .filter(r => r.result && r.result.id === id)
-            .map(r => ({ ...r, source: 'gui' }));
-        return [...crafted, ...processed, ...this.gatheringSourcesFor(id)];
+        return this.buildRecipeIndex().madeBy.get(id) || [];
     },
 
     // Not every item enters the game through a crafting grid or a machine.
@@ -205,13 +202,7 @@ const JEI = {
     // "Usage" tab. Covers shaped/shapeless crafting-grid ingredients and
     // GUI-block input slots.
     usagesFor(id) {
-        const crafted = CraftingRegistry.recipes
-            .filter(r => recipeUsesIngredient(r, id))
-            .map(r => ({ ...r, source: 'craft' }));
-        const processed = (typeof GuiBlockRecipeRegistry !== 'undefined' ? GuiBlockRecipeRegistry.recipes : [])
-            .filter(r => Object.values(r.ingredients).some(ing => ing.id === id))
-            .map(r => ({ ...r, source: 'gui' }));
-        return [...crafted, ...processed];
+        return this.buildRecipeIndex().usedIn.get(id) || [];
     },
 
     toggleOverlay() {
@@ -409,7 +400,7 @@ function jeiRecipeTypeLabel(recipe) {
 
 function jeiRecipeCardHTML(recipe) {
     const resultCount = recipe.result.count > 1 ? `<div class="item-count">${recipe.result.count}</div>` : '';
-    const gridHTML = recipe.source === 'gui' ? jeiGuiRecipeGridHTML(recipe) : jeiRecipeGridHTML(recipe);
+    const gridHTML = recipe.source === 'gui' ? jeiGuiRecipeGridHTML(recipe) : recipe.source === 'gathering' ? jeiGuiRecipeGridHTML(recipe) : jeiRecipeGridHTML(recipe);
     return `<div class="jei-recipe-card" data-recipe-source="${recipe.source}">
         ${gridHTML}
         <div class="jei-recipe-arrow">→</div>
@@ -475,7 +466,8 @@ function renderJEIContextMenu() {
     menuEl.innerHTML = `<div class="jei-context-box">
         <div class="jei-context-title">${name}</div>
         ${giveBtn}
-        <button class="jei-context-btn" data-action="recipes">View Recipes</button>
+        <button class="jei-context-btn" data-action="recipes">Recipes</button>
+        <button class="jei-context-btn" data-action="sources">Sources</button>
         <button class="jei-context-btn" data-action="usages">Usage</button>
         <button class="jei-context-btn jei-context-cancel" data-action="cancel">Cancel</button>
     </div>`;
@@ -519,8 +511,8 @@ function renderJEIRecipeView() {
                 ${producesHTML}
             </div>`;
     } else {
-        const recipes = subTab === 'usage' ? JEI.usagesFor(JEI.recipeView.id) : JEI.recipesFor(JEI.recipeView.id);
-        emptyMsg = subTab === 'usage' ? 'This item isn\u2019t used in any known recipe' : 'No known recipes craft this item';
+        const recipes = subTab === 'usage' ? JEI.usagesFor(JEI.recipeView.id) : subTab === 'sources' ? JEI.gatheringSourcesFor(JEI.recipeView.id) : JEI.recipesFor(JEI.recipeView.id);
+        emptyMsg = subTab === 'usage' ? 'This item isn\u2019t used in any known recipe' : subTab === 'sources' ? 'No gathering source is known for this item' : 'No known crafting or processing recipe';
         body = recipes.length === 0
             ? `<div class="jei-empty">${emptyMsg}</div>`
             : recipes.map(r => jeiRecipeCardHTML(r)).join('');
@@ -538,7 +530,8 @@ function renderJEIRecipeView() {
             </span>
         </div>
         <div class="jei-recipe-subtabs">
-            <button class="jei-recipe-subtab${subTab === 'recipe' ? ' active' : ''}" data-subtab="recipe">Recipe</button>
+            <button class="jei-recipe-subtab${subTab === 'recipe' ? ' active' : ''}" data-subtab="recipe">Recipes</button>
+            <button class="jei-recipe-subtab${subTab === 'sources' ? ' active' : ''}" data-subtab="sources">Sources</button>
             <button class="jei-recipe-subtab${subTab === 'usage' ? ' active' : ''}" data-subtab="usage">Usage</button>
             ${produceTabHTML}
         </div>
@@ -640,6 +633,8 @@ function setupJEIControls() {
                     JEI.closeContextMenu();
                 } else if (action === 'recipes') {
                     JEI.openRecipesFor(id, 'recipe');
+                } else if (action === 'sources') {
+                    JEI.openRecipesFor(id, 'sources');
                 } else if (action === 'usages') {
                     JEI.openRecipesFor(id, 'usage');
                 } else {
