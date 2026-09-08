@@ -1363,6 +1363,33 @@ Registry.register({
     },
 })
 
+
+// Industrial-era materials used by the post-steel quest line.  They are kept
+// as data entries so JEI, inventory and future machines discover them without
+// special-case code.
+Registry.register({
+    'IR-copperore': { name: 'Copper Ore', type: 'item', color: '#9d5035', icon: '🟠' },
+    'IR-zincore': { name: 'Zinc Ore', type: 'item', color: '#94a0ad', icon: '⬡' },
+    'IR-zinc-ingot': { name: 'Zinc Ingot', type: 'item', color: '#9dacb7', icon: '◇' },
+    'IR-copper-ingot': { name: 'Copper Ingot', type: 'item', color: '#d77a45', icon: '🔶' },
+    'IR-brass-ingot': { name: 'Brass Ingot', type: 'item', color: '#d4a73c', icon: '🟡' },
+    'IR-rubber': { name: 'Vulcanized Bio-rubber', type: 'item', color: '#332a25', icon: '⬤' },
+    'IR-insulated-wire': { name: 'Insulated Wire', type: 'item', color: '#b9813e', icon: '〰' },
+    'IR-copper-coil': { name: 'Copper Coil', type: 'item', color: '#c66a3a', icon: '🌀' },
+    'IR-carbon-brush': { name: 'Carbon Brush', type: 'item', color: '#30343a', icon: '▮' },
+    'IR-ceramic-insulator': { name: 'Ceramic Insulator', type: 'item', color: '#e2ddd0', icon: '◉' },
+    'IR-terminal-block': { name: 'Terminal Block', type: 'item', color: '#495060', icon: '▦' },
+    'IR-steam-pipe': { name: 'Steel Steam Pipe', type: 'item', color: '#78818a', icon: '═' },
+    'IR-fluid-pipe': { name: 'Fluid Pipe', type: 'item', color: '#5a7f9b', icon: '╬' },
+    'IR-pressure-valve': { name: 'Pressure Valve', type: 'item', color: '#71808a', icon: '⚙' },
+    'IR-piston-assembly': { name: 'Piston Assembly', type: 'item', color: '#87909a', icon: '↕' },
+    'IR-steam-engine': { name: 'Reciprocating Steam Engine', type: 'item', color: '#59626d', icon: '♨' },
+    'IR-dynamo': { name: 'Dynamo', type: 'item', color: '#596e7a', icon: '⚡' },
+    'IR-galvanic-cell': { name: 'Galvanic Cell', type: 'item', color: '#688b62', icon: '🔋' },
+    'IR-circuit-board': { name: 'Circuit Substrate', type: 'item', color: '#4d7a55', icon: '▤' },
+    'IR-first-circuit': { name: 'First Electric Circuit', type: 'item', color: '#58b7d5', icon: '⚡' }
+});
+
 // ============================================
 // GUI Block Recipes
 // ============================================
@@ -1469,8 +1496,16 @@ const GuiBlockRecipeRegistry = {
                 { id: 'IR-limepowder', count: 1 },
                 { id: 'IR-sodaash', count: 1 }
             ],
-            result: { id: 'IR-capsule-1000', count: 2 },
+            result: { id: 'IR-glass', count: 2 },
             ticks: 110
+        },
+        {
+            id: 'kiln-fired-brick',
+            block: 'IR-kiln',
+            orderMatters: false,
+            ingredients: [{ id: 'IR-claybrick', count: 2 }],
+            result: { id: 'IR-brick', count: 2 },
+            ticks: 90
         },
         {
             // Roasting humus down to ash - real ash yield from organic
@@ -2272,6 +2307,25 @@ const CraftingRegistry = {
         {
             id: 'graphite-crucible', type: 'shaped3x3', width: 3,
             pattern: ['IR-graphite', 'IR-graphite', 'IR-graphite', 'IR-graphite', null, 'IR-graphite', 'IR-graphite', 'IR-graphite', 'IR-graphite'], result: { id: 'IR-cruciblegraphite', count: 1 }
-        }
+        },
+        { id: 'glass-capsules', type: 'shapeless', ingredients: [{ id: 'IR-glass', count: 1 }], result: { id: 'IR-capsule-1000', count: 2 } },
+        { id: 'copper-ingot-reduction', type: 'shapeless', ingredients: [{ id: 'IR-copperore', count: 4 }, { id: 'IR-coal', count: 1 }], result: { id: 'IR-copper-ingot', count: 2 } },
+        { id: 'zinc-ingot-reduction', type: 'shapeless', ingredients: [{ id: 'IR-zincore', count: 4 }, { id: 'IR-coal', count: 1 }], result: { id: 'IR-zinc-ingot', count: 2 } },
+        { id: 'brass-alloy', type: 'shapeless', ingredients: [{ id: 'IR-copper-ingot', count: 2 }, { id: 'IR-zinc-ingot', count: 1 }], result: { id: 'IR-brass-ingot', count: 2 } },
+        { id: 'steam-pipe', type: 'shaped3x3', width: 3, pattern: ['IR-ironplate', null, 'IR-ironplate', 'IR-ironplate', null, 'IR-ironplate', 'IR-ironplate', null, 'IR-ironplate'], result: { id: 'IR-steam-pipe', count: 4 } },
+        { id: 'fluid-pipe', type: 'shapeless', ingredients: [{ id: 'IR-steam-pipe', count: 2 }, { id: 'IR-glass', count: 1 }], result: { id: 'IR-fluid-pipe', count: 2 } },
+        { id: 'ceramic-insulator', type: 'shapeless', ingredients: [{ id: 'IR-ceramictube', count: 1 }, { id: 'IR-glass', count: 1 }], result: { id: 'IR-ceramic-insulator', count: 2 } },
+        { id: 'copper-coil', type: 'shaped3x3', width: 3, pattern: ['IR-copper-ingot', 'IR-copper-ingot', 'IR-copper-ingot', 'IR-copper-ingot', null, 'IR-copper-ingot', 'IR-copper-ingot', 'IR-copper-ingot', 'IR-copper-ingot'], result: { id: 'IR-copper-coil', count: 1 } },
+        { id: 'bio-rubber', type: 'shapeless', ingredients: [{ id: 'IR-humus', count: 2 }, { id: 'IR-plantash', count: 1 }], result: { id: 'IR-rubber', count: 1 } },
+        { id: 'insulated-wire', type: 'shapeless', ingredients: [{ id: 'IR-metalwire', count: 2 }, { id: 'IR-rubber', count: 1 }], result: { id: 'IR-insulated-wire', count: 4 } },
+        { id: 'piston-assembly', type: 'shapeless', ingredients: [{ id: 'IR-ironplate', count: 4 }, { id: 'IR-ironrod', count: 2 }, { id: 'IR-gear', count: 1 }], result: { id: 'IR-piston-assembly', count: 1 } },
+        { id: 'pressure-valve', type: 'shapeless', ingredients: [{ id: 'IR-brass-ingot', count: 2 }, { id: 'IR-ironrod', count: 1 }], result: { id: 'IR-pressure-valve', count: 1 } },
+        { id: 'steam-engine', type: 'shaped3x3', width: 3, pattern: ['IR-steelframe', 'IR-pressure-valve', 'IR-steelframe', 'IR-piston-assembly', 'IR-gear', 'IR-piston-assembly', 'IR-steam-pipe', 'IR-steam-pipe', 'IR-steam-pipe'], result: { id: 'IR-steam-engine', count: 1 } },
+        { id: 'carbon-brush', type: 'shapeless', ingredients: [{ id: 'IR-graphite', count: 2 }, { id: 'IR-brass-ingot', count: 1 }], result: { id: 'IR-carbon-brush', count: 2 } },
+        { id: 'dynamo', type: 'shaped3x3', width: 3, pattern: ['IR-copper-coil', 'IR-steelframe', 'IR-copper-coil', 'IR-carbon-brush', 'IR-gear', 'IR-carbon-brush', 'IR-ceramic-insulator', 'IR-ironrod', 'IR-ceramic-insulator'], result: { id: 'IR-dynamo', count: 1 } },
+        { id: 'galvanic-cell', type: 'shapeless', ingredients: [{ id: 'IR-copper-ingot', count: 1 }, { id: 'IR-ironplate', count: 1 }, { id: 'IR-capsule-1000-water', count: 1 }], result: { id: 'IR-galvanic-cell', count: 1 } },
+        { id: 'terminal-block', type: 'shapeless', ingredients: [{ id: 'IR-brass-ingot', count: 2 }, { id: 'IR-ceramic-insulator', count: 1 }], result: { id: 'IR-terminal-block', count: 1 } },
+        { id: 'circuit-substrate', type: 'shapeless', ingredients: [{ id: 'IR-glass', count: 2 }, { id: 'IR-plantash', count: 1 }], result: { id: 'IR-circuit-board', count: 1 } },
+        { id: 'first-electric-circuit', type: 'shaped3x3', width: 3, pattern: ['IR-insulated-wire', 'IR-terminal-block', 'IR-insulated-wire', 'IR-copper-coil', 'IR-circuit-board', 'IR-copper-coil', 'IR-galvanic-cell', 'IR-ceramic-insulator', 'IR-galvanic-cell'], result: { id: 'IR-first-circuit', count: 1 } }
     ]
 }
