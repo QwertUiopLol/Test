@@ -22,6 +22,22 @@
 // tracked in this single shared object rather than per-cell state.
 let breakingBlock = { x: null, y: null, progress: 0, type: null };
 let isHoldingBreak = false; // Flag for pressing a key/button
+const plantedSaplings = {}; // "x,y" -> growth ticks; intentionally world-coordinate based
+
+function selectedToolData() {
+    const selected = typeof Inventory !== 'undefined' && Inventory.getSelectedItem();
+    return selected && Registry.get(selected.id);
+}
+
+function breakTicksFor(blockData) {
+    const tool = selectedToolData();
+    if (!tool || !tool.toolType || !blockData.effectiveTools || !blockData.effectiveTools.includes(tool.toolType)) {
+        return blockData.breakTimeTicks;
+    }
+    // An under-tier pick can still chip a block, but receives no speed bonus.
+    if ((tool.harvestLevel || 0) < (blockData.requiredHarvestLevel || 0)) return blockData.breakTimeTicks * 3;
+    return Math.max(1, Math.ceil(blockData.breakTimeTicks / (tool.miningSpeed || 1)));
+}
 
 // ============================================
 // Break progress bar (UI)
@@ -40,7 +56,7 @@ function updateBreakBar() {
     bar.classList.add('visible');
 
     const blockData = Registry.get(breakingBlock.type);
-    const pct = blockData ? Math.min(100, (breakingBlock.progress / blockData.breakTimeTicks) * 100) : 0;
+    const pct = blockData ? Math.min(100, (breakingBlock.progress / breakTicksFor(blockData)) * 100) : 0;
     fill.style.width = pct + '%';
 }
 
@@ -116,13 +132,27 @@ function useSelected() {
         return;
     }
 
+    // Wrenches configure pipes, cables and machine faces instead of opening
+    // their GUI. This is deliberately a real action with tool wear: rotate a
+    // port before connecting it, then use the same wrench to reconfigure it.
+    const heldTool = selectedToolData();
+    const overlayType = getGlobalOverlayType(selectedX, selectedY);
+    const groundType = getGlobalCellType(selectedX, selectedY);
+    const targetData = Registry.get(overlayType || groundType);
+    if (heldTool && heldTool.toolType === 'wrench' && targetData && targetData.wrenchConfigurable) {
+        const current = getGlobalDirection(selectedX, selectedY) || 'N';
+        const next = RANDOM_DIRECTIONS[(RANDOM_DIRECTIONS.indexOf(current) + 1) % RANDOM_DIRECTIONS.length];
+        setGlobalDirection(selectedX, selectedY, next);
+        Inventory.damageSelectedTool(1);
+        renderWorld();
+        return;
+    }
+
     // Ground-layer block can also have a GUI (e.g. a furnace placed as the
     // base block rather than an overlay) - check both layers.
-    const overlayType = getGlobalOverlayType(selectedX, selectedY);
     if (overlayType && typeof GuiBlocks !== 'undefined' && GuiBlocks.tryOpen(overlayType, selectedX, selectedY)) {
         return;
     }
-    const groundType = getGlobalCellType(selectedX, selectedY);
     if (groundType && groundType !== 'void' && typeof GuiBlocks !== 'undefined' && GuiBlocks.tryOpen(groundType, selectedX, selectedY)) {
         return;
     }
@@ -184,6 +214,8 @@ function placeBlock() {
 
     setGlobalCellType(x, y, selectedItem.id);
 
+    if (itemData.plantable) plantedSaplings[`${x},${y}`] = 0;
+
     // Blocks registered with `randomDirection: true` (registry.js) get a
     // facing rolled ONCE here, right at placement, and stored per-tile
     // (see setGlobalDirection/getGlobalDirection in game.js) - not
@@ -232,7 +264,11 @@ if (typeof TickSystem !== 'undefined') {
         breakingBlock.progress++;
         updateBreakBar();
         
-        if (breakingBlock.progress >= blockData.breakTimeTicks) {
+        if (breakingBlock.progress >= breakTicksFor(blockData)) {
+            const tool = selectedToolData();
+            if (tool && tool.toolType && blockData.effectiveTools && blockData.effectiveTools.includes(tool.toolType)) {
+                Inventory.damageSelectedTool(1);
+            }
             const dropId = blockData.dropId;
             if (dropId) {
                 addItemOrDrop(breakingBlock.x, breakingBlock.y, dropId, 1);
@@ -246,6 +282,24 @@ if (typeof TickSystem !== 'undefined') {
                 setGlobalCellType(breakingBlock.x, breakingBlock.y, 'void');
             }
             stopBreaking();
+            renderWorld();
+        }
+    });
+
+    // A planted synthetic seed becomes a harvestable tree only when it has
+    // room to expand.  This makes wood renewable without creating logs from
+    // a menu or a world-generation exception.
+    TickSystem.onTick(() => {
+        for (const key of Object.keys(plantedSaplings)) {
+            plantedSaplings[key]++;
+            if (plantedSaplings[key] < 300) continue;
+            const [x, y] = key.split(',').map(Number);
+            if (getGlobalCellType(x, y) !== 'IR-sapling') { delete plantedSaplings[key]; continue; }
+            const crown = [[x, y - 1], [x - 1, y - 1], [x + 1, y - 1], [x, y - 2]];
+            if (crown.some(([cx, cy]) => getGlobalCellType(cx, cy) !== 'void')) continue;
+            setGlobalCellType(x, y, 'IR-oaklog');
+            crown.forEach(([cx, cy]) => setGlobalCellType(cx, cy, 'IR-oak-leaves'));
+            delete plantedSaplings[key];
             renderWorld();
         }
     });

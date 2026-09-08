@@ -87,6 +87,10 @@ const Inventory = {
             if (!this.slots[i]) {
                 const add = Math.min(maxStack, remaining);
                 const newStack = { id, count: add };
+                // Durable tools are always non-stackable.  Store remaining
+                // uses on the stack, rather than mutating the Registry entry,
+                // so two tools can wear independently.
+                if (data && data.durability) newStack.durability = data.durability;
                 if (prefilled) {
                     newStack.fluid = prefilled.fluid;
                     newStack.amount = prefilled.amount;
@@ -122,6 +126,17 @@ const Inventory = {
         if (slot.count < count) return false;
         slot.count -= count;
         if (slot.count <= 0) this.slots[this.selectedHotbarIndex] = null;
+        this.onChange();
+        return true;
+    },
+
+    damageSelectedTool(amount = 1) {
+        const slot = this.getSelectedItem();
+        const data = slot && Registry.get(slot.id);
+        if (!slot || !data || !data.durability) return false;
+        if (slot.durability === undefined) slot.durability = data.durability;
+        slot.durability -= amount;
+        if (slot.durability <= 0) this.slots[this.selectedHotbarIndex] = null;
         this.onChange();
         return true;
     },

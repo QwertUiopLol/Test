@@ -189,7 +189,8 @@ Registry.register({
         color: '#6b8e23',
         dropId: 'IR-dirt',
         icon: '',
-        texture: 'assets/textures/blocks/dirt.png'
+        texture: 'assets/textures/blocks/dirt.png',
+        effectiveTools: ['shovel']
     },
     // Plain "Stone" was removed - it was never wanted, it just existed
     // because Cobblestone's dropId pointed at an 'IR-stone' id that had no
@@ -218,7 +219,9 @@ Registry.register({
         // purely cosmetic, doesn't affect mining/drops/behavior at all.
         // Set to false (or omit the field) on any block that should always
         // face the same way.
-        randomDirection: true
+        randomDirection: true,
+        effectiveTools: ['pickaxe'],
+        requiredHarvestLevel: 1
     },
     'IR-plank': {
         name: 'Plank',
@@ -236,7 +239,10 @@ Registry.register({
         maxStack: 64,
         color: '#a97c50',
         icon: '',
-        texture: 'assets/oaklog.png'
+        texture: 'assets/oaklog.png',
+        breakTimeTicks: 50,
+        hardness: 2,
+        effectiveTools: ['axe']
     },
     'IR-workbench': {
         name: 'Workbench',
@@ -391,15 +397,19 @@ Registry.register({
     },
     'IR-sapling': {
         // The payoff: an encapsulated synthetic seed. Growing it into an
-        // actual placeable tree/log is future content - this is
-        // deliberately where the current tech tree stops.
+        // actual placeable tree/log happens in tInter.js after a growth
+        // period, turning this into a renewable in-world resource.
         name: 'Oak Sapling (Synthetic Seed)',
-        type: 'item',
+        type: 'block',
         stackable: true,
         maxStack: 64,
         color: '#4c8f3d',
         icon: '🌱',
-        texture: 'assets/sapling.png'
+        texture: 'assets/sapling.png',
+        breakTimeTicks: 8,
+        hardness: 0.2,
+        dropId: 'IR-sapling',
+        plantable: true
     },
     // ========================================================
     // Ash / Alkali chain - the missing third glass ingredient
@@ -1390,6 +1400,54 @@ Registry.register({
     'IR-first-circuit': { name: 'First Electric Circuit', type: 'item', color: '#58b7d5', icon: '⚡' }
 });
 
+// Tools and industrial infrastructure use explicit capabilities instead of
+// hard-coded item ids.  Interaction code reads these fields for mining speed,
+// durability and wrench configuration, making later material tiers data-only.
+Registry.register({
+    'IR-flint-pickaxe': { name: 'Flint Pickaxe', type: 'item', color: '#697078', icon: '⛏', stackable: false, maxStack: 1, durability: 96, toolType: 'pickaxe', miningSpeed: 2.2, harvestLevel: 1 },
+    'IR-steel-pickaxe': { name: 'Steel Pickaxe', type: 'item', color: '#8895a2', icon: '⛏', stackable: false, maxStack: 1, durability: 768, toolType: 'pickaxe', miningSpeed: 4.8, harvestLevel: 3 },
+    'IR-steel-axe': { name: 'Steel Axe', type: 'item', color: '#8b98a5', icon: '🪓', stackable: false, maxStack: 1, durability: 640, toolType: 'axe', miningSpeed: 5, harvestLevel: 3 },
+    'IR-steel-shovel': { name: 'Steel Shovel', type: 'item', color: '#8b98a5', icon: '⛏', stackable: false, maxStack: 1, durability: 512, toolType: 'shovel', miningSpeed: 4.2, harvestLevel: 3 },
+    'IR-wrench': { name: 'Engineer Wrench', type: 'item', color: '#b3a56b', icon: '🔧', stackable: false, maxStack: 1, durability: 512, toolType: 'wrench' },
+    'IR-hammer': { name: 'Smithing Hammer', type: 'item', color: '#78818a', icon: '🔨', stackable: false, maxStack: 1, durability: 384, toolType: 'hammer' },
+    'IR-screwdriver': { name: 'Precision Screwdriver', type: 'item', color: '#d4a73c', icon: '🪛', stackable: false, maxStack: 1, durability: 256, toolType: 'screwdriver' },
+    'IR-wire-cutters': { name: 'Wire Cutters', type: 'item', color: '#c85c4a', icon: '✂', stackable: false, maxStack: 1, durability: 320, toolType: 'wirecutters' },
+
+    'IR-oak-leaves': { name: 'Oak Leaves', type: 'block', color: '#4f873f', icon: '♣', breakTimeTicks: 6, hardness: 0.1, dropId: null, effectiveTools: ['axe', 'shears'] },
+    'IR-small-fluid-pipe': { name: 'Small Fluid Pipe', type: 'block', color: '#577f9c', icon: '═', overlay: true, pipe: { medium: 'fluid', capacity: 100, tier: 0 }, wrenchConfigurable: true },
+    'IR-large-fluid-pipe': { name: 'Large Fluid Pipe', type: 'block', color: '#3e6d91', icon: '╬', overlay: true, pipe: { medium: 'fluid', capacity: 800, tier: 2 }, wrenchConfigurable: true },
+    'IR-small-steam-pipe': { name: 'Small Steam Pipe', type: 'block', color: '#89939c', icon: '═', overlay: true, pipe: { medium: 'steam', capacity: 80, tier: 0 }, wrenchConfigurable: true },
+    'IR-gas-pipe': { name: 'Gas Pipe', type: 'block', color: '#b2a35d', icon: '═', overlay: true, pipe: { medium: 'gas', capacity: 200, tier: 1 }, wrenchConfigurable: true },
+    'IR-bronze-boiler': { name: 'Bronze Boiler', type: 'block', color: '#a86f3e', icon: '♨', overlay: true, machine: { tier: 'Steam', eu: 0, produces: 'steam' }, wrenchConfigurable: true },
+    'IR-steam-bender': { name: 'Steam Bender', type: 'block', color: '#65727d', icon: '⌁', overlay: true, machine: { tier: 'Steam', eu: 0, steamPerTick: 16 }, wrenchConfigurable: true },
+    'IR-steam-alloy-smelter': { name: 'Steam Alloy Smelter', type: 'block', color: '#835f4c', icon: '♨', overlay: true, machine: { tier: 'Steam', eu: 0, steamPerTick: 24 }, wrenchConfigurable: true },
+    'IR-lv-cable': { name: 'LV Copper Cable (32 EU/t)', type: 'block', color: '#c9793d', icon: '━', overlay: true, cable: { voltage: 32, amps: 1, loss: 1, tier: 'LV' }, wrenchConfigurable: true },
+    'IR-mv-cable': { name: 'MV Annealed Copper Cable (128 EU/t)', type: 'block', color: '#d19a50', icon: '━', overlay: true, cable: { voltage: 128, amps: 2, loss: 1, tier: 'MV' }, wrenchConfigurable: true },
+    'IR-energy-hatch-lv': { name: 'LV Energy Hatch (32 EU/t)', type: 'block', color: '#5986a1', icon: '⚡', overlay: true, hatch: 'energy', tier: 'LV', wrenchConfigurable: true },
+    'IR-input-bus-lv': { name: 'LV Input Bus', type: 'block', color: '#5e7a64', icon: '⇥', overlay: true, hatch: 'inputBus', tier: 'LV', wrenchConfigurable: true },
+    'IR-output-bus-lv': { name: 'LV Output Bus', type: 'block', color: '#667b5f', icon: '⇤', overlay: true, hatch: 'outputBus', tier: 'LV', wrenchConfigurable: true },
+    'IR-input-hatch-lv': { name: 'LV Fluid Input Hatch', type: 'block', color: '#4e8b9a', icon: '⇩', overlay: true, hatch: 'inputFluid', tier: 'LV', wrenchConfigurable: true },
+    'IR-output-hatch-lv': { name: 'LV Fluid Output Hatch', type: 'block', color: '#4e8b9a', icon: '⇧', overlay: true, hatch: 'outputFluid', tier: 'LV', wrenchConfigurable: true },
+    'IR-maintenance-hatch': { name: 'Maintenance Hatch', type: 'block', color: '#9c9a73', icon: '⚒', overlay: true, hatch: 'maintenance', tier: 'LV', wrenchConfigurable: true },
+    'IR-muffler-hatch': { name: 'Muffler Hatch', type: 'block', color: '#77736c', icon: '≋', overlay: true, hatch: 'muffler', tier: 'LV', wrenchConfigurable: true }
+});
+
+// Late-game machines are registered now so the quest book and JEI expose a
+// coherent roadmap rather than placeholder names. Their recipes are gated by
+// the preceding age and are intentionally added as processing expands.
+Registry.register({
+    'IR-lv-assembler': { name: 'LV Assembler', type: 'block', color: '#52728c', icon: '▣', overlay: true, machine: { tier: 'LV', eu: 30 }, wrenchConfigurable: true },
+    'IR-lv-chemical-reactor': { name: 'LV Chemical Reactor', type: 'block', color: '#5b896d', icon: '⚗', overlay: true, machine: { tier: 'LV', eu: 30 }, wrenchConfigurable: true },
+    'IR-lv-centrifuge': { name: 'LV Centrifuge', type: 'block', color: '#777e9d', icon: '◉', overlay: true, machine: { tier: 'LV', eu: 30 }, wrenchConfigurable: true },
+    'IR-mv-transformer': { name: 'MV Transformer', type: 'block', color: '#a77943', icon: 'ϟ', overlay: true, machine: { tier: 'MV', eu: 128 }, wrenchConfigurable: true },
+    'IR-electric-blast-furnace': { name: 'Electric Blast Furnace Controller', type: 'block', color: '#9d533e', icon: '♨', overlay: true, multiblock: { controller: true, requiredHatches: ['energy', 'inputBus', 'outputBus', 'maintenance', 'muffler'] }, wrenchConfigurable: true },
+    'IR-distillation-tower': { name: 'Distillation Tower Controller', type: 'block', color: '#71888f', icon: '⇅', overlay: true, multiblock: { controller: true, requiredHatches: ['energy', 'inputFluid', 'outputFluid', 'maintenance'] }, wrenchConfigurable: true },
+    'IR-hv-transformer': { name: 'HV Transformer', type: 'block', color: '#9e7040', icon: 'ϟ', overlay: true, machine: { tier: 'HV', eu: 512 }, wrenchConfigurable: true },
+    'IR-cleanroom-controller': { name: 'Cleanroom Controller', type: 'block', color: '#d9e6e9', icon: '◈', overlay: true, multiblock: { controller: true, requiredHatches: ['energy', 'maintenance'] }, wrenchConfigurable: true },
+    'IR-precision-circuit': { name: 'Precision Circuit', type: 'item', color: '#82bfd1', icon: '▤' },
+    'IR-observatory-telescope': { name: 'Industrial Telescope', type: 'block', color: '#32415c', icon: '🔭', overlay: true, machine: { tier: 'HV', eu: 480 }, wrenchConfigurable: true }
+});
+
 // ============================================
 // GUI Block Recipes
 // ============================================
@@ -2317,6 +2375,13 @@ const CraftingRegistry = {
         { id: 'galvanic-cell', type: 'shapeless', ingredients: [{ id: 'IR-copper-ingot', count: 1 }, { id: 'IR-ironplate', count: 1 }, { id: 'IR-capsule-1000-water', count: 1 }], result: { id: 'IR-galvanic-cell', count: 1 } },
         { id: 'terminal-block', type: 'shapeless', ingredients: [{ id: 'IR-brass-ingot', count: 2 }, { id: 'IR-ceramic-insulator', count: 1 }], result: { id: 'IR-terminal-block', count: 1 } },
         { id: 'circuit-substrate', type: 'shapeless', ingredients: [{ id: 'IR-glass', count: 2 }, { id: 'IR-plantash', count: 1 }], result: { id: 'IR-circuit-board', count: 1 } },
-        { id: 'first-electric-circuit', type: 'shaped3x3', width: 3, pattern: ['IR-insulated-wire', 'IR-terminal-block', 'IR-insulated-wire', 'IR-copper-coil', 'IR-circuit-board', 'IR-copper-coil', 'IR-galvanic-cell', 'IR-ceramic-insulator', 'IR-galvanic-cell'], result: { id: 'IR-first-circuit', count: 1 } }
+        { id: 'first-electric-circuit', type: 'shaped3x3', width: 3, pattern: ['IR-insulated-wire', 'IR-terminal-block', 'IR-insulated-wire', 'IR-copper-coil', 'IR-circuit-board', 'IR-copper-coil', 'IR-galvanic-cell', 'IR-ceramic-insulator', 'IR-galvanic-cell'], result: { id: 'IR-first-circuit', count: 1 } },
+        { id: 'flint-pickaxe', type: 'shaped3x3', width: 3, pattern: ['IR-dpebble', 'IR-dpebble', 'IR-dpebble', null, 'IR-plank', null, null, 'IR-plank', null], result: { id: 'IR-flint-pickaxe', count: 1 } },
+        { id: 'steel-pickaxe', type: 'shaped3x3', width: 3, pattern: ['IR-mediumsteelingot', 'IR-mediumsteelingot', 'IR-mediumsteelingot', null, 'IR-ironrod', null, null, 'IR-ironrod', null], result: { id: 'IR-steel-pickaxe', count: 1 } },
+        { id: 'steel-axe', type: 'shaped3x3', width: 3, pattern: ['IR-mediumsteelingot', 'IR-mediumsteelingot', null, 'IR-mediumsteelingot', 'IR-ironrod', null, null, 'IR-ironrod', null], result: { id: 'IR-steel-axe', count: 1 } },
+        { id: 'engineer-wrench', type: 'shaped3x3', width: 3, pattern: ['IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, 'IR-mediumsteelingot', null, null, 'IR-ironrod', null], result: { id: 'IR-wrench', count: 1 } },
+        { id: 'small-fluid-pipes', type: 'shapeless', ingredients: [{ id: 'IR-steam-pipe', count: 1 }, { id: 'IR-glass', count: 1 }], result: { id: 'IR-small-fluid-pipe', count: 2 } },
+        { id: 'small-steam-pipes', type: 'shapeless', ingredients: [{ id: 'IR-steam-pipe', count: 1 }], result: { id: 'IR-small-steam-pipe', count: 2 } },
+        { id: 'lv-cable', type: 'shapeless', ingredients: [{ id: 'IR-insulated-wire', count: 2 }, { id: 'IR-rubber', count: 1 }], result: { id: 'IR-lv-cable', count: 2 } }
     ]
 }

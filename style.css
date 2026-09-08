@@ -1574,6 +1574,16 @@ body {
     display: flex;
     gap: 3px;
 }
+.quest-category-select {
+    max-width: 126px;
+    min-width: 92px;
+    padding: 5px;
+    color: #dce8f4;
+    background: #25253d;
+    border: 1px solid #53537a;
+    border-radius: 4px;
+    font-size: 11px;
+}
 .quest-zoom-controls .quest-mode-btn {
     width: 30px;
 }
