@@ -10,7 +10,7 @@
     <div class="game-container">
         <div class="frame-wrapper">
             <div class="frame">
-                <div id="world" class="world"></div>
+                <canvas id="world" class="world" aria-label="3D мир от первого лица"></canvas>
                 <div id="debug-overlay" class="debug-overlay"></div>
                 <div id="break-bar" class="break-bar"><div id="break-bar-fill" class="break-bar-fill"></div></div>
             </div>
@@ -22,22 +22,15 @@
             <div id="save-toast" class="save-toast"></div>
         </div>
 
-        <div class="controls">
-            <div class="control-section">
-                <div class="d-pad">
-                    <div class="d-pad-row">
-                        <button id="dpad-click" class="arrow-btn click-btn">Click</button>
-                        <button id="dpad-up" class="arrow-btn">▲</button>
-                        <button id="dpad-interact" class="arrow-btn interact-btn">Use</button>
-                    </div>
-                    <div class="d-pad-row">
-                        <button id="dpad-left" class="arrow-btn">◄</button>
-                        <button id="dpad-down" class="arrow-btn">▼</button>
-                        <button id="dpad-right" class="arrow-btn">►</button>
-                    </div>
-                </div>
-                <div id="dpad-mode" class="mode-indicator">Movement</div>
+        <div class="controls mobile-controls">
+            <div class="stick-group"><div id="move-stick" class="virtual-stick" aria-label="Движение"><i></i></div><span>ДВИЖЕНИЕ</span></div>
+            <div class="action-cluster">
+                <button id="dpad-click" class="action-btn break-action">ЛОМАТЬ</button>
+                <button id="dpad-interact" class="action-btn use-action">ИСПОЛЬЗ.</button>
+                <div id="dpad-mode" class="mode-indicator">РЕЖИМ: ДВИЖЕНИЕ</div>
             </div>
+            <div class="stick-group"><div id="look-stick" class="virtual-stick" aria-label="Прицел"><i></i></div><span>ПРИЦЕЛ</span></div>
+            <button id="dpad-up" class="sr-only">Вверх</button><button id="dpad-down" class="sr-only">Вниз</button><button id="dpad-left" class="sr-only">Влево</button><button id="dpad-right" class="sr-only">Вправо</button>
         </div>
 
         <div id="hotbar-selected-name" class="hotbar-selected-name"></div>
@@ -123,17 +116,10 @@
             <div id="quest-panel-body" class="quest-panel-body">
                 <div id="quest-graph-view" class="quest-graph-view">
                     <div class="quest-toolbar">
-                        <div class="quest-line-summary">300 этапов · от мастерской до космической промышленности</div>
+                        <div class="quest-line-summary">12 этапов · от мастерской до выращивания дерева</div>
                         <select id="quest-category-select" class="quest-category-select" aria-label="Категория квестов">
                             <option value="all">Все эпохи</option>
                             <option value="Beginning">Beginning</option>
-                            <option value="Steam">Steam Age</option>
-                            <option value="LV">LV Age</option>
-                            <option value="MV">MV Age</option>
-                            <option value="HV">HV Age</option>
-                            <option value="Energy">Energy Grid</option>
-                            <option value="Multiblocks">Multiblocks</option>
-                            <option value="Industry">Industrial Projects</option>
                         </select>
                         <input id="quest-list-search" class="quest-search" type="text" placeholder="Поиск этапов..." style="display:none;">
                         <button id="quest-list-toggle" class="quest-mode-btn" title="Список этапов" aria-label="Переключить на список">☰</button>
@@ -182,9 +168,11 @@
     <script src="scripts/registry.js"></script>
     <script src="scripts/tick.js"></script>
     <script src="scripts/save.js"></script>
+    <script src="scripts/renderers/firstPersonRenderer.js"></script>
     <script src="scripts/game.js"></script>
     <script src="scripts/altDrop.js"></script>
     <script src="scripts/tInter.js"></script>
+    <script src="scripts/world/treeGrowth.js"></script>
     <script src="scripts/inventory.js"></script>
     <script src="scripts/crafting.js"></script>
     <script src="scripts/guiBlocks.js"></script>

@@ -34,6 +34,7 @@
 const TEST_MODE = true;
 const CHUNK_SIZE = 16;      // world is split into CHUNK_SIZE x CHUNK_SIZE chunks
 const SELECTION_RADIUS = 5; // how far from the player the selection cursor can reach
+const WORLD_TICK_RATE = 20; // Minecraft-style simulation rate, 20 ticks/second
 
 // ============================================
 // Main Data
@@ -305,133 +306,25 @@ function isInSelectionRadius(x, y) {
 // centered cell for the player to stand on - an even count would leave
 // the player straddling two center cells instead of standing in one.
 function calculateViewport() {
-    const maxWorldSize = Math.min(window.innerWidth - 40, window.innerHeight * 0.55);
-    cellSize = Math.max(Math.floor(maxWorldSize / 15), 16);
-    viewportW = Math.floor(maxWorldSize / cellSize);
-    viewportH = viewportW;
-    if (viewportW % 2 === 0) viewportW++;
-    if (viewportH % 2 === 0) viewportH++;
+    // The canvas scales to the available landscape viewport; the renderer
+    // handles perspective instead of allocating a DOM element per tile.
+    cellSize = 1;
+    viewportW = 15;
+    viewportH = 15;
 }
 
-// Creates the actual DOM elements for the viewport - one <div class="cell">
-// per visible tile - and stashes them in `cellPool`. Only called when the
-// viewport SIZE changes (window resized to fit more/fewer cells), not on
-// every render: normally renderWorld() just reuses and repaints the same
-// pooled elements instead of destroying/recreating them, which is much
-// cheaper than rebuilding the DOM every frame/move.
 function rebuildCellPool() {
-    const worldEl = document.getElementById('world');
-    worldEl.innerHTML = '';
     cellPool = [];
-
-    worldEl.style.gridTemplateColumns = `repeat(${viewportW}, ${cellSize}px)`;
-    worldEl.style.gridTemplateRows = `repeat(${viewportH}, ${cellSize}px)`;
-
-    const total = viewportW * viewportH;
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < total; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        fragment.appendChild(cell);
-        cellPool.push(cell);
-    }
-    worldEl.appendChild(fragment);
+    if (typeof FirstPersonRenderer !== 'undefined') FirstPersonRenderer.init();
 }
 
-// The main render function - called after almost every state change
-// (movement, breaking, placing, picking up items...) to redraw the whole
-// visible viewport from scratch. It's cheap because it reuses `cellPool`
-// (see rebuildCellPool above) rather than recreating DOM nodes each time;
-// it just recalculates what belongs in each pooled cell and updates its
-// classes/data/CSS vars.
+// First-person renderer entry point. World/chunk state and all interaction APIs
+// intentionally remain unchanged, so inventories, fluids and machines continue
+// to operate on exactly the same block coordinates.
 function renderWorld() {
-    const worldEl = document.getElementById('world');
-    
-    // Skip viewport recalculation - already cached from init/resize
-    // Only check if we need to rebuild cell pool due to size mismatch
-    const totalCells = viewportW * viewportH;
-    if (cellPool.length !== totalCells) {
-        rebuildCellPool();
-        worldEl.style.gridTemplateColumns = `repeat(${viewportW}, ${cellSize}px)`;
-        worldEl.style.gridTemplateRows = `repeat(${viewportH}, ${cellSize}px)`;
-    }
-
-    const halfW = Math.floor(viewportW / 2);
-    const halfH = Math.floor(viewportH / 2);
-
-    let index = 0;
-    for (let vy = 0; vy < viewportH; vy++) {
-        for (let vx = 0; vx < viewportW; vx++) {
-            const gx = playerX - halfW + vx;
-            const gy = playerY - halfH + vy;
-
-            const cell = cellPool[index++];
-            const cellType = getGlobalCellType(gx, gy);
-            const overlayType = getGlobalOverlayType(gx, gy);
-
-            const groundItem = getGroundItems(gx, gy);
-
-            let className = `cell ${cellType}`;
-            if (overlayType) className += ` overlay overlay-${overlayType}`;
-            if (gx === playerX && gy === playerY) className += ' player';
-            if (gx === selectedX && gy === selectedY) className += ' selected';
-            if (groundItem) {
-                className += ' has-ground-item';
-                if (groundItem.count > 1) className += ' ground-item-many';
-            }
-            cell.className = className;
-
-            // Look up ground block texture/color from the Registry instead
-            // of depending on a per-id CSS rule (.cell.IR-xxx). This means
-            // any block registered with a `texture` or `color` field just
-            // works, with no CSS edits needed.
-            applyBlockVisual(cell, cellType, gx, gy);
-
-            cell.dataset.x = gx;
-            cell.dataset.y = gy;
-            if (overlayType) cell.dataset.overlay = overlayType;
-            else delete cell.dataset.overlay;
-
-            // Dropped item on the ground: shows that specific item's own
-            // texture/icon (see .cell.has-ground-item::before in style.css)
-            // and the stack count, instead of a generic "something's here"
-            // marker - so you can tell what's lying on a tile at a glance.
-            if (groundItem) {
-                const itemData = Registry.get(groundItem.id);
-                setBlockVisualVars(cell, itemData, 'ground-item');
-                // isTransparentColor() lives in registry.js and is reused
-                // by itemIconHTML() in inventory.js for the same idea
-                // applied to inventory icons: a fully
-                // transparent registry color (e.g. the pebbles) means no
-                // solid chip/border should be drawn behind the item's own
-                // art, or a bare dark outline shows up floating on the tile.
-                const solid = !(typeof isTransparentColor === 'function' && isTransparentColor(itemData && itemData.color));
-                cell.classList.toggle('has-solid-bg', solid);
-                if (groundItem.count > 1) cell.dataset.groundCount = groundItem.count;
-                else delete cell.dataset.groundCount;
-            } else {
-                cell.style.removeProperty('--ground-item-bg-color');
-                cell.style.removeProperty('--ground-item-bg-image');
-                cell.classList.remove('has-solid-bg');
-                delete cell.dataset.groundCount;
-            }
-
-            // Overlay block (e.g. workbench) visual, applied to the
-            // ::after pseudo-element via a CSS custom property since JS
-            // can't style pseudo-elements directly.
-            if (overlayType) {
-                const overlayData = Registry.get(overlayType);
-                setBlockVisualVars(cell, overlayData, 'overlay');
-            } else {
-                cell.style.removeProperty('--overlay-bg-color');
-                cell.style.removeProperty('--overlay-bg-image');
-            }
-        }
-    }
-
+    if (typeof FirstPersonRenderer !== 'undefined') FirstPersonRenderer.render();
     updateDebugOverlay();
     updateModeIndicator();
-
     if (typeof updateBreakBar === 'function') updateBreakBar();
 }
 
@@ -525,17 +418,15 @@ r:${SELECTION_RADIUS}`;
 
 function updateModeIndicator() {
     const modeEl = document.getElementById('dpad-mode');
-    const section = document.querySelector('.control-section');
     const toggleBtn = document.getElementById('toggle-mode');
+    if (!modeEl) return;
 
     if (dpadMode === 'select') {
-        modeEl.textContent = 'Selection';
-        section.classList.add('select-active');
-        toggleBtn.classList.add('select-mode');
+        modeEl.textContent = 'РЕЖИМ: ПРИЦЕЛ';
+        if (toggleBtn) toggleBtn.classList.add('select-mode');
     } else {
-        modeEl.textContent = 'Movement';
-        section.classList.remove('select-active');
-        toggleBtn.classList.remove('select-mode');
+        modeEl.textContent = 'РЕЖИМ: ДВИЖЕНИЕ';
+        if (toggleBtn) toggleBtn.classList.remove('select-mode');
     }
 }
 
@@ -624,17 +515,30 @@ function setupControls() {
         });
     }
 
-    const worldEl = document.getElementById('world');
-    worldEl.addEventListener('click', (e) => {
-        const cell = e.target.closest('.cell');
-        if (!cell) return;
-        onCellClick(parseInt(cell.dataset.x, 10), parseInt(cell.dataset.y, 10));
+    // Native dual-stick controls: the left stick walks; the right stick moves
+    // the selection cursor. A short gesture resolves to one tile, preventing
+    // accidental fast movement on touch screens.
+    const bindStick = (id, handler) => {
+        const stick = document.getElementById(id); if (!stick) return;
+        let start = null;
+        stick.addEventListener('pointerdown', e => { start = { x: e.clientX, y: e.clientY }; stick.setPointerCapture(e.pointerId); });
+        stick.addEventListener('pointerup', e => { if (!start) return; const dx = e.clientX - start.x, dy = e.clientY - start.y; start = null; if (Math.max(Math.abs(dx), Math.abs(dy)) < 10) return; handler(Math.abs(dx) > Math.abs(dy) ? Math.sign(dx) : 0, Math.abs(dy) >= Math.abs(dx) ? Math.sign(dy) : 0); });
+        stick.addEventListener('pointercancel', () => { start = null; });
+    };
+    bindStick('move-stick', (dx, dy) => {
+        // Movement is relative to the camera: up/down walks forward/backward,
+        // left/right strafes, as expected in a first-person game.
+        const yaw = typeof FirstPersonRenderer !== 'undefined' ? FirstPersonRenderer.yaw : 0;
+        const forward = -dy;
+        const mx = Math.round(Math.cos(yaw) * forward + Math.cos(yaw + Math.PI / 2) * dx);
+        const my = Math.round(Math.sin(yaw) * forward + Math.sin(yaw + Math.PI / 2) * dx);
+        movePlayer(mx, my);
     });
-    worldEl.addEventListener('touchend', (e) => {
-        const cell = e.target.closest('.cell');
-        if (!cell) return;
-        e.preventDefault();
-        onCellClick(parseInt(cell.dataset.x, 10), parseInt(cell.dataset.y, 10));
+    bindStick('look-stick', (dx, dy) => {
+        if (typeof FirstPersonRenderer !== 'undefined') {
+            FirstPersonRenderer.yaw += dx * 0.42;
+            FirstPersonRenderer.render();
+        }
     });
     
     const keysDown = {};
@@ -713,7 +617,10 @@ function init() {
         const prevW = viewportW;
         const prevH = viewportH;
         calculateViewport();
-        if (viewportW !== prevW || viewportH !== prevH) {
+        if (typeof FirstPersonRenderer !== 'undefined') {
+            FirstPersonRenderer.resize();
+            renderWorld();
+        } else if (viewportW !== prevW || viewportH !== prevH) {
             rebuildCellPool();
             renderWorld();
         }

@@ -31,8 +31,8 @@ const JEI = {
     // Every registered block/item, sorted alphabetically - the base list
     // that filteredEntries() below narrows down by search text.
     allEntries() {
-        const blocks = Object.values(Registry.blocks);
-        const items = Object.values(Registry.items);
+        const blocks = Object.values(Registry.blocks).filter(entry => !entry.retired);
+        const items = Object.values(Registry.items).filter(entry => !entry.retired);
         return [...blocks, ...items].sort((a, b) => a.name.localeCompare(b.name));
     },
 

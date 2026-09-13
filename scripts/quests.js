@@ -865,76 +865,14 @@ const EMBEDDED_QUEST_DATA = {
   "nextNodeId": 35
 };
 
-// Quest map expansion: positions are deliberately a 2D map, not a single
-// recipe chain. Copper, steam, tooling and chemistry can progress in
-// parallel; the age transitions are explicit bottlenecks with 3-4 inputs.
+// The progression intentionally ends at the synthetic sapling.  The quest
+// system remains fully functional, but late industrial/cosmic checklist content
+// no longer distracts from the renewable-world loop.
 (() => {
-    const oldCategory = id => id <= 12 ? 'Beginning' : (id <= 34 ? 'Steam' : 'LV');
-    EMBEDDED_QUEST_DATA.nodes.forEach(n => { n.category = oldCategory(n.id); });
-    const add = (id, category, x, y, contentId, title, subtitle, description, requirements, extraId) => {
-        EMBEDDED_QUEST_DATA.nodes.push({ id, category, x, y, radius: 22, shape: 'circle', iconUrl: '', contentId, title, subtitle, description,
-            tasks: [
-                { text: `Получить: ${title}`, optional: false, type: 'item', itemId: contentId, itemCount: 1 },
-                { text: 'Подготовить сопутствующий компонент', optional: false, type: 'item', itemId: extraId || contentId, itemCount: 1 }
-            ]
-        });
-        requirements.forEach(from => EMBEDDED_QUEST_DATA.edges.push({ from, to: id }));
-    };
-    add(35, 'Steam', 1080, 500, 'IR-flint-pickaxe', 'Кремниевая кирка', 'Первый инструмент', 'Соберите инструмент с ресурсом прочности: камень больше не ломается голыми руками эффективно.', [13, 14], 'IR-dpebble');
-    add(36, 'Steam', 1080, 680, 'IR-steel-axe', 'Стальной топор', 'Лесное хозяйство', 'Топор ускоряет рубку выросших деревьев; выращивайте древесину вместо бесконечных стартовых запасов.', [12, 34], 'IR-oaklog');
-    add(37, 'Steam', 1300, 500, 'IR-wrench', 'Инженерный ключ', 'Настройка портов', 'Ключ поворачивает трубы, кабели и машины. Направление порта — часть проектирования, а не косметика.', [26, 34], 'IR-ironrod');
-    add(38, 'Steam', 1300, 680, 'IR-small-steam-pipe', 'Паровая магистраль', 'Пар как сеть', 'Соберите малую паровую трубу. Соединяйте источники и потребители, следя за пропускной способностью.', [37, 34], 'IR-steam-pipe');
-    add(39, 'Steam', 1520, 500, 'IR-bronze-boiler', 'Бронзовый котёл', 'Источник пара', 'Котёл превращает воду и топливо в пар. Это общий ресурс для нескольких независимых станков.', [38, 7, 28], 'IR-pressure-valve');
-    add(40, 'Steam', 1520, 680, 'IR-steam-bender', 'Паровой гибочный станок', 'Механическая ветвь', 'Запустите bender от паровой линии: листовой металл и точная геометрия больше не ручная работа.', [38, 37], 'IR-ironplate');
-    add(41, 'Steam', 1740, 680, 'IR-steam-alloy-smelter', 'Паровая плавильня сплавов', 'Химическая ветвь', 'Запустите alloy smelter. Он идёт параллельно гибочному станку и сводит медь с цинком в латунь.', [38, 37], 'IR-brass-ingot');
-    add(42, 'LV', 1740, 440, 'IR-dynamo', 'Динамо-машина', 'Бутылочное горлышко LV', 'Динамо требует одновременно паровой механики, латуни и изоляции — критический узел входа в электричество.', [39, 40, 41, 34], 'IR-copper-coil');
-    add(43, 'LV', 1960, 350, 'IR-lv-cable', 'LV сеть 32 EU/t', 'Амперы и потери', 'Проложите LV кабель: одна линия несёт 32 EU/t на ампер и теряет энергию по длине.', [42, 37], 'IR-insulated-wire');
-    add(44, 'LV', 1960, 530, 'IR-energy-hatch-lv', 'LV Energy Hatch', 'Тирированный ввод', 'Соберите входной hatch. Мультиблок принимает энергию только через hatch своего тира.', [43, 42], 'IR-terminal-block');
-    add(45, 'LV', 1960, 710, 'IR-input-bus-lv', 'LV Input Bus', 'Автоматизация предметов', 'Соберите input bus и подготовьте деталь для подачи в мультиблок.', [40, 43], 'IR-ironplate');
-    add(46, 'LV', 2180, 440, 'IR-first-circuit', 'Первая микросхема', 'Вход в LV', 'Соберите первую схему: это блокировка, объединяющая энергетику, проводку, химию и точную механику.', [42, 43, 44, 45], 'IR-circuit-board');
-    add(47, 'LV', 2400, 300, 'IR-lv-assembler', 'LV Assembler', 'Сборочная линия', 'LV assembly открывает рецепты из нескольких компонентов и заменяемые конфигурации машин.', [46, 45], 'IR-first-circuit');
-    add(48, 'LV', 2400, 500, 'IR-lv-chemical-reactor', 'LV Chemical Reactor', 'Реакторная ветвь', 'Химический реактор ведёт к кислотам, пластикам и качественным изоляторам параллельно сборке.', [46, 41], 'IR-first-circuit');
-    add(49, 'LV', 2400, 700, 'IR-lv-centrifuge', 'LV Centrifuge', 'Обогащение', 'Центрифуга создаёт альтернативный путь к чистым материалам и побочным продуктам.', [46, 35], 'IR-first-circuit');
-    add(50, 'MV', 2660, 440, 'IR-mv-transformer', 'MV Transformer', 'Бутылочное горлышко MV', 'Переход в MV требует LV производства, химии и обогащения; нельзя пройти его одной прямой цепочкой.', [47, 48, 49], 'IR-first-circuit');
-    add(51, 'MV', 2880, 300, 'IR-mv-cable', 'MV сеть 128 EU/t', 'Высокая мощность', 'Постройте MV кабель: 128 EU/t, больше ампер и более строгая изоляция.', [50], 'IR-rubber');
-    add(52, 'MV', 2880, 500, 'IR-electric-blast-furnace', 'Electric Blast Furnace', 'Горячая ветвь', 'Печь требует maintenance hatch, energy hatch и muffler hatch в валидной мультиблочной структуре.', [50, 44], 'IR-maintenance-hatch');
-    add(53, 'MV', 2880, 700, 'IR-distillation-tower', 'Distillation Tower', 'Жидкости и газы', 'Колонна разделяет жидкости и газы по трубам; выбирайте диаметры по требуемому потоку.', [50, 48], 'IR-gas-pipe');
-    add(54, 'HV', 3140, 440, 'IR-hv-transformer', 'HV Transformer', 'Вход в HV', 'HV — блокировка из энергетики, жаропрочного производства и химической инфраструктуры.', [51, 52, 53], 'IR-mv-cable');
-    add(55, 'HV', 3360, 300, 'IR-cleanroom-controller', 'Cleanroom Controller', 'Чистые помещения', 'Чистая комната требует герметичной структуры, maintenance hatch и стабильного HV питания.', [54, 52], 'IR-maintenance-hatch');
-    add(56, 'HV', 3360, 520, 'IR-precision-circuit', 'Прецизионная схема', 'Чистое производство', 'Изготовьте схему в cleanroom: она открывает высокоточные компоненты, не заменяя ранние ветви.', [55, 54], 'IR-first-circuit');
-    add(57, 'HV', 3580, 440, 'IR-observatory-telescope', 'Промышленный телескоп', 'Начало космоса', 'Телескоп — первая космическая веха HV: изучение неба до ракет и межпланетной логистики.', [55, 56], 'IR-precision-circuit');
-    // Five long-form tabs turn the roadmap into 300 authored milestones.
-    // Each task names a real registered component and explains why it matters;
-    // tracks are independent after their entry gate so players can specialize.
-    const tracks = [
-        ['Energy', 42, ['IR-coal-generator', 'IR-tin-cable', 'IR-lv-cable', 'IR-lv-battery-box', 'IR-solar-generator', 'IR-mv-cable', 'IR-mv-battery-box', 'IR-hv-cable', 'IR-hv-battery-box', 'IR-energy-meter'], 'Энергосеть'],
-        ['Multiblocks', 50, MULTIBLOCK_PROJECTS ? MULTIBLOCK_PROJECTS.map(p => p[0]) : ['IR-electric-blast-furnace', 'IR-distillation-tower', 'IR-cleanroom-controller'], 'Мультиблок'],
-        ['Industry', 46, ['IR-copper-ingot', 'IR-zinc-ingot', 'IR-brass-ingot', 'IR-copper-coil', 'IR-terminal-block', 'IR-circuit-board', 'IR-first-circuit', 'IR-precision-circuit', 'IR-steelframe'], 'Промышленный узел'],
-        ['Steam', 39, ['IR-bronze-boiler', 'IR-small-steam-pipe', 'IR-steam-bender', 'IR-steam-alloy-smelter', 'IR-steam-engine', 'IR-pressure-valve'], 'Паровой контур'],
-        ['HV', 54, ['IR-hv-transformer', 'IR-cleanroom-controller', 'IR-observatory-telescope', 'IR-hv-battery-box', 'IR-orbital-launchpad'], 'Высоковольтный проект']
-    ];
-    let generatedId = 58;
-    tracks.forEach(([category, gate, components, label], trackIndex) => {
-        let previous = gate;
-        const milestones = 243 / tracks.length; // 48.6: distribute the remainder below
-        const count = trackIndex < 3 ? 49 : 48;
-        for (let step = 0; step < count; step++) {
-            const contentId = components[step % components.length];
-            const id = generatedId++;
-            const phase = Math.floor(step / components.length) + 1;
-            const title = `${label}: этап ${step + 1}`;
-            EMBEDDED_QUEST_DATA.nodes.push({
-                id, category, x: 3820 + (step % 9) * 205, y: 180 + trackIndex * 235 + Math.floor(step / 9) * 42,
-                radius: 20, shape: step % 7 === 0 ? '6' : 'circle', iconUrl: '', contentId, title,
-                subtitle: `Фаза ${phase} · ${Registry.get(contentId)?.name || contentId}`,
-                description: `Спроектируйте и изготовьте «${Registry.get(contentId)?.name || contentId}». Этап ${step + 1} закрепляет ${category === 'Energy' ? 'баланс генерации, проводов и накопителей' : category === 'Multiblocks' ? 'сборку корпуса, hatch-ов и контроллера' : 'производственную цепочку и запас компонентов'}; храните резерв деталей перед следующим узлом.`,
-                tasks: [{ text: `Изготовить: ${Registry.get(contentId)?.name || contentId}`, optional: false, type: 'item', itemId: contentId, itemCount: 1 }]
-            });
-            EMBEDDED_QUEST_DATA.edges.push({ from: previous, to: id });
-            previous = id;
-        }
-    });
-    EMBEDDED_QUEST_DATA.nextNodeId = generatedId;
+    EMBEDDED_QUEST_DATA.nodes = EMBEDDED_QUEST_DATA.nodes.filter(node => node.id <= 12);
+    EMBEDDED_QUEST_DATA.nodes.forEach(node => { node.category = 'Beginning'; });
+    EMBEDDED_QUEST_DATA.edges = EMBEDDED_QUEST_DATA.edges.filter(edge => edge.from <= 12 && edge.to <= 12);
+    EMBEDDED_QUEST_DATA.nextNodeId = 13;
 })();
 
 const QuestBook = {
