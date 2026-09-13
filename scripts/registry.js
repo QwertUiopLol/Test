@@ -2439,3 +2439,25 @@ MULTIBLOCK_PROJECTS.forEach(([id, , tier]) => CraftingRegistry.recipes.push({
     id: `${id.slice(3)}-controller`, type: 'shapeless',
     ingredients: [{ id: 'IR-steelframe', count: tier === 'HV' ? 4 : 2 }, { id: 'IR-first-circuit', count: tier === 'Steam' ? 1 : 2 }, { id: 'IR-maintenance-hatch', count: 1 }], result: { id, count: 1 }
 }));
+
+// 3D survival edition deliberately ends its authored progression at the sapling.
+// Keep only the compact early-game catalogue and fluid infrastructure available;
+// retired industrial entries stay readable in old saves without appearing in JEI.
+Registry.retirePostSaplingContent = function () {
+    const available = new Set([
+        'IR-dirt', 'IR-cobblestone', 'IR-plank', 'IR-oaklog', 'IR-oak-leaves',
+        'IR-workbench', 'IR-apebble', 'IR-cpebble', 'IR-bpebble', 'IR-blpebble', 'IR-dpebble',
+        'IR-humus', 'IR-limepowder', 'IR-mineralpowder', 'IR-silicapowder',
+        'IR-nutrientgel', 'IR-callusculture', 'IR-sapling', 'IR-plantash',
+        'IR-ashlye', 'IR-sodaash', 'IR-kiln', 'IR-autoclave', 'IR-bioreactor',
+        'IR-capsule-1000', 'IR-capsule-1000-water', 'IR-fluid-extractor'
+    ]);
+    [...Object.values(this.blocks), ...Object.values(this.items)].forEach(entry => {
+        entry.retired = !available.has(entry.id);
+    });
+    CraftingRegistry.recipes = CraftingRegistry.recipes.filter(recipe => {
+        const ingredients = recipe.ingredients || (recipe.pattern || []).filter(Boolean).map(id => ({ id }));
+        return available.has(recipe.result.id) && ingredients.every(ingredient => available.has(ingredient.id));
+    });
+};
+Registry.retirePostSaplingContent();

@@ -56,7 +56,9 @@ const SaveGame = {
                 playerX,
                 playerY,
                 selectedX,
-                selectedY
+                selectedY,
+                trees: (typeof TreeGrowth !== 'undefined') ? TreeGrowth.planted : {},
+                cameraYaw: (typeof FirstPersonRenderer !== 'undefined') ? FirstPersonRenderer.yaw : 0
             },
             inventory: (typeof Inventory !== 'undefined') ? {
                 slots: Inventory.slots,
@@ -160,6 +162,12 @@ const SaveGame = {
         if (typeof data.world.playerY === 'number') playerY = data.world.playerY;
         if (typeof data.world.selectedX === 'number') selectedX = data.world.selectedX;
         if (typeof data.world.selectedY === 'number') selectedY = data.world.selectedY;
+        const savedTrees = data.world.trees && typeof data.world.trees === 'object' ? data.world.trees : {};
+        if (typeof TreeGrowth !== 'undefined') TreeGrowth.planted = savedTrees;
+        else this.pendingTrees = savedTrees;
+        if (typeof FirstPersonRenderer !== 'undefined' && typeof data.world.cameraYaw === 'number') {
+            FirstPersonRenderer.yaw = data.world.cameraYaw;
+        }
         return true;
     },
 

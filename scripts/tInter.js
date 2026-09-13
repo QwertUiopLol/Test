@@ -22,7 +22,6 @@
 // tracked in this single shared object rather than per-cell state.
 let breakingBlock = { x: null, y: null, progress: 0, type: null };
 let isHoldingBreak = false; // Flag for pressing a key/button
-const plantedSaplings = {}; // "x,y" -> growth ticks; intentionally world-coordinate based
 
 function selectedToolData() {
     const selected = typeof Inventory !== 'undefined' && Inventory.getSelectedItem();
@@ -214,7 +213,7 @@ function placeBlock() {
 
     setGlobalCellType(x, y, selectedItem.id);
 
-    if (itemData.plantable) plantedSaplings[`${x},${y}`] = 0;
+    if (itemData.plantable && typeof TreeGrowth !== 'undefined') TreeGrowth.plant(x, y);
 
     // Blocks registered with `randomDirection: true` (registry.js) get a
     // facing rolled ONCE here, right at placement, and stored per-tile
@@ -286,21 +285,4 @@ if (typeof TickSystem !== 'undefined') {
         }
     });
 
-    // A planted synthetic seed becomes a harvestable tree only when it has
-    // room to expand.  This makes wood renewable without creating logs from
-    // a menu or a world-generation exception.
-    TickSystem.onTick(() => {
-        for (const key of Object.keys(plantedSaplings)) {
-            plantedSaplings[key]++;
-            if (plantedSaplings[key] < 300) continue;
-            const [x, y] = key.split(',').map(Number);
-            if (getGlobalCellType(x, y) !== 'IR-sapling') { delete plantedSaplings[key]; continue; }
-            const crown = [[x, y - 1], [x - 1, y - 1], [x + 1, y - 1], [x, y - 2]];
-            if (crown.some(([cx, cy]) => getGlobalCellType(cx, cy) !== 'void')) continue;
-            setGlobalCellType(x, y, 'IR-oaklog');
-            crown.forEach(([cx, cy]) => setGlobalCellType(cx, cy, 'IR-oak-leaves'));
-            delete plantedSaplings[key];
-            renderWorld();
-        }
-    });
 }
